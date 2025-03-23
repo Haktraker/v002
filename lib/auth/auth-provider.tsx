@@ -6,18 +6,24 @@ import axios from "axios"
 import { TokenService } from "./token-service"
 import { RateLimitService } from "./rate-limit"
 import { toast } from "react-toastify"
+import { AuthService } from "@/lib/api/auth-service"
+
+// Get BASE_URL from environment variables
+const BASE_URL = process.env.BASE_URL || "https://api-9fi5.onrender.com/api"
 
 interface User {
-  id: string
+  _id: string
   name: string
   email: string
   role: string
+  active: boolean
+  createdAt: string
+  updatedAt: string
 }
 
 interface LoginResponse {
-  accessToken: string
-  refreshToken: string
-  user: User
+  data: User
+  token: string
 }
 
 interface AuthError {
@@ -41,84 +47,73 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<AuthError | null>(null)
+  const [isInitialized, setIsInitialized] = useState(false)
   const router = useRouter()
 
-  // Initialize axios with interceptors
+  // Function to handle logout
+  const logout = () => {
+    TokenService.clearTokens()
+    localStorage.removeItem("user_data")
+    AuthService.removeAuthHeader()
+    setUser(null)
+    router.push("/auth/login")
+  }
+
+  // Initialize auth state on app load
   useEffect(() => {
-    const accessToken = TokenService.getAccessToken()
+    const initializeAuth = async () => {
+      setIsLoading(true)
 
-    if (accessToken) {
-      axios.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`
-    }
-
-    // Add request interceptor for token refresh
-    const requestInterceptor = axios.interceptors.request.use(
-      async (config) => {
-        if (!config.url?.includes("/auth/refresh")) {
-          const token = TokenService.getAccessToken()
-
-          if (!token) {
-            const refreshToken = TokenService.getRefreshToken()
-
-            if (refreshToken) {
-              try {
-                // In a real app, this would call your API to refresh the token
-                // For demo, we'll simulate a token refresh
-                const newAccessToken = `refreshed-mock-jwt-token-${Date.now()}`
-                TokenService.storeTokens(newAccessToken, refreshToken)
-                config.headers.Authorization = `Bearer ${newAccessToken}`
-              } catch (error) {
-                TokenService.clearTokens()
-              }
-            }
-          } else {
-            config.headers.Authorization = `Bearer ${token}`
-          }
-        }
-
-        return config
-      },
-      (error) => Promise.reject(error),
-    )
-
-    // Add response interceptor for handling auth errors
-    const responseInterceptor = axios.interceptors.response.use(
-      (response) => response,
-      (error) => {
-        if (error.response?.status === 401) {
-          logout()
-          router.push("/auth/login")
-        }
-        return Promise.reject(error)
-      },
-    )
-
-    // Check if user is already logged in
-    const checkAuth = async () => {
       try {
-        const accessToken = TokenService.getAccessToken()
+        const token = TokenService.getAccessToken()
 
-        if (accessToken) {
-          // Mock user data for demo purposes
-          // In a real app, you would validate the token with your API
-          setUser({
-            id: "1",
-            name: "Security Analyst",
-            email: "analyst@haktrak.com",
-            role: "analyst",
-          })
+        if (!token) {
+          setIsLoading(false)
+          setIsInitialized(true)
+          return
+        }
+
+        // Set the auth header for all future requests
+        AuthService.setAuthHeader(token)
+
+        // Try to load user data first - this is faster than validating the token
+        const userData = localStorage.getItem("user_data")
+        if (userData) {
+          setUser(JSON.parse(userData))
+        }
+
+        // In parallel, validate the token to ensure it's still valid
+        const isValid = await AuthService.validateToken(token)
+        if (!isValid) {
+          // If token is invalid, log out
+          logout()
         }
       } catch (error) {
-        TokenService.clearTokens()
+        console.error("Error initializing auth:", error)
+        // If any error occurs during initialization, log out
+        logout()
       } finally {
         setIsLoading(false)
+        setIsInitialized(true)
       }
     }
 
-    checkAuth()
+    // Set up axios interceptor for handling 401 responses
+    const responseInterceptor = axios.interceptors.response.use(
+      response => response,
+      error => {
+        // If we get a 401 Unauthorized response, log out the user
+        if (error.response?.status === 401) {
+          logout()
+        }
+        return Promise.reject(error)
+      }
+    )
 
+    initializeAuth()
+
+    // Clean up interceptor on unmount
     return () => {
-      axios.interceptors.request.eject(requestInterceptor)
       axios.interceptors.response.eject(responseInterceptor)
     }
   }, [router])
@@ -142,25 +137,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       }
 
-      // In a real app, this would be an API call
-      // const response = await axios.post('http://localhost:5000/api/auth/login', { email, password })
-
-      // Mock successful login for demo
-      const mockResponse = {
-        data: {
-          accessToken: "mock-jwt-token",
-          refreshToken: "mock-refresh-token",
-          user: {
-            id: "1",
-            name: "Security Analyst",
-            email,
-            role: "analyst",
-          },
-        },
-      }
-
+      // Make the API call to login
+      const response = await AuthService.login({ email, password })
+      
       // Complete the login process
-      completeLogin(mockResponse.data)
+      completeLogin(response)
 
       // Reset rate limiting on successful login
       RateLimitService.resetAttempts(email)
@@ -181,8 +162,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setError({ message: "Your account has been locked. Please contact support." })
         toast.error("Your account has been locked. Please contact support.")
       } else {
-        setError({ message: "An error occurred during login. Please try again." })
-        toast.error("An error occurred during login. Please try again.")
+        setError({ message: error.message || "An error occurred during login. Please try again." })
+        toast.error(error.message || "An error occurred during login. Please try again.")
       }
 
       throw error
@@ -192,33 +173,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const completeLogin = (data: LoginResponse) => {
-    const { accessToken, refreshToken, user } = data
+    const { token, data: userData } = data
 
-    // Store tokens securely
-    TokenService.storeTokens(accessToken, refreshToken)
+    // Store token securely
+    TokenService.storeTokens(token, token) // Using the same token for access and refresh for simplicity
+
+    // Store user data
+    localStorage.setItem("user_data", JSON.stringify(userData))
 
     // Set authorization header for future requests
-    axios.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`
+    AuthService.setAuthHeader(token)
 
     // Set user data
-    setUser(user)
+    setUser(userData)
 
     // Navigate to dashboard
     router.push("/dashboard")
-  }
-
-  const logout = () => {
-    TokenService.clearTokens()
-    delete axios.defaults.headers.common["Authorization"]
-    setUser(null)
-    router.push("/")
   }
 
   return (
     <AuthContext.Provider
       value={{
         user,
-        isLoading,
+        isLoading: isLoading || !isInitialized,
         login,
         logout,
         isAuthenticated: !!user,
