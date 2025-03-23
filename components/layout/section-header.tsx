@@ -53,7 +53,7 @@ export function SectionHeader({
           i < arr.length - 1 ? (
             <React.Fragment key={`part-${i}`}>
               {part}
-              <span className="text-purple font-semibold">{highlightWord}</span>
+              <span className="text-purple dark:cyber-gradient font-semibold">{highlightWord}</span>
             </React.Fragment>
           ) : (
             part
@@ -75,7 +75,7 @@ export function SectionHeader({
       if (index !== -1) {
         parts.push(remainingTitle.toString().substring(0, index))
         parts.push(
-          <span key={`highlight-${highlightIndex}`} className="text-purple font-semibold">{highlightText}</span>
+          <span key={`highlight-${highlightIndex}`} className="text-purple dark:cyber-gradient font-semibold">{highlightText}</span>
         )
         remainingTitle = remainingTitle.toString().substring(index + highlightText.length)
       }
@@ -107,7 +107,7 @@ export function SectionHeader({
     >
       <h2 
         className={cn(
-          "text-3xl md:text-4xl font-bold mb-4 text-gray-800 dark:text-white",
+          `text-3xl md:text-4xl font-bold mb-4 text-gray-800 dark:text-white ${titleClasses[titleSize]}`,
           titleClassName
         )}
       >

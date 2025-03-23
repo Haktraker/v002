@@ -5,7 +5,7 @@
 @layer base {
   :root {
     /* Light mode */
-    --background: 0 0% 100%;
+    --background: 0 0% 98%;
     --foreground: 0 0% 0%;
 
     --card: 0 0% 100%;
@@ -20,7 +20,7 @@
     --secondary: 271 67% 46%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 271 67% 95%;
+    --muted: 0 0% 96%;
     --muted-foreground: 0 0% 45%;
 
     --accent: 187 92% 43%;
@@ -29,7 +29,7 @@
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 0% / 0;
+    --border: 0 0% 90%;
     --input: 0 0% 90%;
     --ring: 271 67% 53%;
 
@@ -150,9 +150,18 @@ body,
   }
 }
 
+/* Light mode background class */
+.bg-light-gray {
+  background-color: rgb(247, 247, 247);
+}
+
+.dark .bg-light-gray {
+  background-color: rgb(15, 15, 27); /* Dark mode background */
+}
+
 .glass-effect {
   @apply backdrop-blur-md;
-  background-color: rgba(255, 255, 255, 0.7);
+  background-color: rgba(247, 247, 247, 0.7);
 }
 
 .dark .glass-effect {
@@ -200,28 +209,30 @@ body,
   background-color: rgb(33, 19, 57);
 }
 
-.text-purple {
-  color: rgb(138, 44, 226);
-}
+@layer utilities {
+  .text-purple {
+    color: rgb(138, 44, 226);
+  }
 
-.text-purple-secondary {
-  color: rgb(120, 40, 195);
-}
+  .text-purple-secondary {
+    color: rgb(120, 40, 195);
+  }
 
-.text-purple-85 {
-  color: rgba(138, 44, 226, 0.85);
-}
+  .text-purple-85 {
+    color: rgba(138, 44, 226, 0.85);
+  }
 
-.text-white-85 {
-  color: rgba(255, 255, 255, 0.85);
-}
+  .text-white-85 {
+    color: rgba(255, 255, 255, 0.85);
+  }
 
-.text-white-45 {
-  color: rgba(255, 255, 255, 0.45);
-}
-
-.text-green {
-  color: rgb(19, 103, 65);
+  .text-white-45 {
+    color: rgba(255, 255, 255, 0.45);
+  }
+  
+  .text-green {
+    color: rgb(19, 103, 65);
+  }
 }
 
 .btn-primary {
@@ -238,7 +249,7 @@ body,
 
 /* Card styles */
 .card-dark-atlas {
-  @apply bg-white rounded-lg shadow-md;
+  @apply bg-[#F7F7F7] rounded-lg shadow-md;
 }
 
 .dark .card-dark-atlas {
@@ -328,5 +339,76 @@ body,
 }
 .dark .bg-cyber-darker {
   background-color: rgb(10, 10, 18);
+}
+
+/* Dashboard specific light/dark mode styles */
+.dashboard-card {
+  @apply bg-[#F7F7F7] border border-gray-100 dark:bg-[#171727] dark:border-gray-800 rounded-lg shadow-sm;
+}
+
+.dashboard-text-primary {
+  @apply text-gray-800 dark:text-white;
+}
+
+.dashboard-text-secondary {
+  @apply text-gray-600 dark:text-[rgba(255,255,255,0.85)];
+}
+
+.dashboard-text-muted {
+  @apply text-gray-500 dark:text-[rgba(255,255,255,0.45)];
+}
+
+.dashboard-border {
+  @apply border-gray-200 dark:border-gray-800;
+}
+
+.dashboard-highlight {
+  @apply text-purple dark:text-purple;
+}
+
+.dashboard-bg-hover {
+  @apply hover:bg-gray-50 dark:hover:bg-gray-800;
+}
+
+/* Fix for cyber-gradient in light mode */
+.cyber-gradient {
+  @apply text-purple;
+}
+
+.dark .cyber-gradient {
+  @apply text-transparent bg-clip-text;
+  background-image: linear-gradient(to right, rgb(138, 44, 226), rgb(6, 182, 212));
+  -webkit-background-clip: text;
+}
+
+/* Improved light mode styling */
+.light-mode-shadow {
+  @apply shadow-md dark:shadow-none;
+}
+
+.light-mode-border {
+  @apply border border-gray-100 dark:border-transparent;
+}
+
+/* Better button styles for light/dark modes */
+.btn-dark-atlas {
+  @apply bg-purple text-white hover:bg-purple/90 transition-all;
+}
+
+.btn-outline-dark-atlas {
+  @apply bg-transparent border border-purple text-purple dark:text-white hover:bg-purple/5 dark:hover:bg-purple/10 transition-all;
+}
+
+/* Improved contrast for light mode text */
+.text-adaptive {
+  @apply text-gray-800 dark:text-white;
+}
+
+.text-adaptive-secondary {
+  @apply text-gray-600 dark:text-[rgba(255,255,255,0.85)];
+}
+
+.text-adaptive-muted {
+  @apply text-gray-500 dark:text-[rgba(255,255,255,0.45)];
 }
 

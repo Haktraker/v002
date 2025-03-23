@@ -65,7 +65,7 @@ export function Hero({
   return (
     <section 
       className={cn(
-        "relative bg-white dark:bg-dark-bg overflow-hidden",
+        "relative bg-[#F7F7F7] dark:bg-dark-bg overflow-hidden",
         fullHeight && "h-screen",
         className
       )}

@@ -42,7 +42,7 @@ export function CtaSection({
       className={cn(
         "flex flex-col",
         layout === "row" ? "md:flex-row items-center justify-between" : "items-center text-center",
-        withCard && "bg-white dark:bg-dark-card p-8 md:p-12 rounded-lg"
+        withCard && "bg-[#F7F7F7] dark:bg-dark-card p-8 md:p-12 rounded-lg"
       )}
       data-aos={withAnimation ? "fade-up" : undefined}
     >

@@ -25,17 +25,19 @@ import {
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { useAuth } from "@/lib/auth/auth-provider"
 
 interface SidebarItemProps {
   icon: React.ReactNode
   label: string
-  href: string
+  href?: string
   isActive: boolean
   isCollapsed: boolean
+  onClick?: () => void
 }
 
-function SidebarItem({ icon, label, href, isActive, isCollapsed }: SidebarItemProps) {
-  const content = (
+function SidebarItem({ icon, label, href, isActive, isCollapsed, onClick }: SidebarItemProps) {
+  const content = href ? (
     <Link
       href={href}
       className={cn(
@@ -46,7 +48,18 @@ function SidebarItem({ icon, label, href, isActive, isCollapsed }: SidebarItemPr
       <div className="mr-3">{icon}</div>
       {!isCollapsed && <span>{label}</span>}
     </Link>
-  )
+  ) : (
+    <button
+      onClick={onClick}
+      className={cn(
+        "flex items-center py-2 px-3 rounded-md group transition-colors w-full text-left",
+        "text-muted-foreground hover:text-foreground hover:bg-muted/20",
+      )}
+    >
+      <div className="mr-3">{icon}</div>
+      {!isCollapsed && <span>{label}</span>}
+    </button>
+  );
 
   if (isCollapsed) {
     return (
@@ -65,6 +78,7 @@ function SidebarItem({ icon, label, href, isActive, isCollapsed }: SidebarItemPr
 export function DashboardSidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false)
   const pathname = usePathname()
+  const { logout } = useAuth()
 
   const sidebarItems = [
     {
@@ -133,20 +147,20 @@ export function DashboardSidebar() {
     {
       icon: <LogOut className="h-5 w-5" />,
       label: "Log Out",
-      href: "/auth/logout",
+      onClick: logout,
     },
   ]
 
   return (
     <>
-      <div className={cn("bg-card transition-all duration-300 h-screen fixed z-30", isCollapsed ? "w-16" : "w-64")}>
+      <div className={cn("bg-[#FFFFFF] dark:bg-dark-card border-r border-gray-200 dark:border-gray-800 transition-all duration-300 h-screen fixed z-30", isCollapsed ? "w-16" : "w-64")}>
         <div className="p-4 flex items-center justify-between">
           {!isCollapsed && (
             <div className="flex items-center">
-              <Shield className="h-6 w-6 text-primary mr-2" />
-              <span className="font-bold">
-                DARK<span className="text-foreground">ATLAS</span>
-              </span>
+              <Shield className="h-6 w-12 text-primary mr-2" />
+              <Link href="/" className="font-bold">
+                HakTrak<span className="text-gray-600 dark:text-foreground"> Networks</span>
+              </Link>
             </div>
           )}
           {isCollapsed && <Shield className="h-6 w-6 text-primary mx-auto" />}
@@ -178,12 +192,13 @@ export function DashboardSidebar() {
             <div className="px-3 py-4 space-y-2">
               {bottomItems.map((item) => (
                 <SidebarItem
-                  key={item.href}
+                  key={item.href || item.label}
                   icon={item.icon}
                   label={item.label}
                   href={item.href}
-                  isActive={pathname === item.href}
+                  isActive={item.href ? pathname === item.href : false}
                   isCollapsed={isCollapsed}
+                  onClick={item.onClick}
                 />
               ))}
             </div>

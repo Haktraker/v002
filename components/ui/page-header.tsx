@@ -29,7 +29,7 @@ export function PageHeader({ title, description }: PageHeaderProps) {
   }, [])
 
   return (
-    <section className="py-16 bg-white dark:bg-dark-bg border-b border-purple-10 dark:border-purple-30 relative z-30">
+    <section className="py-16 bg-[#F7F7F7] dark:bg-dark-bg border-b border-purple-10 dark:border-purple-30 relative z-30">
       <div className="container mx-auto px-4 text-center relative z-10">
         <h1
           className="text-4xl md:text-5xl font-bold mb-4 text-purple relative"

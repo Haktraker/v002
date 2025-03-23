@@ -63,7 +63,7 @@ export function ProcessSection({
           {steps.map((step, index) => (
             <div 
               key={index} 
-              className="bg-white dark:bg-dark-card p-6 rounded-lg relative"
+              className="bg-[#F7F7F7] dark:bg-dark-card p-6 rounded-lg relative"
               data-aos={withAnimation ? "fade-up" : undefined}
               data-aos-delay={index * 100}
             >

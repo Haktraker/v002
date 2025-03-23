@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
 export function ThemeToggle() {
-  const { setTheme, isDarkMode } = useTheme()
+  const { theme, setTheme, isDarkMode } = useTheme()
 
   return (
     <DropdownMenu>
@@ -18,15 +18,24 @@ export function ThemeToggle() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="bg-background border-border">
-        <DropdownMenuItem onClick={() => setTheme("light")} className="cursor-pointer">
+        <DropdownMenuItem
+          onClick={() => setTheme("light")}
+          className={`cursor-pointer ${theme === "light" ? "bg-accent/10 text-accent" : ""}`}
+        >
           <Sun className="h-4 w-4 mr-2" />
           <span>Light</span>
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("dark")} className="cursor-pointer">
+        <DropdownMenuItem
+          onClick={() => setTheme("dark")}
+          className={`cursor-pointer ${theme === "dark" ? "bg-accent/10 text-accent" : ""}`}
+        >
           <Moon className="h-4 w-4 mr-2" />
           <span>Dark</span>
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("system")} className="cursor-pointer">
+        <DropdownMenuItem
+          onClick={() => setTheme("system")}
+          className={`cursor-pointer ${theme === "system" ? "bg-accent/10 text-accent" : ""}`}
+        >
           <Monitor className="h-4 w-4 mr-2" />
           <span>System</span>
         </DropdownMenuItem>

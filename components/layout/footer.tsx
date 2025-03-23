@@ -78,7 +78,7 @@ export function Footer() {
   )
 
   return (
-    <footer className="bg-white dark:bg-dark-bg" role="contentinfo" aria-label="Site footer">
+    <footer className="bg-[#F7F7F7] dark:bg-dark-bg" role="contentinfo" aria-label="Site footer">
       <div className="container mx-auto px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}

@@ -28,12 +28,14 @@ const initialState: ThemeProviderState = {
   isDarkMode: true,
 }
 
+const STORAGE_KEY = "theme-preference" // Consistent storage key across the app
+
 const ThemeProviderContext = createContext<ThemeProviderState>(initialState)
 
 export function ThemeProvider({
   children,
   defaultTheme = "system",
-  storageKey = "theme",
+  storageKey = STORAGE_KEY,
   attribute = "class",
   enableSystem = true,
   disableTransitionOnChange = false,
@@ -43,9 +45,19 @@ export function ThemeProvider({
   const [isDarkMode, setIsDarkMode] = useState(true)
   const [theme, setTheme] = useState<Theme>(defaultTheme)
 
-  // After mounting, we have access to the theme
+  // Initialize theme from localStorage on mount
   useEffect(() => {
     setMounted(true)
+    
+    // Get theme from localStorage
+    try {
+      const storedTheme = localStorage.getItem(storageKey) as Theme | null
+      if (storedTheme && ["dark", "light", "system"].includes(storedTheme)) {
+        setTheme(storedTheme)
+      }
+    } catch (error) {
+      console.error("Error reading theme from localStorage:", error)
+    }
 
     // Check if we're in dark mode
     const isDark =
@@ -54,13 +66,32 @@ export function ThemeProvider({
       (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches && theme === "system")
 
     setIsDarkMode(isDark)
-  }, [theme])
+  }, [storageKey, theme])
+
+  // Update localStorage when theme changes
+  const handleThemeChange = (newTheme: Theme) => {
+    setTheme(newTheme)
+    try {
+      localStorage.setItem(storageKey, newTheme)
+      
+      // Force apply theme class to document
+      if (newTheme === "dark" || (newTheme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+        document.documentElement.classList.add("dark")
+        document.documentElement.classList.remove("light")
+      } else {
+        document.documentElement.classList.add("light")
+        document.documentElement.classList.remove("dark")
+      }
+    } catch (error) {
+      console.error("Error saving theme to localStorage:", error)
+    }
+  }
 
   // Listen for theme changes
   useEffect(() => {
     if (!mounted) return
 
-    const handleThemeChange = () => {
+    const handleThemeChangeObserver = () => {
       const isDark =
         document.documentElement.classList.contains("dark") ||
         document.documentElement.getAttribute("data-theme") === "dark"
@@ -69,14 +100,27 @@ export function ThemeProvider({
     }
 
     // Set up a mutation observer to watch for class changes on the html element
-    const observer = new MutationObserver(handleThemeChange)
+    const observer = new MutationObserver(handleThemeChangeObserver)
     observer.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ["class", "data-theme"],
     })
 
-    return () => observer.disconnect()
-  }, [mounted])
+    // Also listen for system preference changes
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
+    const handleMediaChange = (e: MediaQueryListEvent) => {
+      if (theme === "system") {
+        setIsDarkMode(e.matches)
+      }
+    }
+    
+    mediaQuery.addEventListener("change", handleMediaChange)
+
+    return () => {
+      observer.disconnect()
+      mediaQuery.removeEventListener("change", handleMediaChange)
+    }
+  }, [mounted, theme])
 
   if (!mounted) {
     // Avoid rendering with incorrect theme
@@ -95,7 +139,7 @@ export function ThemeProvider({
       <ThemeProviderContext.Provider
         value={{
           theme,
-          setTheme: (t) => setTheme(t),
+          setTheme: handleThemeChange,
           isDarkMode,
         }}
       >

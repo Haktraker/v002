@@ -16,7 +16,7 @@ interface StatCardProps {
   withAnimation?: boolean
   animationDelay?: number
   direction?: "row" | "column"
-  variant?: "default" | "outline" | "filled"
+  variant?: "default" | "outline" | "filled" | "primary-outline" | "primary-filled"
 }
 
 export function StatCard({ 
@@ -34,10 +34,11 @@ export function StatCard({
   direction = "row",
   variant = "default"
 }: StatCardProps) {
-  const variantStyles: Record<string, string> = {
-    default: "bg-white/80 dark:bg-dark-card-translucent backdrop-blur-md",
-    outline: "bg-white/50 dark:bg-dark-card/50 backdrop-blur-md border border-border dark:border-white/10",
-    filled: "bg-purple-bg-5 dark:bg-purple-bg-10"
+  const variantStyles: Record<StatCardVariant, string> = {
+    default: "bg-[#F7F7F7]/80 dark:bg-dark-card-translucent backdrop-blur-md",
+    outline: "bg-[#F7F7F7]/50 dark:bg-dark-card/50 backdrop-blur-md border border-border dark:border-white/10",
+    "primary-outline": "bg-transparent border border-primary dark:border-primary",
+    "primary-filled": "bg-primary/10 dark:bg-primary/20 text-primary",
   }
 
   return (

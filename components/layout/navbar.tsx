@@ -5,7 +5,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/lib/auth/auth-provider"
-import { useTheme as useNextTheme } from "next-themes"
+import { useTheme } from "@/components/theme-provider"
 import { Menu, X, Shield, ChevronDown, User, LogOut, Sun, Moon, LaptopIcon } from "lucide-react"
 import {
   DropdownMenu,
@@ -30,7 +30,7 @@ export function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const pathname = usePathname()
   const { user, logout, isAuthenticated } = useAuth()
-  const { theme, setTheme, resolvedTheme } = useNextTheme()
+  const { theme, setTheme, isDarkMode } = useTheme()
   const [mounted, setMounted] = useState(false)
 
   // After mounting, we have access to the theme
@@ -87,16 +87,16 @@ export function Navbar() {
             size="icon"
             aria-label="Change theme"
           >
-            {theme === "light" || (theme === "system" && resolvedTheme === "light") ? (
-              <Sun className="h-[1.2rem] w-[1.2rem]" />
-            ) : (
+            {isDarkMode ? (
               <Moon className="h-[1.2rem] w-[1.2rem]" />
+            ) : (
+              <Sun className="h-[1.2rem] w-[1.2rem]" />
             )}
             <span className="sr-only">Toggle theme</span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="bg-background border-purple-10 dark:border-purple-30">
-          <DropdownMenuRadioGroup value={theme} onValueChange={(value) => setTheme(value)}>
+          <DropdownMenuRadioGroup value={theme} onValueChange={(value) => setTheme(value as "light" | "dark" | "system")}>
             <DropdownMenuRadioItem value="light" className="cursor-pointer">
               <Sun className="h-4 w-4 mr-2" />
               Light
@@ -125,7 +125,7 @@ export function Navbar() {
       className={cn(
         "fixed top-0 w-full z-50 transition-all duration-300",
         isScrolled || isMobileMenuOpen ? 
-          "bg-white/90 dark:bg-dark-card-translucent backdrop-blur-md shadow-sm" : 
+          "bg-[#F7F7F7]/90 dark:bg-dark-card-translucent backdrop-blur-md shadow-sm" : 
           "bg-transparent"
       )}
       role="navigation"
@@ -250,7 +250,7 @@ export function Navbar() {
       <div 
         id="mobile-menu"
         className={cn(
-          "md:hidden bg-white dark:bg-dark-card border-t border-purple-10 dark:border-purple-30 transition-all duration-300 overflow-hidden",
+          "md:hidden bg-[#F7F7F7] dark:bg-dark-card border-t border-purple-10 dark:border-purple-30 transition-all duration-300 overflow-hidden",
           isMobileMenuOpen ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
         )}
         aria-hidden={!isMobileMenuOpen}

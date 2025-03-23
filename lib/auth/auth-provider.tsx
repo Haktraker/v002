@@ -52,11 +52,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Function to handle logout
   const logout = () => {
-    TokenService.clearTokens()
-    localStorage.removeItem("user_data")
-    AuthService.removeAuthHeader()
-    setUser(null)
-    router.push("/auth/login")
+    // Clear all tokens from localStorage
+    TokenService.clearTokens();
+    
+    // Remove user data from localStorage
+    localStorage.removeItem("user_data");
+    
+    // Remove auth header from axios
+    AuthService.removeAuthHeader();
+    
+    // Reset user state
+    setUser(null);
+    
+    // Add a success toast notification
+    toast.success("Logged out successfully");
+    
+    // Redirect to homepage instead of login page
+    router.push("/");
   }
 
   // Initialize auth state on app load

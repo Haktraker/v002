@@ -34,7 +34,7 @@ export function FeatureCard({
   withHoverEffect = true,
 }: FeatureCardProps) {
   const variantStyles: Record<string, string> = {
-    default: "bg-white dark:bg-dark-card",
+    default: "bg-[#F7F7F7] dark:bg-dark-card",
     outline: "bg-transparent border border-border dark:border-white/10",
     filled: "bg-purple-bg-5 dark:bg-purple-bg-10"
   }

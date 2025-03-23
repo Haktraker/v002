@@ -21,7 +21,7 @@ export default function ClientLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.className} min-h-screen`} suppressHydrationWarning>
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={true} disableTransitionOnChange>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={true} storageKey="theme-preference" disableTransitionOnChange>
           <AuthProvider>
             <AOSProvider>
               <div className="flex flex-col min-h-screen">

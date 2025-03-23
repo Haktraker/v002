@@ -31,7 +31,7 @@ export function Section({
   withOverflow = false,
 }: SectionProps) {
   const variantStyles: Record<SectionVariant, string> = {
-    default: "bg-white dark:bg-dark-bg",
+    default: "bg-[#F7F7F7] dark:bg-dark-bg",
     primary: "bg-purple-bg-5 dark:bg-dark-purple",
     secondary: "bg-purple/5 dark:bg-dark-card",
     dark: "bg-dark-bg dark:bg-black",

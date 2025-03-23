@@ -56,9 +56,25 @@ export const TokenService = {
   // Clear all tokens
   clearTokens(): void {
     try {
-      localStorage.removeItem("auth_tokens")
+      // Remove tokens from localStorage
+      localStorage.removeItem("auth_tokens");
+      
+      // Also clear any other auth-related items
+      localStorage.removeItem("user_data");
+      
+      // Clear cookies if any (this is a fallback in case cookies are used)
+      document.cookie.split(";").forEach(cookie => {
+        const [name] = cookie.trim().split("=");
+        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+      });
+      
+      // Ensure sessions are cleared in case they're used
+      if (typeof sessionStorage !== 'undefined') {
+        sessionStorage.removeItem("auth_tokens");
+        sessionStorage.removeItem("user_data");
+      }
     } catch (error) {
-      console.error("Error clearing tokens:", error)
+      console.error("Error clearing tokens:", error);
     }
   },
 
