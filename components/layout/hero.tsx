@@ -88,7 +88,7 @@ export function Hero({
       <div className="relative container mx-auto px-4 h-full flex flex-col justify-center items-center text-center z-10 pt-16">
         <h1 
           className={cn(
-            "text-4xl md:text-6xl font-bold mb-6 cyber-gradient glow-text",
+            "text-4xl md:text-6xl font-bold mb-6 text-gray-800 dark:text-white",
             titleClassName
           )}
         >
@@ -98,7 +98,7 @@ export function Hero({
         {description && (
           <p 
             className={cn(
-              "text-xl md:text-2xl text-foreground/80 dark:text-white-85 max-w-3xl mb-8",
+              "text-xl md:text-2xl text-gray-600 dark:text-white-85 max-w-3xl mb-8",
               descriptionClassName
             )}
           >
@@ -153,9 +153,9 @@ export function Hero({
         {/* Scroll Indicator */}
         {fullHeight && (
           <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center">
-            <span className="text-sm text-foreground/60 dark:text-white-45 mb-2">Scroll to explore</span>
-            <div className="w-6 h-10 border-2 border-foreground/30 dark:border-white-45 rounded-full flex justify-center">
-              <div className="w-1.5 h-1.5 bg-foreground/60 dark:bg-white-45 rounded-full animate-bounce mt-2"></div>
+            <span className="text-sm text-gray-500 dark:text-white-45 mb-2">Scroll to explore</span>
+            <div className="w-6 h-10 border-2 border-gray-300 dark:border-white-45 rounded-full flex justify-center">
+              <div className="w-1.5 h-1.5 bg-gray-400 dark:bg-white-45 rounded-full animate-bounce mt-2"></div>
             </div>
           </div>
         )}

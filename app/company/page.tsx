@@ -103,7 +103,7 @@ export default function CompanyPage() {
                 data-aos="fade-up"
                 data-aos-delay="200"
               >
-                <p className="text-xl font-bold cyber-gradient">Protection Beyond Perimeters</p>
+                <p className="text-xl font-bold text-purple">Protection Beyond Perimeters</p>
               </div>
             </div>
           </div>
@@ -113,10 +113,11 @@ export default function CompanyPage() {
       {/* Values Section */}
       <section className="py-16 bg-muted/30">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12" data-aos="fade-up">
-            <h2 className="text-3xl font-bold mb-4">Our Values</h2>
-            <p className="text-lg text-foreground/80 max-w-2xl mx-auto">
-              These core principles guide everything we do at Haktrak Networks
+          <div className="text-center mb-12">
+            <p className="text-xl font-bold text-purple">Protection Beyond Perimeters</p>
+            <h2 className="text-3xl md:text-4xl font-bold mt-2">Our Values</h2>
+            <p className="mt-4 text-gray-600 dark:text-white-85 max-w-3xl mx-auto">
+              Our core values guide every decision we make and shape how we deliver security solutions to our clients.
             </p>
           </div>
 

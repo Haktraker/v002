@@ -140,7 +140,7 @@ export function Navbar() {
             aria-label="Haktrak Networks homepage"
           >
             <Shield className="h-8 w-8 text-purple" aria-hidden="true" />
-            <span className="font-bold text-xl tracking-tight cyber-gradient">Haktrak Networks</span>
+            <span className="font-bold text-xl text-purple">Haktrak Networks</span>
           </Link>
 
           {/* Desktop Navigation */}

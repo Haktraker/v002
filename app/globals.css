@@ -124,39 +124,15 @@ body,
     linear-gradient(to bottom, rgba(138, 44, 226, 0.1) 1px, transparent 1px);
 }
 
+/* Dark mode cyber grid */
 .dark .cyber-grid {
   background-image: linear-gradient(to right, rgba(138, 44, 226, 0.15) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(138, 44, 226, 0.15) 1px, transparent 1px);
 }
 
-/* Gradient text styles for both modes */
-.cyber-gradient {
-  @apply text-transparent bg-clip-text;
-  background: linear-gradient(to right, rgb(120, 40, 195), rgb(138, 44, 226)); /* Purple gradient for light mode */
-}
-
-/* Dark mode specific gradient */
-.dark .cyber-gradient {
-  background: linear-gradient(to right, rgb(138, 44, 226), rgb(160, 80, 255)); /* Brighter purple gradient for dark mode */
-  @apply text-transparent bg-clip-text;
-}
-
 /* Glow effects for both modes */
 .glow {
-  box-shadow: 0 0 15px rgba(138, 44, 226, 0.3); /* Purple glow for light mode */
-}
-
-.dark .glow {
-  box-shadow: 0 0 15px rgba(138, 44, 226, 0.5); /* Brighter purple glow for dark mode */
-}
-
-/* Text glow effects for both modes */
-.glow-text {
-  text-shadow: 0 0 10px rgba(138, 44, 226, 0.5); /* Purple text glow for light mode */
-}
-
-.dark .glow-text {
-  text-shadow: 0 0 10px rgba(138, 44, 226, 0.7); /* Brighter purple text glow for dark mode */
+  box-shadow: 0 0 20px rgba(138, 44, 226, 0.4);
 }
 
 .threat-node {

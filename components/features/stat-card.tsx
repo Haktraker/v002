@@ -65,19 +65,19 @@ export function StatCard({
         </div>
         <div>
           <h3 className={cn(
-            "text-lg font-medium text-foreground/80 dark:text-white-85",
+            "text-lg font-medium text-gray-700 dark:text-white-85",
             titleClassName
           )}>
             {title}
           </h3>
           <p className={cn(
-            "text-2xl font-bold cyber-gradient",
+            "text-2xl font-bold text-purple",
             valueClassName
           )}>
             {value}
           </p>
           <p className={cn(
-            "text-sm text-foreground/60 dark:text-white-45 mt-1",
+            "text-sm text-gray-500 dark:text-white-45 mt-1",
             descriptionClassName
           )}>
             {description}

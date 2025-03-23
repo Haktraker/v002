@@ -54,7 +54,7 @@ export function FeatureCard({
       </div>
       <h3 
         className={cn(
-          "text-xl font-bold mb-2", 
+          "text-xl font-bold mb-2 text-gray-800 dark:text-white", 
           withHoverEffect && "group-hover:text-purple", 
           "transition-colors duration-300",
           titleClassName
@@ -64,7 +64,7 @@ export function FeatureCard({
       </h3>
       <p 
         className={cn(
-          "text-foreground/80 dark:text-white-85",
+          "text-gray-600 dark:text-white-85",
           descriptionClassName
         )}
       >

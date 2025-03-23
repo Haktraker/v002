@@ -73,8 +73,8 @@ export function ProcessSection({
               <div className="h-12 w-12 mb-4 text-purple">
                 {step.icon}
               </div>
-              <h3 className="text-xl font-bold mb-2">{step.title}</h3>
-              <p className="text-foreground/80 dark:text-white-85">
+              <h3 className="text-xl font-bold mb-2 text-gray-800 dark:text-white">{step.title}</h3>
+              <p className="text-gray-600 dark:text-white-85">
                 {step.description}
               </p>
             </div>

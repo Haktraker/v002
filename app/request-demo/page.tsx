@@ -63,13 +63,12 @@ export default function RequestDemoPage() {
 
         <div className="max-w-md w-full space-y-8 bg-cyber-dark p-8 rounded-lg z-10">
           <div className="text-center">
-            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-cyber-primary/20">
-              <CheckCircle className="h-10 w-10 text-cyber-primary" />
+            <div className="h-24 w-24 text-purple mx-auto mb-4">
+              <CheckCircle className="h-full w-full" />
             </div>
-            <h2 className="mt-6 text-3xl font-extrabold cyber-gradient">Thank You!</h2>
-            <p className="mt-2 text-sm text-gray-400">
-              Your demo request has been submitted successfully. Our team will contact you shortly to schedule your
-              personalized demo.
+            <h2 className="mt-6 text-3xl font-extrabold text-purple">Thank You!</h2>
+            <p className="mt-2 text-lg text-gray-600 dark:text-white-85">
+              Your demo request has been received. A member of our team will be in touch shortly.
             </p>
           </div>
           <div className="mt-6">
@@ -91,10 +90,12 @@ export default function RequestDemoPage() {
 
       <div className="sm:mx-auto sm:w-full sm:max-w-md mb-8 z-10">
         <div className="flex justify-center">
-          <Shield className="h-12 w-12 text-cyber-primary" />
+          <Shield className="h-12 w-12 text-purple" aria-hidden="true" />
         </div>
-        <h2 className="mt-6 text-center text-3xl font-extrabold cyber-gradient">Request a Demo</h2>
-        <p className="mt-2 text-center text-sm text-gray-400">Experience the power of AI-driven cyber intelligence</p>
+        <h2 className="mt-6 text-center text-3xl font-extrabold text-purple">Request a Demo</h2>
+        <p className="mt-2 text-center text-gray-600 dark:text-white-85">
+          See how Haktrak Networks can protect your organization
+        </p>
       </div>
 
       <div className="sm:mx-auto sm:w-full sm:max-w-5xl z-10">
@@ -214,7 +215,7 @@ export default function RequestDemoPage() {
             </div>
 
             <div className="bg-cyber-gray/10 p-6 rounded-lg">
-              <h3 className="text-xl font-bold mb-4 cyber-gradient">Why Choose Haktrak Networks?</h3>
+              <h3 className="text-xl font-bold mb-4 text-purple">Why Choose Haktrak Networks?</h3>
               <ul className="space-y-3">
                 {features.map((feature, index) => (
                   <li key={index} className="flex items-start">

@@ -94,13 +94,13 @@ export default function LoginPage() {
 
       <div className="sm:mx-auto sm:w-full sm:max-w-md z-10">
         <div className="flex justify-center">
-          <Shield className="h-12 w-12 text-cyber-primary" />
+          <Shield className="h-12 w-12 text-purple" aria-hidden="true" />
         </div>
-        <h2 className="mt-6 text-center text-3xl font-extrabold cyber-gradient">Sign in to your account</h2>
-        <p className="mt-2 text-center text-sm text-gray-400">
-          Or{" "}
-          <Link href="/request-demo" className="font-medium text-cyber-primary hover:text-cyber-primary/90">
-            request a demo to get started
+        <h2 className="mt-6 text-center text-3xl font-extrabold text-purple">Sign in to your account</h2>
+        <p className="mt-2 text-center text-gray-600 dark:text-white-85">
+          Or {" "}
+          <Link href="/auth/register" className="text-purple hover:text-purple/90">
+            create a new account
           </Link>
         </p>
       </div>

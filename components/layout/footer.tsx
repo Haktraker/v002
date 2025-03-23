@@ -85,12 +85,13 @@ export function Footer() {
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
               <Shield className="h-6 w-6 text-purple" aria-hidden="true" />
-              <span className="font-bold text-lg cyber-gradient">Haktrak Networks</span>
+              <div className="flex flex-col">
+                <span className="font-bold text-lg text-purple">Haktrak Networks</span>
+                <p className="text-gray-600 dark:text-white-85 mt-2 max-w-sm">
+                  Protecting your digital assets with state-of-the-art security solutions tailored for modern enterprises.
+                </p>
+              </div>
             </div>
-            <p className="text-sm text-foreground/80 dark:text-white-45 max-w-xs">
-              AI-powered eXtended Cyber Intelligence platform providing actionable and contextualized intelligence for
-              cyber threat protection.
-            </p>
             <div className="flex space-x-4">
               {socialLinks.map((social) => (
                 <a
