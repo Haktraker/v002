@@ -1,0 +1,8 @@
+// Note: Make sure to install these packages:
+// npm install sonner aos next-themes recharts @radix-ui/react-dialog
+// or
+// yarn add sonner aos next-themes recharts @radix-ui/react-dialog
+//
+// Important: Make sure you're using React 18.2.0 or higher and Next.js 14.0.0 or higher
+// to avoid hydration issues.
+

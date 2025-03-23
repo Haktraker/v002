@@ -1,0 +1,356 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Light mode */
+    --background: 0 0% 100%;
+    --foreground: 0 0% 0%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 0%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 0%;
+
+    --primary: 271 67% 53%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 271 67% 46%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 271 67% 95%;
+    --muted-foreground: 0 0% 45%;
+
+    --accent: 187 92% 43%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 0% / 0;
+    --input: 0 0% 90%;
+    --ring: 271 67% 53%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    /* Dark mode - using exact colors from Dark Atlas */
+    --background: 240 29% 8%; /* rgb(15, 15, 27) */
+    --foreground: 0 0% 100%; /* rgb(255, 255, 255) */
+
+    --card: 240 26% 12%; /* rgb(23, 23, 39) */
+    --card-foreground: 0 0% 100%;
+
+    --popover: 240 26% 12%;
+    --popover-foreground: 0 0% 100%;
+
+    --primary: 271 67% 53%; /* rgb(138, 44, 226) */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 271 66% 46%; /* rgb(120, 40, 195) */
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 240 26% 12%; /* rgb(23, 23, 39) */
+    --muted-foreground: 0 0% 45%; /* rgba(255, 255, 255, 0.45) */
+
+    --accent: 187 92% 43%; /* rgb(6, 182, 212) */
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 0% / 0;
+    --input: 240 26% 12%; /* rgb(23, 23, 39) */
+    --ring: 271 67% 53%; /* rgb(138, 44, 226) */
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+/* Add smooth transitions for theme changes */
+.transition-theme {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
+}
+
+/* Apply transitions to common elements */
+body,
+.bg-background,
+.bg-card,
+.text-foreground,
+.text-muted-foreground,
+.border-border,
+.bg-muted {
+  @apply transition-theme;
+}
+
+/* Custom color variables for direct use */
+:root {
+  /* Dark Atlas exact colors */
+  --dark-bg: rgb(15, 15, 27);
+  --dark-card: rgb(23, 23, 39);
+  --dark-card-translucent: rgba(23, 23, 39, 0.85);
+  --purple-primary: rgb(138, 44, 226);
+  --purple-secondary: rgb(120, 40, 195);
+  --purple-bg-5: rgba(138, 44, 226, 0.05);
+  --purple-bg-10: rgba(138, 44, 226, 0.1);
+  --purple-bg-15: rgba(138, 44, 226, 0.15);
+  --purple-bg-20: rgba(138, 44, 226, 0.2);
+  --purple-bg-30: rgba(138, 44, 226, 0.3);
+  --purple-text-85: rgba(138, 44, 226, 0.85);
+  --white-text: rgb(255, 255, 255);
+  --white-text-85: rgba(255, 255, 255, 0.85);
+  --white-text-45: rgba(255, 255, 255, 0.45);
+  --teal-bg-10: rgba(6, 182, 212, 0.1);
+  --dark-purple: rgb(33, 19, 57);
+  --green-text: rgb(19, 103, 65);
+}
+
+.cyber-grid {
+  background-size: 50px 50px;
+  background-image: linear-gradient(to right, rgba(138, 44, 226, 0.1) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(138, 44, 226, 0.1) 1px, transparent 1px);
+}
+
+.dark .cyber-grid {
+  background-image: linear-gradient(to right, rgba(138, 44, 226, 0.15) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(138, 44, 226, 0.15) 1px, transparent 1px);
+}
+
+/* Gradient text styles for both modes */
+.cyber-gradient {
+  @apply text-transparent bg-clip-text;
+  background: linear-gradient(to right, rgb(120, 40, 195), rgb(138, 44, 226)); /* Purple gradient for light mode */
+}
+
+/* Dark mode specific gradient */
+.dark .cyber-gradient {
+  background: linear-gradient(to right, rgb(138, 44, 226), rgb(160, 80, 255)); /* Brighter purple gradient for dark mode */
+  @apply text-transparent bg-clip-text;
+}
+
+/* Glow effects for both modes */
+.glow {
+  box-shadow: 0 0 15px rgba(138, 44, 226, 0.3); /* Purple glow for light mode */
+}
+
+.dark .glow {
+  box-shadow: 0 0 15px rgba(138, 44, 226, 0.5); /* Brighter purple glow for dark mode */
+}
+
+/* Text glow effects for both modes */
+.glow-text {
+  text-shadow: 0 0 10px rgba(138, 44, 226, 0.5); /* Purple text glow for light mode */
+}
+
+.dark .glow-text {
+  text-shadow: 0 0 10px rgba(138, 44, 226, 0.7); /* Brighter purple text glow for dark mode */
+}
+
+.threat-node {
+  filter: drop-shadow(0 0 8px rgba(138, 44, 226, 0.7));
+}
+
+.data-line {
+  stroke-dasharray: 5;
+  animation: dash 15s linear infinite;
+}
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: -1000;
+  }
+}
+
+.glass-effect {
+  @apply backdrop-blur-md;
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+.dark .glass-effect {
+  background-color: rgba(23, 23, 39, 0.7);
+}
+
+/* Custom utility classes for Dark Atlas colors */
+.bg-dark-atlas {
+  background-color: rgb(15, 15, 27);
+}
+
+.bg-dark-card {
+  background-color: rgb(23, 23, 39);
+}
+
+.bg-dark-card-translucent {
+  background-color: rgba(23, 23, 39, 0.85);
+}
+
+.bg-purple-5 {
+  background-color: rgba(138, 44, 226, 0.05);
+}
+
+.bg-purple-10 {
+  background-color: rgba(138, 44, 226, 0.1);
+}
+
+.bg-purple-15 {
+  background-color: rgba(138, 44, 226, 0.15);
+}
+
+.bg-purple-20 {
+  background-color: rgba(138, 44, 226, 0.2);
+}
+
+.bg-purple {
+  background-color: rgb(138, 44, 226);
+}
+
+.bg-teal-10 {
+  background-color: rgba(6, 182, 212, 0.1);
+}
+
+.bg-dark-purple {
+  background-color: rgb(33, 19, 57);
+}
+
+.text-purple {
+  color: rgb(138, 44, 226);
+}
+
+.text-purple-secondary {
+  color: rgb(120, 40, 195);
+}
+
+.text-purple-85 {
+  color: rgba(138, 44, 226, 0.85);
+}
+
+.text-white-85 {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.text-white-45 {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.text-green {
+  color: rgb(19, 103, 65);
+}
+
+.btn-primary {
+  @apply bg-purple text-white hover:bg-opacity-90 transition-all;
+}
+
+.btn-outline {
+  @apply bg-transparent text-purple hover:bg-purple-bg-5 transition-all;
+}
+
+.dark .btn-outline {
+  @apply text-white hover:bg-purple-bg-10;
+}
+
+/* Card styles */
+.card-dark-atlas {
+  @apply bg-white rounded-lg shadow-md;
+}
+
+.dark .card-dark-atlas {
+  @apply bg-dark-card shadow-lg;
+}
+
+/* Theme-aware cyber colors */
+.text-cyber-primary {
+  color: rgb(138, 44, 226);
+}
+.dark .text-cyber-primary {
+  color: rgb(138, 44, 226);
+}
+
+.bg-cyber-primary {
+  background-color: rgb(138, 44, 226);
+}
+.dark .bg-cyber-primary {
+  background-color: rgb(138, 44, 226);
+}
+
+.border-cyber-primary {
+  border-color: rgb(138, 44, 226);
+}
+.dark .border-cyber-primary {
+  border-color: rgb(138, 44, 226);
+}
+
+.hover\:bg-cyber-primary\/10:hover {
+  background-color: rgba(138, 44, 226, 0.1);
+}
+.dark .hover\:bg-cyber-primary\/10:hover {
+  background-color: rgba(138, 44, 226, 0.1);
+}
+
+.hover\:border-cyber-primary:hover {
+  border-color: rgb(138, 44, 226);
+}
+.dark .hover\:border-cyber-primary:hover {
+  border-color: rgb(138, 44, 226);
+}
+
+.hover\:text-cyber-primary:hover {
+  color: rgb(138, 44, 226);
+}
+.dark .hover\:text-cyber-primary:hover {
+  color: rgb(138, 44, 226);
+}
+
+.text-cyber-secondary {
+  color: rgb(120, 40, 195);
+}
+.dark .text-cyber-secondary {
+  color: rgb(120, 40, 195);
+}
+
+.bg-cyber-secondary {
+  background-color: rgb(120, 40, 195);
+}
+.dark .bg-cyber-secondary {
+  background-color: rgb(120, 40, 195);
+}
+
+.text-cyber-accent {
+  color: rgb(6, 182, 212);
+}
+.dark .text-cyber-accent {
+  color: rgb(6, 182, 212);
+}
+
+.bg-cyber-accent {
+  background-color: rgb(6, 182, 212);
+}
+.dark .bg-cyber-accent {
+  background-color: rgb(6, 182, 212);
+}
+
+.bg-cyber-dark {
+  background-color: rgb(255, 255, 255);
+}
+.dark .bg-cyber-dark {
+  background-color: rgb(15, 15, 27);
+}
+
+.bg-cyber-darker {
+  background-color: rgb(245, 245, 245);
+}
+.dark .bg-cyber-darker {
+  background-color: rgb(10, 10, 18);
+}
+
