@@ -6,7 +6,6 @@ import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Navbar } from "@/components/layout/navbar"
 import { Footer } from "@/components/layout/footer"
-import { Toaster } from "@/components/ui/sonner"
 import { AuthProvider } from "@/lib/auth/auth-provider"
 import { AOSProvider } from "@/components/aos-provider"
 import { SessionInitializer } from "@/components/session-initializer"
@@ -29,7 +28,6 @@ export default function ClientLayout({
                 <main className="flex-grow">{children}</main>
                 <Footer />
               </div>
-              <Toaster position="top-right" />
               <SessionInitializer />
             </AOSProvider>
           </AuthProvider>

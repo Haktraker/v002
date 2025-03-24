@@ -1,62 +1,75 @@
 "use client"
 
-import { useTheme } from "@/components/theme-provider"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { formatNumber } from "@/lib/utils"
 
-interface CompromisedEmployee {
+interface Employee {
   id: string
+  name: string
   email: string
-  attacks: number
+  department: string
+  attackCount: number
 }
 
 interface CompromisedEmployeesProps {
-  employees: CompromisedEmployee[]
+  employees: Employee[]
+  maxAttacks?: number
 }
 
-export function CompromisedEmployees({ employees }: CompromisedEmployeesProps) {
-  const { isDarkMode } = useTheme()
-
-  // Find the highest attack value for relative scaling
-  const maxAttacks = Math.max(...employees.map((emp) => emp.attacks), 1)
-
-  return (
-    <div className="space-y-4">
-      <div className="flex justify-between text-xs text-muted-foreground mb-2 px-1">
-        <span># Email</span>
-        <div className="flex gap-6">
-          <span>Attacks</span>
-          <span className="w-10"></span>
-        </div>
-      </div>
-
-      {employees.map((employee, index) => (
-        <div key={employee.id} className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground">{String(index + 1).padStart(2, "0")}</span>
-            <span className="text-sm">{employee.email}</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="flex items-center">
-              <div className="flex-1 h-1.5 w-36 bg-muted/30 rounded-full overflow-hidden transition-colors duration-200">
-                <div
-                  className={`h-full rounded-full ${getBarColor(employee.attacks, isDarkMode)}`}
-                  style={{ width: `${(employee.attacks / maxAttacks) * 100}%` }}
-                ></div>
-              </div>
-            </div>
-            <span className="text-sm font-medium w-10 text-right">{employee.attacks}</span>
-          </div>
-        </div>
-      ))}
-    </div>
+export function CompromisedEmployees({ 
+  employees, 
+  maxAttacks = 10 
+}: CompromisedEmployeesProps) {
+  // Find the highest attack count to normalize the percentage bars
+  const highestAttackCount = employees.reduce(
+    (max, employee) => Math.max(max, employee.attackCount), 
+    0
   )
-}
-
-function getBarColor(attacks: number, isDarkMode: boolean): string {
-  // Theme-aware colors
-  if (attacks >= 300) return isDarkMode ? "bg-red-500" : "bg-red-600"
-  if (attacks >= 200) return isDarkMode ? "bg-orange-500" : "bg-orange-600"
-  if (attacks >= 150) return isDarkMode ? "bg-amber-500" : "bg-amber-600"
-  if (attacks >= 100) return isDarkMode ? "bg-blue-500" : "bg-blue-600"
-  return isDarkMode ? "bg-green-500" : "bg-green-600"
+  
+  return (
+    <Card className="dashboard-card h-full">
+      <CardHeader className="pb-2">
+        <CardTitle className="dashboard-text-primary">Most Compromised Employees</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Table>
+          <TableHeader>
+            <TableRow className="border-b dashboard-border">
+              <TableHead className="dashboard-text-muted font-normal">Employee</TableHead>
+              <TableHead className="dashboard-text-muted font-normal">Department</TableHead>
+              <TableHead className="text-right dashboard-text-muted font-normal">Attacks</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {employees.map((employee) => (
+              <TableRow key={employee.id} className="border-b dashboard-border">
+                <TableCell className="py-2">
+                  <div className="flex flex-col">
+                    <span className="font-medium dashboard-text-primary">{employee.name}</span>
+                    <span className="text-xs dashboard-text-muted">{employee.email}</span>
+                  </div>
+                </TableCell>
+                <TableCell className="dashboard-text-secondary">{employee.department}</TableCell>
+                <TableCell>
+                  <div className="flex items-center justify-end gap-2">
+                    <span className="text-sm font-medium text-primary">{formatNumber(employee.attackCount)}</span>
+                    <div className="w-24 h-2 bg-muted rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-primary rounded-full"
+                        style={{ 
+                          width: `${(employee.attackCount / highestAttackCount) * 100}%` 
+                        }}
+                      />
+                    </div>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
+  )
 }
 

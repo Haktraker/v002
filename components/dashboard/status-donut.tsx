@@ -3,24 +3,32 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import ApexChart from "@/components/ui/apex-chart"
 
-interface EmployeeData {
+interface StatusData {
   name: string
   value: number
   color: string
 }
 
-interface EmployeesDonutChartProps {
-  data: EmployeeData[]
+interface StatusDonutProps {
+  data: StatusData[]
+  title: string
+  description?: string
+  total?: number
 }
 
-export function EmployeesDonutChart({ data }: EmployeesDonutChartProps) {
+export function StatusDonut({ 
+  data, 
+  title, 
+  description, 
+  total 
+}: StatusDonutProps) {
   // Extract values and colors for ApexCharts
   const series = data.map(item => item.value)
   const labels = data.map(item => item.name)
   const colors = data.map(item => item.color)
   
-  // Calculate the total
-  const total = series.reduce((sum, value) => sum + value, 0)
+  // Calculate total if not provided
+  const calculatedTotal = total || series.reduce((sum, value) => sum + value, 0)
 
   const options = {
     chart: {
@@ -30,7 +38,7 @@ export function EmployeesDonutChart({ data }: EmployeesDonutChartProps) {
     plotOptions: {
       pie: {
         donut: {
-          size: '55%',
+          size: '65%',
           labels: {
             show: true,
             name: {
@@ -43,7 +51,7 @@ export function EmployeesDonutChart({ data }: EmployeesDonutChartProps) {
               show: true,
               label: 'Total',
               formatter: function() {
-                return total
+                return calculatedTotal
               },
               color: '#ffffff',
               fontSize: '22px',
@@ -93,24 +101,33 @@ export function EmployeesDonutChart({ data }: EmployeesDonutChartProps) {
     },
     colors: colors,
     labels: labels,
+    responsive: [{
+      breakpoint: 480,
+      options: {
+        chart: {
+          height: 250
+        }
+      }
+    }]
   }
   
   return (
     <Card className="dashboard-card h-full">
       <CardHeader>
-        <CardTitle className="dashboard-text-primary">Employees</CardTitle>
+        <CardTitle className="dashboard-text-primary">{title}</CardTitle>
+        {description && <p className="text-sm dashboard-text-secondary">{description}</p>}
       </CardHeader>
       <CardContent>
-        <div className="h-[220px]">
+        <div className="h-[200px]">
           <ApexChart 
             options={options}
             series={series}
             type="donut"
-            height={220}
+            height={200}
           />
         </div>
         
-        <div className="grid grid-cols-2 gap-2 mt-4">
+        <div className="grid grid-cols-2 gap-x-4 gap-y-2 mt-4">
           {data.map((item, index) => (
             <div key={index} className="flex items-center">
               <div 
@@ -127,5 +144,4 @@ export function EmployeesDonutChart({ data }: EmployeesDonutChartProps) {
       </CardContent>
     </Card>
   )
-}
-
+} 

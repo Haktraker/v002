@@ -18,7 +18,9 @@ export default function DashboardLayout({
         <DashboardSidebar />
         <div className="flex-1 flex flex-col overflow-hidden">
           <DashboardHeader />
-          <main className="flex-1 overflow-y-auto bg-[#F7F7F7] dark:bg-dark-bg p-4 transition-colors duration-200">{children}</main>
+          <main className="flex-1 overflow-y-auto bg-[hsl(var(--dashboard-bg))] p-4 md:p-6 transition-colors duration-200">
+            {children}
+          </main>
         </div>
         <Toaster />
       </div>

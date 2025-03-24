@@ -153,13 +153,13 @@ export function DashboardSidebar() {
 
   return (
     <>
-      <div className={cn("bg-[#FFFFFF] dark:bg-dark-card border-r border-gray-200 dark:border-gray-800 transition-all duration-300 h-screen fixed z-30", isCollapsed ? "w-16" : "w-64")}>
+      <div className={cn("bg-card border-r dashboard-border transition-all duration-300 h-screen fixed z-30", isCollapsed ? "w-16" : "w-64")}>
         <div className="p-4 flex items-center justify-between">
           {!isCollapsed && (
             <div className="flex items-center">
               <Shield className="h-6 w-12 text-primary mr-2" />
               <Link href="/" className="font-bold">
-                HakTrak<span className="text-gray-600 dark:text-foreground"> Networks</span>
+                HakTrak<span className="dashboard-text-secondary"> Networks</span>
               </Link>
             </div>
           )}

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import axios from "axios"
 import { TokenService } from "./token-service"
 import { RateLimitService } from "./rate-limit"
-import { toast } from "react-toastify"
+import { toast } from "sonner"
 import { AuthService } from "@/lib/api/auth-service"
 
 // Get BASE_URL from environment variables
