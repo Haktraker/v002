@@ -9,7 +9,7 @@
 
 # production
 /build
-
+Hak Trak Network.postman_collection.json
 # debug
 npm-debug.log*
 yarn-debug.log*

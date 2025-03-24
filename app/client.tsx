@@ -18,22 +18,17 @@ export default function ClientLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className} min-h-screen`} suppressHydrationWarning>
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={true} storageKey="theme-preference" disableTransitionOnChange>
-          <AuthProvider>
-            <AOSProvider>
-              <div className="flex flex-col min-h-screen">
-                <Navbar />
-                <main className="flex-grow">{children}</main>
-                <Footer />
-              </div>
-              <SessionInitializer />
-            </AOSProvider>
-          </AuthProvider>
-        </ThemeProvider>
-      </body>
-    </html>
-  )
+    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={true} storageKey="theme-preference" disableTransitionOnChange>
+      <AuthProvider>
+        <AOSProvider>
+          <div className={`${inter.className} flex flex-col min-h-screen`}>
+            <Navbar />
+            <main className="flex-grow">{children}</main>
+            <Footer />
+          </div>
+          <SessionInitializer />
+        </AOSProvider>
+      </AuthProvider>
+    </ThemeProvider>
+  );
 }
-

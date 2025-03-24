@@ -1,12 +1,14 @@
 import type React from "react"
 import type { Metadata } from "next"
 import ClientLayout from "./client"
+import { QueryProvider } from "@/providers/query-client"
+import './globals.css'
 
 export const metadata: Metadata = {
   title: "Haktrak Networks - AI-Powered XCI Platform",
   description:
     "Advanced eXtended Cyber Intelligence platform providing actionable and contextualized intelligence for cyber threat protection.",
-    generator: 'v0.dev'
+  generator: 'v0.dev'
 }
 
 export default function RootLayout({
@@ -14,9 +16,13 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  return <ClientLayout>{children}</ClientLayout>
+  return (
+    <html lang="en">
+      <body>
+        <QueryProvider>
+          <ClientLayout>{children}</ClientLayout>
+        </QueryProvider>
+      </body>
+    </html>
+  )
 }
-
-
-
-import './globals.css'

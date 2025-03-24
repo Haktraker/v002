@@ -1,147 +1,156 @@
 "use client"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import ApexChart from "@/components/ui/apex-chart"
+import { useTheme } from "next-themes"
+import dynamic from "next/dynamic"
 
-interface StatusData {
-  name: string
-  value: number
-  color: string
-}
+const ApexChart = dynamic(() => import("@/components/ui/apex-chart"), { ssr: false })
 
 interface StatusDonutProps {
-  data: StatusData[]
   title: string
-  description?: string
+  data: Array<{
+    name: string
+    value: number
+    color: string
+  }>
   total?: number
 }
 
-export function StatusDonut({ 
-  data, 
-  title, 
-  description, 
-  total 
-}: StatusDonutProps) {
-  // Extract values and colors for ApexCharts
-  const series = data.map(item => item.value)
-  const labels = data.map(item => item.name)
-  const colors = data.map(item => item.color)
-  
-  // Calculate total if not provided
-  const calculatedTotal = total || series.reduce((sum, value) => sum + value, 0)
+export function StatusDonut({ title, data, total }: StatusDonutProps) {
+  const { theme } = useTheme()
+  const isDark = theme === "dark"
+
+  const series = data.map(d => d.value)
+  const calculatedTotal = total || series.reduce((sum, val) => sum + val, 0)
 
   const options = {
     chart: {
       type: 'donut',
       background: 'transparent',
+      animations: {
+        enabled: true,
+        speed: 500,
+        animateGradually: {
+          enabled: true,
+          delay: 150
+        },
+        dynamicAnimation: {
+          enabled: true,
+          speed: 350
+        }
+      }
+    },
+    colors: data.map(d => d.color),
+    labels: data.map(d => d.name),
+    stroke: {
+      width: 0
     },
     plotOptions: {
       pie: {
         donut: {
-          size: '65%',
+          size: '85%',
+          background: 'transparent',
           labels: {
             show: true,
             name: {
-              show: false,
+              show: true,
+              fontSize: '14px',
+              color: isDark ? '#fff' : '#1F2937',
+              fontFamily: 'Inter, sans-serif',
+              offsetY: -10
             },
             value: {
-              show: false,
+              show: true,
+              fontSize: '24px',
+              color: isDark ? '#fff' : '#1F2937',
+              fontFamily: 'Inter, sans-serif',
+              formatter: function(val: number) {
+                return val.toLocaleString()
+              }
             },
             total: {
               show: true,
-              label: 'Total',
+              label: 'Total Logs',
+              color: isDark ? '#fff' : '#1F2937',
+              fontSize: '14px',
+              fontFamily: 'Inter, sans-serif',
               formatter: function() {
-                return calculatedTotal
-              },
-              color: '#ffffff',
-              fontSize: '22px',
-              fontWeight: 600,
+                return calculatedTotal.toLocaleString()
+              }
             }
           }
         }
       }
     },
     dataLabels: {
-      enabled: false,
-    },
-    fill: {
-      opacity: 1,
+      enabled: false
     },
     legend: {
-      show: false,
+      show: true,
+      position: 'bottom',
+      horizontalAlign: 'left',
+      fontSize: '14px',
+      fontFamily: 'Inter, sans-serif',
+      labels: {
+        colors: isDark ? '#fff' : '#1F2937'
+      },
+      markers: {
+        width: 8,
+        height: 8,
+        radius: 12
+      },
+      itemMargin: {
+        horizontal: 15,
+        vertical: 8
+      }
+    },
+    tooltip: {
+      enabled: true,
+      theme: isDark ? 'dark' : 'light',
+      style: {
+        fontSize: '14px',
+        fontFamily: 'Inter, sans-serif'
+      }
     },
     states: {
       hover: {
         filter: {
-          type: 'none',
-        }
-      },
-      active: {
-        filter: {
-          type: 'none',
+          type: 'darken',
+          value: 0.8
         }
       }
-    },
-    stroke: {
-      width: 3,
-      colors: ['#171727'],
-    },
-    tooltip: {
-      enabled: true,
-      fillSeriesColor: false,
-      theme: 'dark',
-      style: {
-        fontSize: '12px',
-      },
-      y: {
-        formatter: function(value: number) {
-          return value.toString()
-        }
-      }
-    },
-    colors: colors,
-    labels: labels,
-    responsive: [{
-      breakpoint: 480,
-      options: {
-        chart: {
-          height: 250
-        }
-      }
-    }]
+    }
   }
-  
+
   return (
-    <Card className="dashboard-card h-full">
+    <Card className={isDark ? "bg-[#171727] border-0" : "bg-white"}>
       <CardHeader>
-        <CardTitle className="dashboard-text-primary">{title}</CardTitle>
-        {description && <p className="text-sm dashboard-text-secondary">{description}</p>}
+        <CardTitle className={isDark ? "text-white" : "text-gray-900"}>{title}</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="h-[200px]">
-          <ApexChart 
+        <div className="h-[300px]">
+          <ApexChart
+            type="donut"
             options={options}
             series={series}
-            type="donut"
-            height={200}
+            height="100%"
           />
         </div>
-        
-        <div className="grid grid-cols-2 gap-x-4 gap-y-2 mt-4">
+        <div className="grid grid-cols-2 gap-4 mt-4">
           {data.map((item, index) => (
-            <div key={index} className="flex items-center">
+            <div key={index} className="flex items-center space-x-2">
               <div 
-                className="w-3 h-3 rounded-full mr-2" 
+                className="w-3 h-3 rounded-full" 
                 style={{ backgroundColor: item.color }}
               />
-              <div className="flex justify-between w-full">
-                <span className="text-sm dashboard-text-secondary">{item.name}</span>
-                <span className="text-sm font-medium dashboard-text-primary">{item.value}</span>
-              </div>
+              <span className={isDark ? "text-sm text-gray-400" : "text-sm text-gray-600"}>{item.name}</span>
+              <span className={isDark ? "text-sm text-white font-medium ml-auto" : "text-sm text-gray-900 font-medium ml-auto"}>
+                {item.value.toLocaleString()}
+              </span>
             </div>
           ))}
         </div>
       </CardContent>
     </Card>
   )
-} 
+}

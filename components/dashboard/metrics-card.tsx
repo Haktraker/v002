@@ -1,86 +1,38 @@
 "use client"
 
 import { Card, CardContent } from "@/components/ui/card"
-import { ArrowUp, ArrowDown } from "lucide-react"
+import { TrendingUp, TrendingDown } from "lucide-react"
 import ApexChart from "@/components/ui/apex-chart"
 
 interface MetricsCardProps {
-  value: number
-  label: string
-  trend: "up" | "down" | "neutral"
-  trendValue?: number
-  trendLabel?: string
-  icon?: string
+  metric: {
+    score: number
+    grade?: string
+    trend: "up" | "down" | "stable"
+    changePercentage: number
+  }
+  label?: string
   iconColor?: string
   variant?: "default" | "minimal"
-  chartData?: number[]
 }
 
 export function MetricsCard({
-  value,
-  label,
-  trend,
-  trendValue = 0,
-  trendLabel = "",
-  icon = "alert",
+  metric,
+  label = "Security Score",
   iconColor = "text-primary",
-  variant = "default",
-  chartData = [10, 25, 30, 40, 25, 45, 35, 55, 25, 35, 60, 45]
+  variant = "default"
 }: MetricsCardProps) {
-  const isPositive = trend === "up"
-  const isNeutral = trend === "neutral"
+  const { score, grade, trend, changePercentage } = metric
   
-  // Determine if the trend is good or bad
-  const isPositiveGood = label.toLowerCase().includes("resolved") || label.toLowerCase().includes("score")
-  const isGood = isNeutral ? true : (isPositiveGood ? isPositive : !isPositive)
-
-  const series = [{
-    name: label,
-    data: chartData
-  }]
-
-  const options = {
-    chart: {
-      type: 'line',
-      sparkline: {
-        enabled: true,
-      },
-      toolbar: {
-        show: false,
-      },
-      background: 'transparent',
-    },
-    colors: isGood ? ['#4CAF50'] : ['#FF5050'],
-    stroke: {
-      curve: 'smooth',
-      width: 2,
-    },
-    tooltip: {
-      enabled: false,
-    },
-    grid: {
-      show: false,
-    },
-    xaxis: {
-      labels: {
-        show: false,
-      },
-      axisBorder: {
-        show: false,
-      },
-      axisTicks: {
-        show: false,
-      },
-    },
-    yaxis: {
-      labels: {
-        show: false,
-      },
-    },
-  }
+  // Determine if the trend is good or bad based on the metric type
+  const isPositive = trend === 'up'
+  const isNeutral = trend === 'stable'
+  
+  // Default to treating upward trends as good for security scores
+  const isGood = isNeutral ? true : isPositive
 
   return (
-    <Card className="dashboard-card overflow-hidden">
+    <Card className={`dashboard-card overflow-hidden ${variant === 'minimal' ? 'bg-transparent border-none shadow-none' : ''}`}>
       <CardContent className="dashboard-card-padding">
         <div className="flex items-center justify-between">
           <div>
@@ -90,21 +42,22 @@ export function MetricsCard({
               ) : null}
               <span className="text-sm dashboard-text-secondary">{label}</span>
             </div>
-            <div className="text-2xl font-bold mt-1 dashboard-text-primary">{value}</div>
+            <div className="text-2xl font-bold mt-1 dashboard-text-primary">{score}</div>
+            {grade && <p className="text-sm font-medium">Grade: {grade}</p>}
             
-            {!isNeutral && trendValue && trendLabel ? (
-              <div className="flex items-center mt-1">
+            {trend && changePercentage ? (
+              <div className={`flex items-center mt-1 ${isGood ? 'text-green-500' : 'text-red-500'}`}>
                 {isPositive ? (
-                  <ArrowUp className={`h-4 w-4 mr-1 ${isGood ? "text-green-500" : "text-red-500"}`} />
+                  <TrendingUp className={`h-4 w-4 mr-1 ${iconColor}`} />
                 ) : (
-                  <ArrowDown className={`h-4 w-4 mr-1 ${isGood ? "text-green-500" : "text-red-500"}`} />
+                  <TrendingDown className={`h-4 w-4 mr-1 ${iconColor}`} />
                 )}
                 <span className={`text-xs ${isGood ? "text-green-500" : "text-red-500"}`}>
-                  {trendValue}% {trendLabel}
+                  {changePercentage}% 
                 </span>
               </div>
             ) : (
-              <div className="text-xs dashboard-text-muted mt-1">{trendLabel}</div>
+              <div className="text-xs dashboard-text-muted mt-1"></div>
             )}
           </div>
           
@@ -112,8 +65,51 @@ export function MetricsCard({
             <div className="h-16 w-24">
               <ApexChart
                 type="line"
-                options={options}
-                series={series}
+                options={{
+                  chart: {
+                    type: 'line',
+                    sparkline: {
+                      enabled: true,
+                    },
+                    toolbar: {
+                      show: false,
+                    },
+                    background: 'transparent',
+                  },
+                  colors: isGood ? ['#4CAF50'] : ['#FF5050'],
+                  stroke: {
+                    curve: 'smooth',
+                    width: 2,
+                  },
+                  tooltip: {
+                    enabled: false,
+                  },
+                  grid: {
+                    show: false,
+                  },
+                  xaxis: {
+                    labels: {
+                      show: false,
+                    },
+                    axisBorder: {
+                      show: false,
+                    },
+                    axisTicks: {
+                      show: false,
+                    },
+                  },
+                  yaxis: {
+                    labels: {
+                      show: false,
+                    },
+                  },
+                }}
+                series={[
+                  {
+                    name: label,
+                    data: [10, 25, 30, 40, 25, 45, 35, 55, 25, 35, 60, 45]
+                  }
+                ]}
                 height={65}
                 width={96}
               />

@@ -1,7 +1,10 @@
 "use client"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import ApexChart from "@/components/ui/apex-chart"
+import { useTheme } from "next-themes"
+import dynamic from "next/dynamic"
+
+const ApexChart = dynamic(() => import("@/components/ui/apex-chart"), { ssr: false })
 
 interface EmployeeData {
   name: string
@@ -14,113 +17,113 @@ interface EmployeesDonutChartProps {
 }
 
 export function EmployeesDonutChart({ data }: EmployeesDonutChartProps) {
-  // Extract values and colors for ApexCharts
+  const { theme } = useTheme()
+  const isDark = theme === "dark"
+
   const series = data.map(item => item.value)
-  const labels = data.map(item => item.name)
-  const colors = data.map(item => item.color)
-  
-  // Calculate the total
-  const total = series.reduce((sum, value) => sum + value, 0)
+  const colors = [
+    "#4CAF50",  // New - Green
+    "#00BCD4",  // Pending - Cyan
+    "#9C27B0",  // Resolved - Purple
+    "#FF5050",  // False Positive - Red
+  ]
 
   const options = {
     chart: {
       type: 'donut',
       background: 'transparent',
+      animations: {
+        enabled: true,
+        speed: 500,
+        animateGradually: {
+          enabled: true,
+          delay: 150
+        },
+        dynamicAnimation: {
+          enabled: true,
+          speed: 350
+        }
+      }
+    },
+    colors: colors,
+    labels: data.map(item => item.name),
+    stroke: {
+      width: 0
     },
     plotOptions: {
       pie: {
         donut: {
-          size: '55%',
+          size: '85%',
+          background: 'transparent',
           labels: {
-            show: true,
-            name: {
-              show: false,
-            },
-            value: {
-              show: false,
-            },
-            total: {
-              show: true,
-              label: 'Total',
-              formatter: function() {
-                return total
-              },
-              color: '#ffffff',
-              fontSize: '22px',
-              fontWeight: 600,
-            }
+            show: false
           }
         }
       }
     },
     dataLabels: {
-      enabled: false,
-    },
-    fill: {
-      opacity: 1,
+      enabled: false
     },
     legend: {
-      show: false,
+      show: true,
+      position: 'bottom',
+      horizontalAlign: 'left',
+      fontSize: '14px',
+      fontFamily: 'Inter, sans-serif',
+      labels: {
+        colors: isDark ? '#fff' : '#1F2937'
+      },
+      markers: {
+        width: 8,
+        height: 8,
+        radius: 12
+      },
+      itemMargin: {
+        horizontal: 15,
+        vertical: 8
+      }
+    },
+    tooltip: {
+      enabled: true,
+      theme: isDark ? 'dark' : 'light',
+      style: {
+        fontSize: '14px',
+        fontFamily: 'Inter, sans-serif'
+      }
     },
     states: {
       hover: {
         filter: {
-          type: 'none',
-        }
-      },
-      active: {
-        filter: {
-          type: 'none',
+          type: 'darken',
+          value: 0.8
         }
       }
-    },
-    stroke: {
-      width: 3,
-      colors: ['#171727'],
-    },
-    tooltip: {
-      enabled: true,
-      fillSeriesColor: false,
-      theme: 'dark',
-      style: {
-        fontSize: '12px',
-      },
-      y: {
-        formatter: function(value: number) {
-          return value.toString()
-        }
-      }
-    },
-    colors: colors,
-    labels: labels,
+    }
   }
-  
+
   return (
-    <Card className="dashboard-card h-full">
+    <Card className={isDark ? "bg-[#171727] border-0" : "bg-white"}>
       <CardHeader>
-        <CardTitle className="dashboard-text-primary">Employees</CardTitle>
+        <CardTitle className={isDark ? "text-white" : "text-gray-900"}>Employees</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="h-[220px]">
-          <ApexChart 
+        <div className="h-[300px]">
+          <ApexChart
+            type="donut"
             options={options}
             series={series}
-            type="donut"
-            height={220}
+            height="100%"
           />
         </div>
-        
-        <div className="grid grid-cols-2 gap-2 mt-4">
+        <div className="grid grid-cols-2 gap-4 mt-4">
           {data.map((item, index) => (
-            <div key={index} className="flex items-center">
+            <div key={index} className="flex items-center space-x-2">
               <div 
-                className="w-3 h-3 rounded-full mr-2" 
-                style={{ backgroundColor: item.color }}
+                className="w-3 h-3 rounded-full" 
+                style={{ backgroundColor: colors[index] }}
               />
-              <div className="flex justify-between w-full">
-                <span className="text-sm dashboard-text-secondary">{item.name}</span>
-                <span className="text-sm font-medium dashboard-text-primary">{item.value}</span>
-              </div>
+              <span className={isDark ? "text-sm text-gray-400" : "text-sm text-gray-600"}>{item.name}</span>
+              <span className={isDark ? "text-sm text-white font-medium ml-auto" : "text-sm text-gray-900 font-medium ml-auto"}>{item.value}</span>
             </div>
           ))}
         </div>
@@ -128,4 +131,3 @@ export function EmployeesDonutChart({ data }: EmployeesDonutChartProps) {
     </Card>
   )
 }
-
