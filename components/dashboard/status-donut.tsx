@@ -56,7 +56,12 @@ export function StatusDonut({ data, isLoading = false }: StatusDonutProps) {
         }
       }
     },
-    colors: data.map(d => d.color),
+    colors: [
+      '#22C55E', // Success - Green
+      '#F59E0B', // Warning - Amber
+      '#EF4444', // Error - Red
+      '#6366F1'  // Info - Indigo
+    ],
     labels: data.map(d => d.name),
     stroke: {
       width: 0
@@ -64,31 +69,31 @@ export function StatusDonut({ data, isLoading = false }: StatusDonutProps) {
     plotOptions: {
       pie: {
         donut: {
-          size: '85%',
+          size: '75%',
           labels: {
             show: true,
             name: {
               show: true,
               fontSize: '14px',
+              fontFamily: 'inherit',
               color: isDark ? '#e5e7eb' : '#374151'
             },
             value: {
               show: true,
               fontSize: '16px',
-              fontWeight: 600,
+              fontFamily: 'inherit',
               color: isDark ? '#e5e7eb' : '#374151',
-              formatter: function(val: number) {
-                return Math.round(val).toString()
+              formatter: function(val: any) {
+                const numVal = Number(val);
+                return isNaN(numVal) ? '0%' : numVal.toFixed(0) + '%';
               }
             },
             total: {
               show: true,
               label: 'Total',
               fontSize: '14px',
-              color: isDark ? '#e5e7eb' : '#374151',
-              formatter: function() {
-                return total.toString()
-              }
+              fontFamily: 'inherit',
+              color: isDark ? '#e5e7eb' : '#374151'
             }
           }
         }
@@ -101,6 +106,7 @@ export function StatusDonut({ data, isLoading = false }: StatusDonutProps) {
       show: true,
       position: 'bottom',
       fontSize: '14px',
+      fontFamily: 'inherit',
       labels: {
         colors: isDark ? '#e5e7eb' : '#374151'
       },

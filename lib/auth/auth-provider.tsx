@@ -6,6 +6,7 @@ import { AuthService } from "@/lib/api/auth-service";
 import { TokenService } from "@/lib/auth/token-service";
 
 interface User {
+  _id: string;
   email: string;
   name: string;
   role: string;
@@ -31,10 +32,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const initializeAuth = async () => {
       try {
         // Check if we have a valid token
-        if (!TokenService.isAuthenticated()) {
+        const token = TokenService.getAccessToken();
+        if (!token) {
           setIsLoading(false);
           return;
         }
+
+        // Set the token in auth header
+        AuthService.setAuthToken(token);
 
         // Get stored user data
         try {
@@ -57,11 +62,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           console.error('Error parsing user data:', parseError);
           // Clear invalid data
           localStorage.removeItem("user_data");
+          TokenService.clearTokens();
+          AuthService.removeAuthToken();
         }
       } catch (error) {
         console.error('Error initializing auth:', error);
         // Clear any invalid data
         TokenService.clearTokens();
+        AuthService.removeAuthToken();
         localStorage.removeItem("user_data");
       } finally {
         setIsLoading(false);
@@ -75,14 +83,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       setIsLoading(true);
       const response = await AuthService.login({ email, password });
-      console.log('Login response:', response);
+      
       // Store user data
       const userData = {
+        _id: response.data._id,
         email: response.data.email,
         name: response.data.name,
         role: response.data.role
       };
       
+      // Store token
+      TokenService.storeTokens(response.token);
+      AuthService.setAuthToken(response.token);
+      
+      // Store user data
       localStorage.setItem("user_data", JSON.stringify(userData));
       setUser(userData);
       
@@ -99,6 +113,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = () => {
     // Clear auth state
     TokenService.clearTokens();
+    AuthService.removeAuthToken();
     localStorage.removeItem("user_data");
     setUser(null);
     
@@ -106,7 +121,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     router.replace("/auth/login");
   };
 
-  const isAuthenticated = !!user && TokenService.isAuthenticated();
+  const isAuthenticated = !!user && !!TokenService.getAccessToken();
 
   return (
     <AuthContext.Provider value={{ 

@@ -1,15 +1,17 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { PlusCircle, RefreshCw } from "lucide-react"
+import AOS from "aos"
+import "aos/dist/aos.css"
 
 // Import components
 import { SecurityGauge } from "../../components/dashboard/security-gauge"
 import { MetricsCard } from "../../components/dashboard/metrics-card"
 import { MentionsOverview } from "../../components/dashboard/mentions-overview"
-import { EmployeesDonutChart } from "../../components/dashboard/employees-donut-chart" 
+import { EmployeesDonutChart } from "../../components/dashboard/employees-donut-chart"
 import { CompromisedEmployees } from "../../components/dashboard/compromised-employees"
 import { SourcesBarChart } from "../../components/dashboard/sources-bar-chart"
 import { StatusDonut } from "../../components/dashboard/status-donut"
@@ -30,6 +32,14 @@ export default function DashboardPage() {
     refresh
   } = useDashboard()
 
+  useEffect(() => {
+    AOS.init({
+      duration: 800,
+      once: true,
+      easing: 'ease-out-cubic'
+    })
+  }, [])
+
   if (error) {
     return (
       <div className="flex h-full items-center justify-center">
@@ -46,7 +56,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <Tabs defaultValue={timeRange} className="w-full sm:w-auto">
@@ -68,56 +78,74 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Grid Layout */}
-      <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {/* Row 1 */}
-        <div className="col-span-1 md:col-span-2 lg:col-span-3 xl:col-span-4">
-          <SecurityGauge value={data?.securityScore ?? 0} isLoading={isLoading} />
+      {/* Dashboard Grid */}
+      <div className="grid gap-4">
+        {/* Top Row */}
+          <div className=" grid md:grid-cols-1 xl:grid-cols-3 gap-4 bg-background rounded-lg gap-2">
+            <SecurityGauge value={data?.securityScore ?? 0} isLoading={isLoading} />
+            
+          <div className="grid  md:grid-cols-1 gap-4 bg-background rounded-lg gap-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <IPsCard />
+              <MetricsCard
+                title="Pending"
+                value={30}
+                change={80}
+                isLoading={isLoading}
+              />
+              <MetricsCard
+                title="Resolved"
+                value={12}
+                change={0}
+                isLoading={isLoading}
+              />
+              <MetricsCard
+                title="False Positive"
+                value={16}
+                change={-50}
+                isLoading={isLoading}
+              />
+            </div>
+          </div>
+          <div className="bg-background rounded-lg h-full">
+            <MentionsOverview 
+              data={[
+                { type: 'Total Mentions', percentage: 62.2, count: 120, change: 80 },
+                { type: 'Surface Web', percentage: 30, count: 120, change: 80 },
+                { type: 'Dark Web', percentage: 54, count: 120, change: 80 }
+              ]} 
+              isLoading={isLoading} 
+            />
+          </div>
+          </div>
+
+
+
+        {/* Middle Row */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <div className="bg-background rounded-lg h-full">
+            <EmployeesDonutChart data={data?.employeesData ?? []} isLoading={isLoading} />
+          </div>
+
+          <div className="bg-background rounded-lg h-full ">
+            <CompromisedEmployees data={data?.compromisedEmployees ?? []} isLoading={isLoading} />
+          </div>
+
+          <div className="bg-background rounded-lg h-full">
+            <SourcesBarChart data={data?.sourcesData ?? []} isLoading={isLoading} />
+          </div>
         </div>
 
-        {/* Row 2 */}
-        <div className="col-span-1">
-          <IPsCard />
-        </div>
-        <div className="col-span-1">
-          <MetricsCard
-            title="Active Threats"
-            value={data?.activeThreats ?? 0}
-            change={data?.threatChange ?? 0}
-            isLoading={isLoading}
-          />
-        </div>
-        <div className="col-span-1">
-          <MetricsCard
-            title="Compromised Assets"
-            value={data?.compromisedAssets ?? 0}
-            change={data?.assetChange ?? 0}
-            isLoading={isLoading}
-          />
-        </div>
-        <div className="col-span-1">
-          <StatusDonut data={data?.statusData ?? []} isLoading={isLoading} />
-        </div>
+        {/* Bottom Row */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-background rounded-lg h-full">
+            <StatusDonut data={data?.statusData ?? []} isLoading={isLoading} />
+          </div>
 
-        {/* Row 3 */}
-        <div className="col-span-1 md:col-span-2">
-          <MentionsOverview data={data?.mentionsData ?? []} isLoading={isLoading} />
-        </div>
-        <div className="col-span-1 md:col-span-2">
-          <SourcesBarChart data={data?.sourcesData ?? []} isLoading={isLoading} />
-        </div>
+          <div className="bg-background rounded-lg h-full">
+            <TopMalware data={data?.malwareData ?? []} isLoading={isLoading} />
+          </div>
 
-        {/* Row 4 */}
-        <div className="col-span-1 md:col-span-2">
-          <EmployeesDonutChart data={data?.employeesData ?? []} isLoading={isLoading} />
-        </div>
-        <div className="col-span-1 md:col-span-2">
-          <TopMalware data={data?.malwareData ?? []} isLoading={isLoading} />
-        </div>
-
-        {/* Row 5 */}
-        <div className="col-span-1 md:col-span-2 lg:col-span-3 xl:col-span-4">
-          <CompromisedEmployees data={data?.compromisedEmployees ?? []} isLoading={isLoading} />
         </div>
       </div>
     </div>

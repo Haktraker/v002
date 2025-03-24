@@ -61,7 +61,12 @@ export function EmployeesDonutChart({ data, isLoading = false }: EmployeesDonutC
         }
       }
     },
-    colors: data.map(item => item.color),
+    colors: [
+      '#10B981', // Active - Emerald
+      '#F59E0B', // At Risk - Amber
+      '#EF4444', // Compromised - Red
+      '#6B7280'  // Inactive - Gray
+    ],
     labels: data.map(item => item.name),
     stroke: {
       width: 0
@@ -69,31 +74,31 @@ export function EmployeesDonutChart({ data, isLoading = false }: EmployeesDonutC
     plotOptions: {
       pie: {
         donut: {
-          size: '85%',
+          size: '75%',
           labels: {
             show: true,
             name: {
               show: true,
               fontSize: '14px',
+              fontFamily: 'inherit',
               color: isDark ? '#e5e7eb' : '#374151'
             },
             value: {
               show: true,
               fontSize: '16px',
-              fontWeight: 600,
+              fontFamily: 'inherit',
               color: isDark ? '#e5e7eb' : '#374151',
-              formatter: function(val: number) {
-                return Math.round(val).toString()
+              formatter: function(val: any) {
+                const numVal = Number(val);
+                return isNaN(numVal) ? '0' : numVal.toFixed(0);
               }
             },
             total: {
               show: true,
               label: 'Total',
               fontSize: '14px',
-              color: isDark ? '#e5e7eb' : '#374151',
-              formatter: function() {
-                return total.toString()
-              }
+              fontFamily: 'inherit',
+              color: isDark ? '#e5e7eb' : '#374151'
             }
           }
         }
@@ -106,6 +111,7 @@ export function EmployeesDonutChart({ data, isLoading = false }: EmployeesDonutC
       show: true,
       position: 'bottom',
       fontSize: '14px',
+      fontFamily: 'inherit',
       labels: {
         colors: isDark ? '#e5e7eb' : '#374151'
       },
