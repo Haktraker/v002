@@ -3,9 +3,9 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AuthService } from "@/lib/api/auth-service";
+import { TokenService } from "@/lib/auth/token-service";
 
 interface User {
-  _id: string;
   email: string;
   name: string;
   role: string;
@@ -16,6 +16,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   isLoading: boolean;
+  isAuthenticated: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -29,21 +30,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        // Check if we have a token
-        if (!AuthService.validateToken()) {
+        // Check if we have a valid token
+        if (!TokenService.isAuthenticated()) {
           setIsLoading(false);
           return;
         }
 
         // Get stored user data
-        const userData = localStorage.getItem("user_data");
-        if (userData) {
-          setUser(JSON.parse(userData));
+        try {
+          const userData = localStorage.getItem("user_data");
+          if (userData) {
+            const parsedUser = JSON.parse(userData);
+            // Validate user data structure
+            if (parsedUser && 
+                typeof parsedUser === 'object' && 
+                '_id' in parsedUser && 
+                'email' in parsedUser && 
+                'name' in parsedUser && 
+                'role' in parsedUser) {
+              setUser(parsedUser);
+            } else {
+              throw new Error('Invalid user data structure');
+            }
+          }
+        } catch (parseError) {
+          console.error('Error parsing user data:', parseError);
+          // Clear invalid data
+          localStorage.removeItem("user_data");
         }
       } catch (error) {
         console.error('Error initializing auth:', error);
         // Clear any invalid data
-        AuthService.removeAuthToken();
+        TokenService.clearTokens();
         localStorage.removeItem("user_data");
       } finally {
         setIsLoading(false);
@@ -57,13 +75,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       setIsLoading(true);
       const response = await AuthService.login({ email, password });
-      
+      console.log('Login response:', response);
       // Store user data
-      localStorage.setItem("user_data", JSON.stringify(response.user));
-      setUser(response.user);
+      const userData = {
+        email: response.data.email,
+        name: response.data.name,
+        role: response.data.role
+      };
+      
+      localStorage.setItem("user_data", JSON.stringify(userData));
+      setUser(userData);
       
       // Redirect to dashboard
-      router.push("/dashboard");
+      router.replace("/dashboard");
     } catch (error) {
       console.error('Login error:', error);
       throw error;
@@ -74,16 +98,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = () => {
     // Clear auth state
-    AuthService.removeAuthToken();
+    TokenService.clearTokens();
     localStorage.removeItem("user_data");
     setUser(null);
     
     // Redirect to login
-    router.push("/auth/login");
+    router.replace("/auth/login");
   };
 
+  const isAuthenticated = !!user && TokenService.isAuthenticated();
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, isLoading }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      login, 
+      logout, 
+      isLoading,
+      isAuthenticated
+    }}>
       {children}
     </AuthContext.Provider>
   );
