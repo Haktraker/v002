@@ -1,30 +1,66 @@
 "use client"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import ApexChart from "@/components/ui/apex-chart"
+import { useTheme } from "next-themes"
+import dynamic from "next/dynamic"
+import { Skeleton } from "@/components/ui/skeleton"
 
-interface MentionsOverviewProps {
-  totalMentions: number
-  negativeMentions: number
-  positiveMentions: number
-  neutralMentions: number
+const ApexChart = dynamic(() => import("@/components/ui/apex-chart"), { ssr: false })
+
+interface ChartDataPoint {
+  name: string
+  value: number
 }
 
-export function MentionsOverview({
-  totalMentions = 842,
-  negativeMentions = 256,
-  positiveMentions = 428,
-  neutralMentions = 158
-}: MentionsOverviewProps) {
-  const negativePercentage = Math.round((negativeMentions / totalMentions) * 100)
-  const positivePercentage = Math.round((positiveMentions / totalMentions) * 100)
-  const neutralPercentage = Math.round((neutralMentions / totalMentions) * 100)
+interface MentionsOverviewProps {
+  data: ChartDataPoint[]
+  isLoading?: boolean
+}
 
-  // Configure the ApexCharts options for the semi-circle gauge
+export function MentionsOverview({ data, isLoading = false }: MentionsOverviewProps) {
+  const { theme } = useTheme()
+  const isDark = theme === "dark"
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <Skeleton className="h-6 w-48" />
+        </CardHeader>
+        <CardContent className="p-6">
+          <div className="space-y-4">
+            <Skeleton className="h-[200px] w-full" />
+            <div className="grid grid-cols-3 gap-4">
+              <Skeleton className="h-8 w-full" />
+              <Skeleton className="h-8 w-full" />
+              <Skeleton className="h-8 w-full" />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  const total = data.reduce((sum, item) => sum + item.value, 0)
+  const series = data.map(item => Math.round((item.value / total) * 100))
+
+  // Configure the ApexCharts options
   const options = {
     chart: {
       type: 'radialBar',
       background: 'transparent',
+      animations: {
+        enabled: true,
+        speed: 500,
+        animateGradually: {
+          enabled: true,
+          delay: 150
+        },
+        dynamicAnimation: {
+          enabled: true,
+          speed: 350
+        }
+      }
     },
     plotOptions: {
       radialBar: {
@@ -34,72 +70,90 @@ export function MentionsOverview({
           size: '65%',
         },
         track: {
-          background: 'rgba(255, 255, 255, 0.1)',
+          background: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
           strokeWidth: '97%',
         },
         dataLabels: {
           name: {
-            show: false,
+            show: true,
+            fontSize: '14px',
+            color: isDark ? '#e5e7eb' : '#374151',
+            offsetY: -10
           },
           value: {
-            show: false,
-          },
+            show: true,
+            fontSize: '16px',
+            fontWeight: 600,
+            color: isDark ? '#e5e7eb' : '#374151',
+            formatter: function(val: number) {
+              return val.toFixed(0) + '%'
+            }
+          }
         }
-      },
+      }
     },
     colors: ['#FF5050', '#FFBB28', '#4CAF50'],
-    labels: ['Negative', 'Neutral', 'Positive'],
+    labels: data.map(item => item.name),
     legend: {
-      show: false,
+      show: true,
+      position: 'bottom',
+      fontSize: '14px',
+      labels: {
+        colors: isDark ? '#e5e7eb' : '#374151'
+      },
+      markers: {
+        width: 12,
+        height: 12,
+        radius: 6
+      },
+      itemMargin: {
+        horizontal: 10,
+        vertical: 5
+      }
     },
-    stroke: {
-      lineCap: 'round'
+    tooltip: {
+      enabled: true,
+      theme: isDark ? 'dark' : 'light',
+      y: {
+        formatter: function(val: number) {
+          return val.toFixed(0) + '%'
+        }
+      }
     },
+    responsive: [{
+      breakpoint: 480,
+      options: {
+        chart: {
+          height: 300
+        },
+        legend: {
+          position: 'bottom'
+        }
+      }
+    }]
   }
 
-  const series = [negativePercentage, neutralPercentage, positivePercentage]
-
-  const mentionTypes = [
-    { type: "Negative", count: negativeMentions, color: "#FF5050", percentage: negativePercentage },
-    { type: "Neutral", count: neutralMentions, color: "#FFBB28", percentage: neutralPercentage },
-    { type: "Positive", count: positiveMentions, color: "#4CAF50", percentage: positivePercentage },
-  ]
-
   return (
-    <Card className="dashboard-card h-full">
-      <CardHeader className="pb-0">
-        <CardTitle className="dashboard-text-primary">Mentions Overview</CardTitle>
+    <Card>
+      <CardHeader>
+        <CardTitle>Mentions Overview</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="relative h-[180px] w-full flex items-center justify-center">
-          <ApexChart
-            options={options}
-            series={series}
-            type="radialBar"
-            height={180}
-          />
-          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-center">
-            <div className="text-2xl font-bold dashboard-text-primary">{totalMentions}</div>
-            <div className="text-xs dashboard-text-muted">Total Mentions</div>
-          </div>
-        </div>
-        
-        <div className="grid grid-cols-3 gap-2 mt-4">
-          {mentionTypes.map((item) => (
-            <div key={item.type} className="flex flex-col items-center">
-              <div className="flex items-center">
-                <div 
-                  className="w-3 h-3 rounded-full mr-1" 
-                  style={{ backgroundColor: item.color }}
-                />
-                <span className="text-xs dashboard-text-secondary">{item.type}</span>
-              </div>
-              <div className="text-lg font-medium mt-1 dashboard-text-primary">{item.count}</div>
-              <div className="text-xs dashboard-text-muted">{item.percentage}%</div>
+        <ApexChart
+          type="radialBar"
+          height={300}
+          options={options}
+          series={series}
+        />
+        <div className="grid grid-cols-3 gap-4 mt-4">
+          {data.map((item, index) => (
+            <div key={index} className="text-center">
+              <p className="text-sm text-muted-foreground">{item.name}</p>
+              <p className="text-xl font-semibold mt-1">{item.value}</p>
             </div>
           ))}
         </div>
       </CardContent>
     </Card>
   )
-} 
+}

@@ -19,7 +19,6 @@ import { IPsCard } from "@/components/dashboard/ips-card"
 // Import custom hook and types
 import { useDashboard } from "@/hooks/useDashboard"
 import { TimeRange } from "@/types/dashboard"
-import { EmployeeData, MalwareDataPoint, StatusData } from "@/types/components"
 
 export default function DashboardPage() {
   const {
@@ -46,80 +45,81 @@ export default function DashboardPage() {
     )
   }
 
-  // Transform data to match component interfaces
-  const employeesChartData: EmployeeData[] = data?.employeesData.map(d => ({
-    ...d,
-    color: d.color || '#808080' // Fallback color
-  })) || []
-
-  const logsChartData: StatusData[] = data?.logsData.map(d => ({
-    ...d,
-    color: d.color || '#808080'
-  })) || []
-
-  const findingsChartData: StatusData[] = data?.findingsData.map(d => ({
-    ...d,
-    color: d.color || '#808080'
-  })) || []
-
-  const malwareChartData: MalwareDataPoint[] = data?.malwareData.dates.map((date, i) => ({
-    date,
-    value: data.malwareData.values[i]
-  })) || []
-
-  const mentionsData = {
-    totalMentions: 120,
-    negativeMentions: 30,
-    positiveMentions: 60,
-    neutralMentions: 30
-  }
-
   return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <Tabs value={timeRange} onValueChange={(value) => setTimeRange(value as TimeRange)}>
-          <TabsList>
-            <TabsTrigger value="week">Last Week</TabsTrigger>
-            <TabsTrigger value="month">Last Month</TabsTrigger>
-            <TabsTrigger value="quarter">Last Quarter</TabsTrigger>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <Tabs defaultValue={timeRange} className="w-full sm:w-auto">
+          <TabsList className="grid w-full sm:w-auto grid-cols-3">
+            <TabsTrigger value="24h" onClick={() => setTimeRange("24h" as TimeRange)}>24h</TabsTrigger>
+            <TabsTrigger value="7d" onClick={() => setTimeRange("7d" as TimeRange)}>7d</TabsTrigger>
+            <TabsTrigger value="30d" onClick={() => setTimeRange("30d" as TimeRange)}>30d</TabsTrigger>
           </TabsList>
         </Tabs>
-        <div className="flex gap-2">
-          <Button onClick={refresh} variant="outline" size="sm">
-            <RefreshCw className="mr-2 h-4 w-4" />
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <Button variant="outline" size="sm" onClick={refresh} disabled={isLoading}>
+            <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
             Refresh
           </Button>
           <Button size="sm">
-            <PlusCircle className="mr-2 h-4 w-4" />
+            <PlusCircle className="h-4 w-4 mr-2" />
             Add Widget
           </Button>
         </div>
       </div>
 
-      {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-pulse">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="bg-card h-64 rounded-lg" />
-          ))}
+      {/* Grid Layout */}
+      <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {/* Row 1 */}
+        <div className="col-span-1 md:col-span-2 lg:col-span-3 xl:col-span-4">
+          <SecurityGauge value={data?.securityScore ?? 0} isLoading={isLoading} />
         </div>
-      ) : data ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <SecurityGauge score={data.securityMetrics.score} grade={data.securityMetrics.grade} />
-          <MetricsCard 
-            metric={data.securityMetrics} 
-            label="Security Score" 
-            iconColor="text-primary" 
-          />
-          <MentionsOverview {...mentionsData} />
-          <EmployeesDonutChart data={employeesChartData} />
-          <CompromisedEmployees employees={data.compromisedEmployees} />
-          <SourcesBarChart data={data.sourcesData} />
-          <StatusDonut title="Logs Status" data={logsChartData} />
-          <StatusDonut title="Findings Status" data={findingsChartData} />
-          <TopMalware data={malwareChartData} />
+
+        {/* Row 2 */}
+        <div className="col-span-1">
           <IPsCard />
         </div>
-      ) : null}
+        <div className="col-span-1">
+          <MetricsCard
+            title="Active Threats"
+            value={data?.activeThreats ?? 0}
+            change={data?.threatChange ?? 0}
+            isLoading={isLoading}
+          />
+        </div>
+        <div className="col-span-1">
+          <MetricsCard
+            title="Compromised Assets"
+            value={data?.compromisedAssets ?? 0}
+            change={data?.assetChange ?? 0}
+            isLoading={isLoading}
+          />
+        </div>
+        <div className="col-span-1">
+          <StatusDonut data={data?.statusData ?? []} isLoading={isLoading} />
+        </div>
+
+        {/* Row 3 */}
+        <div className="col-span-1 md:col-span-2">
+          <MentionsOverview data={data?.mentionsData ?? []} isLoading={isLoading} />
+        </div>
+        <div className="col-span-1 md:col-span-2">
+          <SourcesBarChart data={data?.sourcesData ?? []} isLoading={isLoading} />
+        </div>
+
+        {/* Row 4 */}
+        <div className="col-span-1 md:col-span-2">
+          <EmployeesDonutChart data={data?.employeesData ?? []} isLoading={isLoading} />
+        </div>
+        <div className="col-span-1 md:col-span-2">
+          <TopMalware data={data?.malwareData ?? []} isLoading={isLoading} />
+        </div>
+
+        {/* Row 5 */}
+        <div className="col-span-1 md:col-span-2 lg:col-span-3 xl:col-span-4">
+          <CompromisedEmployees data={data?.compromisedEmployees ?? []} isLoading={isLoading} />
+        </div>
+      </div>
     </div>
   )
 }

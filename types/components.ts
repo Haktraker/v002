@@ -1,17 +1,20 @@
-import { ChartDataPoint, Employee, SecurityMetric } from './dashboard'
+import { ChartDataPoint, Employee, MalwareDataPoint as DashboardMalwareDataPoint } from './dashboard'
+
+export interface SecurityGaugeProps {
+  value: number
+  isLoading?: boolean
+}
 
 export interface MetricsCardProps {
-  metric: SecurityMetric
-  label?: string
-  iconColor?: string
-  variant?: 'default' | 'minimal'
+  title: string
+  value: number
+  change: number
+  isLoading?: boolean
 }
 
 export interface MentionsOverviewProps {
-  totalMentions: number
-  negativeMentions: number
-  positiveMentions: number
-  neutralMentions: number
+  data: ChartDataPoint[]
+  isLoading?: boolean
 }
 
 export interface EmployeeData {
@@ -20,8 +23,14 @@ export interface EmployeeData {
   color: string
 }
 
+export interface EmployeesDonutChartProps {
+  data: EmployeeData[]
+  isLoading?: boolean
+}
+
 export interface CompromisedEmployeesProps {
-  employees: Employee[]
+  data: Employee[]
+  isLoading?: boolean
 }
 
 export interface StatusData {
@@ -31,16 +40,18 @@ export interface StatusData {
 }
 
 export interface StatusDonutProps {
-  title: string
   data: StatusData[]
-  total?: number
+  isLoading?: boolean
 }
 
-export interface MalwareDataPoint {
-  date: string
-  value: number
+export interface SourcesBarChartProps {
+  data: ChartDataPoint[]
+  isLoading?: boolean
 }
+
+export type MalwareDataPoint = DashboardMalwareDataPoint
 
 export interface TopMalwareProps {
   data: MalwareDataPoint[]
+  isLoading?: boolean
 }

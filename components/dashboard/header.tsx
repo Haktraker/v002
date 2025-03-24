@@ -47,106 +47,100 @@ export function DashboardHeader() {
   }
 
   return (
-    <header className="bg-background py-2 px-4 transition-colors duration-200">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center w-1/3">
-          <div className="relative w-full max-w-md">
-            <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input placeholder="Search..." className="pl-8 bg-muted/30 border-border w-full" />
-          </div>
-        </div>
-
-        <div className="flex items-center space-x-4">
-          <ThemeToggle />
-
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="ghost" size="icon" className="relative">
-                <Bell className="h-5 w-5 text-muted-foreground" />
-                {unreadCount > 0 && (
-                  <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center bg-primary border-none">
-                    {unreadCount}
-                  </Badge>
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-80 p-0 bg-card border-border">
-              <div className="flex items-center justify-between p-4">
-                <h3 className="font-medium">Notifications</h3>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={markAllAsRead}
-                  className="text-xs text-primary hover:text-primary/90"
-                >
-                  Mark all as read
-                </Button>
+    <header className="bg-background border-b sticky top-0 z-30 transition-colors duration-200">
+      <div className="container mx-auto px-4 h-16">
+        <div className="flex items-center justify-between h-full">
+          {/* Search */}
+          <div className="hidden sm:flex-1 sm:flex sm:items-center sm:max-w-lg">
+            <div className="w-full">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  type="search"
+                  placeholder="Search..."
+                  className="w-full pl-9 bg-muted/50"
+                />
               </div>
-              <div className="max-h-80 overflow-y-auto">
-                {notifications.length === 0 ? (
-                  <div className="p-4 text-center text-muted-foreground">No notifications</div>
-                ) : (
-                  notifications.map((notification) => (
+            </div>
+          </div>
+
+          {/* Right section */}
+          <div className="flex items-center space-x-2 md:space-x-4">
+            {/* Notifications */}
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="ghost" size="icon" className="relative">
+                  <Bell className="h-5 w-5" />
+                  {unreadCount > 0 && (
+                    <Badge
+                      variant="destructive"
+                      className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-xs"
+                    >
+                      {unreadCount}
+                    </Badge>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent align="end" className="w-80">
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="font-semibold">Notifications</h4>
+                  <Button variant="ghost" size="sm" onClick={markAllAsRead}>
+                    Mark all as read
+                  </Button>
+                </div>
+                <div className="space-y-2">
+                  {notifications.map((notification) => (
                     <div
                       key={notification.id}
-                      className={`p-4 hover:bg-muted/10 cursor-pointer ${!notification.read ? "bg-muted/5" : ""}`}
+                      className={`p-2 rounded-lg ${
+                        notification.read ? "bg-muted/50" : "bg-muted"
+                      }`}
                       onClick={() => markAsRead(notification.id)}
                     >
-                      <div className="flex justify-between items-start">
-                        <h4 className="font-medium text-sm">
-                          {notification.title}
-                          {!notification.read && (
-                            <span className="ml-2 h-2 w-2 rounded-full bg-primary inline-block"></span>
-                          )}
-                        </h4>
-                        <span className="text-xs text-muted-foreground">{notification.time}</span>
+                      <div className="flex items-start gap-2">
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium truncate">{notification.title}</p>
+                          <p className="text-sm text-muted-foreground truncate">
+                            {notification.description}
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {notification.time}
+                          </p>
+                        </div>
+                        {!notification.read && (
+                          <div className="w-2 h-2 rounded-full bg-primary mt-2" />
+                        )}
                       </div>
-                      <p className="text-xs text-muted-foreground mt-1">{notification.description}</p>
                     </div>
-                  ))
-                )}
-              </div>
-              <div className="p-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="w-full text-center text-xs text-primary hover:text-primary/90"
-                >
-                  View all notifications
-                </Button>
-              </div>
-            </PopoverContent>
-          </Popover>
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="flex items-center gap-2">
-                <div className="h-8 w-8 rounded-full bg-muted/50 flex items-center justify-center">
-                  <User className="h-4 w-4 text-foreground" />
-                </div>
-                <div className="text-sm text-left hidden md:block">
-                  <div className="font-medium">{user?.name || "Admin"}</div>
-                  <div className="text-xs text-muted-foreground">{user?.role || "Administrator"}</div>
-                </div>
-                <ChevronDown className="h-4 w-4 text-muted-foreground" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56 bg-card border-border">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="cursor-pointer">
-                <User className="h-4 w-4 mr-2" />
-                Profile
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="cursor-pointer text-destructive" onClick={logout}>
-                Log Out
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+            {/* Theme Toggle */}
+            <ThemeToggle />
+
+            {/* User Menu */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="hidden sm:flex items-center gap-2">
+                  <User className="h-5 w-5" />
+                  <span className="hidden md:inline-block">{user?.name}</span>
+                  <ChevronDown className="h-4 w-4 opacity-50" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>Profile</DropdownMenuItem>
+                <DropdownMenuItem>Settings</DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={logout}>Log out</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </div>
     </header>
   )
 }
-

@@ -2,13 +2,30 @@
 
 import { Card, CardContent } from "@/components/ui/card"
 import ApexChart from "@/components/ui/apex-chart"
+import { Skeleton } from "@/components/ui/skeleton"
 
 interface SecurityGaugeProps {
-  score: number
-  grade: string
+  value: number
+  isLoading?: boolean
 }
 
-export function SecurityGauge({ score, grade }: SecurityGaugeProps) {
+export function SecurityGauge({ value, isLoading = false }: SecurityGaugeProps) {
+  if (isLoading) {
+    return (
+      <Card>
+        <CardContent className="p-6">
+          <div className="space-y-4">
+            <Skeleton className="h-[200px] w-full" />
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-24 mx-auto" />
+              <Skeleton className="h-6 w-32 mx-auto" />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
   // Color spectrum: red -> orange -> yellow -> green
   const colorScale = [
     "#FF0000", // 0-25: Red (F)
@@ -20,18 +37,30 @@ export function SecurityGauge({ score, grade }: SecurityGaugeProps) {
     "#008000", // 90-100: Dark Green (A+)
   ]
 
-  // Determine color based on score
-  const getColor = (score: number) => {
-    if (score < 25) return colorScale[0]
-    if (score < 50) return colorScale[1]
-    if (score < 60) return colorScale[2]
-    if (score < 70) return colorScale[3]
-    if (score < 80) return colorScale[4]
-    if (score < 90) return colorScale[5]
+  // Determine color based on value
+  const getColor = (value: number) => {
+    if (value < 25) return colorScale[0]
+    if (value < 50) return colorScale[1]
+    if (value < 60) return colorScale[2]
+    if (value < 70) return colorScale[3]
+    if (value < 80) return colorScale[4]
+    if (value < 90) return colorScale[5]
     return colorScale[6]
   }
 
-  const scoreColor = getColor(score)
+  // Get grade based on value
+  const getGrade = (value: number) => {
+    if (value < 25) return "F"
+    if (value < 50) return "D"
+    if (value < 60) return "C"
+    if (value < 70) return "C+"
+    if (value < 80) return "B"
+    if (value < 90) return "A-"
+    return "A+"
+  }
+
+  const scoreColor = getColor(value)
+  const grade = getGrade(value)
 
   // ApexCharts options for radial gauge
   const options = {
@@ -51,9 +80,6 @@ export function SecurityGauge({ score, grade }: SecurityGaugeProps) {
           background: "rgba(255,255,255,0.1)",
           strokeWidth: '97%',
           margin: 5,
-          dropShadow: {
-            enabled: false,
-          }
         },
         dataLabels: {
           name: {
@@ -61,55 +87,65 @@ export function SecurityGauge({ score, grade }: SecurityGaugeProps) {
           },
           value: {
             offsetY: -2,
-            fontSize: '0px',
+            fontSize: '22px',
             color: scoreColor,
+            formatter: function (val: number) {
+              return val.toFixed(0)
+            }
           }
-        },
-        hollow: {
-          margin: 15,
-          size: '65%'
         }
       }
     },
-    colors: [scoreColor],
+    grid: {
+      padding: {
+        top: -10
+      }
+    },
     fill: {
       type: 'gradient',
       gradient: {
-        shade: 'dark',
-        type: 'horizontal',
-        shadeIntensity: 0.5,
-        gradientToColors: [scoreColor],
+        shade: 'light',
+        shadeIntensity: 0.4,
         inverseColors: false,
         opacityFrom: 1,
         opacityTo: 1,
-        stops: [0, 100]
-      }
+        stops: [0, 50, 100],
+        colorStops: [
+          {
+            offset: 0,
+            color: scoreColor,
+            opacity: 1
+          },
+          {
+            offset: 100,
+            color: scoreColor,
+            opacity: 1
+          }
+        ]
+      },
     },
     stroke: {
       lineCap: 'round'
     },
+    labels: ['Security Score'],
   }
 
-  const series = [score]
-
   return (
-    <Card className="dashboard-card">
-      <CardContent className="pt-6">
-        <div className="relative h-[250px] w-full flex items-center justify-center">
-          <ApexChart 
-            options={options}
-            series={series}
+    <Card>
+      <CardContent className="p-6">
+        <div className="text-center">
+          <ApexChart
             type="radialBar"
-            height={250}
+            height={200}
+            options={options}
+            series={[value]}
           />
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-            <div className="text-6xl font-bold" style={{ color: scoreColor }}>
-              {grade}
-            </div>
-            <div className="text-sm dashboard-text-secondary mt-1">Your Security Rank</div>
+          <div className="mt-4">
+            <p className="text-sm text-muted-foreground">Security Grade</p>
+            <h3 className="text-2xl font-bold" style={{ color: scoreColor }}>{grade}</h3>
           </div>
         </div>
       </CardContent>
     </Card>
   )
-} 
+}

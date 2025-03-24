@@ -1,8 +1,7 @@
 "use client"
 
 import type React from "react"
-
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
@@ -21,11 +20,13 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
+  Menu,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useAuth } from "@/lib/auth/auth-provider"
+import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet"
 
 interface SidebarItemProps {
   icon: React.ReactNode
@@ -37,178 +38,196 @@ interface SidebarItemProps {
 }
 
 function SidebarItem({ icon, label, href, isActive, isCollapsed, onClick }: SidebarItemProps) {
-  const content = href ? (
-    <Link
-      href={href}
+  const content = (
+    <div
       className={cn(
-        "flex items-center py-2 px-3 rounded-md group transition-colors",
+        "flex items-center py-2 px-3 rounded-md group transition-colors cursor-pointer",
         isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/20",
       )}
-    >
-      <div className="mr-3">{icon}</div>
-      {!isCollapsed && <span>{label}</span>}
-    </Link>
-  ) : (
-    <button
       onClick={onClick}
-      className={cn(
-        "flex items-center py-2 px-3 rounded-md group transition-colors w-full text-left",
-        "text-muted-foreground hover:text-foreground hover:bg-muted/20",
-      )}
     >
-      <div className="mr-3">{icon}</div>
-      {!isCollapsed && <span>{label}</span>}
-    </button>
+      <div className="mr-3 flex-shrink-0">{icon}</div>
+      {!isCollapsed && <span className="truncate">{label}</span>}
+    </div>
   );
 
-  if (isCollapsed) {
+  if (href) {
     return (
-      <Tooltip>
-        <TooltipTrigger asChild>{content}</TooltipTrigger>
-        <TooltipContent side="right" align="start">
-          {label}
-        </TooltipContent>
-      </Tooltip>
-    )
+      <Link href={href} className="block">
+        {content}
+      </Link>
+    );
   }
 
-  return content
+  return content;
 }
 
-export function DashboardSidebar() {
-  const [isCollapsed, setIsCollapsed] = useState(false)
+function SidebarContent({ className, isCollapsed, setIsCollapsed }: { 
+  className?: string
+  isCollapsed: boolean
+  setIsCollapsed: (value: boolean) => void 
+}) {
   const pathname = usePathname()
   const { logout } = useAuth()
 
   const sidebarItems = [
-    {
-      icon: <LayoutDashboard className="h-5 w-5" />,
-      label: "Dashboard",
-      href: "/dashboard",
-    },
-    {
-      icon: <Database className="h-5 w-5" />,
-      label: "Breached Databases",
-      href: "/dashboard/breached",
-    },
-    {
-      icon: <Virus className="h-5 w-5" />,
-      label: "Employees Malware Logs",
-      href: "/dashboard/employee-logs",
-    },
-    {
-      icon: <Users className="h-5 w-5" />,
-      label: "Customers Malware Logs",
-      href: "/dashboard/customer-logs",
-    },
-    {
-      icon: <FileSearch className="h-5 w-5" />,
-      label: "Threats Hunting",
-      href: "/dashboard/threats",
-    },
-    {
-      icon: <Globe className="h-5 w-5" />,
-      label: "Mentions Monitoring",
-      href: "/dashboard/mentions",
-    },
-    {
-      icon: <Lock className="h-5 w-5" />,
-      label: "Typo Squatting Domains",
-      href: "/dashboard/typo-squatting",
-    },
-    {
-      icon: <Shield className="h-5 w-5" />,
-      label: "C-Level Protection",
-      href: "/dashboard/c-level",
-    },
-    {
-      icon: <BarChart2 className="h-5 w-5" />,
-      label: "Third Party Monitoring",
-      href: "/dashboard/third-party",
-    },
-  ]
-
-  const bottomItems = [
-    {
-      icon: <Building className="h-5 w-5" />,
-      label: "Organization",
-      href: "/dashboard/organization",
-    },
-    {
-      icon: <HelpCircle className="h-5 w-5" />,
-      label: "Support",
-      href: "/dashboard/support",
-    },
-    {
-      icon: <Settings className="h-5 w-5" />,
-      label: "Settings",
-      href: "/dashboard/settings",
-    },
-    {
-      icon: <LogOut className="h-5 w-5" />,
-      label: "Log Out",
-      onClick: logout,
-    },
+    { icon: <LayoutDashboard size={20} />, label: "Dashboard", href: "/dashboard" },
+    { icon: <Database size={20} />, label: "IPS Events", href: "/dashboard/ips" },
+    { icon: <Virus size={20} />, label: "Malware", href: "/dashboard/malware" },
+    { icon: <Users size={20} />, label: "Employees", href: "/dashboard/employees" },
+    { icon: <Shield size={20} />, label: "Security", href: "/dashboard/security" },
+    { icon: <FileSearch size={20} />, label: "Logs", href: "/dashboard/logs" },
+    { icon: <Globe size={20} />, label: "Network", href: "/dashboard/network" },
+    { icon: <Building size={20} />, label: "Assets", href: "/dashboard/assets" },
+    { icon: <Lock size={20} />, label: "Access", href: "/dashboard/access" },
+    { icon: <BarChart2 size={20} />, label: "Reports", href: "/dashboard/reports" },
   ]
 
   return (
-    <>
-      <div className={cn("bg-card border-r dashboard-border transition-all duration-300 h-screen fixed z-30", isCollapsed ? "w-16" : "w-64")}>
-        <div className="p-4 flex items-center justify-between">
+    <div className={cn("flex flex-col h-full bg-card border-r", className)}>
+      <div className="p-3 flex-shrink-0">
+        <div className="flex items-center justify-between mb-4 px-2">
           {!isCollapsed && (
             <div className="flex items-center">
-              <Shield className="h-6 w-12 text-primary mr-2" />
-              <Link href="/" className="font-bold">
-                HakTrak<span className="dashboard-text-secondary"> Networks</span>
-              </Link>
+              <Shield className="h-6 w-6 text-primary" />
+              <span className="text-lg font-semibold ml-2">Haktrak</span>
             </div>
           )}
-          {isCollapsed && <Shield className="h-6 w-6 text-primary mx-auto" />}
           <Button
             variant="ghost"
             size="icon"
+            className="h-8 w-8"
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="text-muted-foreground hover:text-foreground"
           >
-            {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+            {isCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
           </Button>
         </div>
-
-        <TooltipProvider delayDuration={300}>
-          <div className="flex flex-col h-[calc(100vh-4rem)]">
-            <div className="flex-1 py-4 px-3 space-y-2 overflow-y-auto">
-              {sidebarItems.map((item) => (
-                <SidebarItem
-                  key={item.href}
-                  icon={item.icon}
-                  label={item.label}
-                  href={item.href}
-                  isActive={pathname === item.href}
-                  isCollapsed={isCollapsed}
-                />
-              ))}
-            </div>
-
-            <div className="px-3 py-4 space-y-2">
-              {bottomItems.map((item) => (
-                <SidebarItem
-                  key={item.href || item.label}
-                  icon={item.icon}
-                  label={item.label}
-                  href={item.href}
-                  isActive={item.href ? pathname === item.href : false}
-                  isCollapsed={isCollapsed}
-                  onClick={item.onClick}
-                />
-              ))}
-            </div>
-          </div>
-        </TooltipProvider>
+        <nav className="space-y-1">
+          {sidebarItems.map((item) => (
+            <TooltipProvider key={item.href} delayDuration={0}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div>
+                    <SidebarItem
+                      icon={item.icon}
+                      label={item.label}
+                      href={item.href}
+                      isActive={pathname === item.href}
+                      isCollapsed={isCollapsed}
+                    />
+                  </div>
+                </TooltipTrigger>
+                {isCollapsed && (
+                  <TooltipContent side="right" className="flex items-center gap-4">
+                    {item.label}
+                  </TooltipContent>
+                )}
+              </Tooltip>
+            </TooltipProvider>
+          ))}
+        </nav>
       </div>
-      <div className={cn("transition-all duration-300", isCollapsed ? "ml-16" : "ml-64")}>
-        {/* This is an empty div that pushes the main content to make space for the sidebar */}
+      <div className="mt-auto p-3">
+        <nav className="space-y-1">
+          <TooltipProvider delayDuration={0}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div>
+                  <SidebarItem
+                    icon={<Settings size={20} />}
+                    label="Settings"
+                    href="/dashboard/settings"
+                    isActive={pathname === "/dashboard/settings"}
+                    isCollapsed={isCollapsed}
+                  />
+                </div>
+              </TooltipTrigger>
+              {isCollapsed && (
+                <TooltipContent side="right">Settings</TooltipContent>
+              )}
+            </Tooltip>
+          </TooltipProvider>
+          <TooltipProvider delayDuration={0}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div>
+                  <SidebarItem
+                    icon={<HelpCircle size={20} />}
+                    label="Help"
+                    href="/dashboard/help"
+                    isActive={pathname === "/dashboard/help"}
+                    isCollapsed={isCollapsed}
+                  />
+                </div>
+              </TooltipTrigger>
+              {isCollapsed && (
+                <TooltipContent side="right">Help</TooltipContent>
+              )}
+            </Tooltip>
+          </TooltipProvider>
+          <TooltipProvider delayDuration={0}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div>
+                  <SidebarItem
+                    icon={<LogOut size={20} />}
+                    label="Logout"
+                    isActive={false}
+                    isCollapsed={isCollapsed}
+                    onClick={logout}
+                  />
+                </div>
+              </TooltipTrigger>
+              {isCollapsed && (
+                <TooltipContent side="right">Logout</TooltipContent>
+              )}
+            </Tooltip>
+          </TooltipProvider>
+        </nav>
       </div>
-    </>
+    </div>
   )
 }
 
+export function DashboardSidebar() {
+  const [isCollapsed, setIsCollapsed] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+      setIsCollapsed(window.innerWidth < 1024)
+    }
+
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
+  if (isMobile) {
+    return (
+      <Sheet>
+        <SheetTrigger asChild>
+          <Button variant="ghost" size="icon" className="md:hidden fixed left-4 top-3 z-40">
+            <Menu size={20} />
+          </Button>
+        </SheetTrigger>
+        <SheetContent side="left" className="p-0 w-72">
+          <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+          <SidebarContent isCollapsed={false} setIsCollapsed={setIsCollapsed} />
+        </SheetContent>
+      </Sheet>
+    )
+  }
+
+  return (
+    <SidebarContent 
+      className={cn(
+        "border-r transition-all duration-300",
+        isCollapsed ? "w-[70px]" : "w-[240px]"
+      )}
+      isCollapsed={isCollapsed}
+      setIsCollapsed={setIsCollapsed}
+    />
+  )
+}

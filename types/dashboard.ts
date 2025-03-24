@@ -18,20 +18,34 @@ export interface Employee {
 export interface ChartDataPoint {
   name: string
   value: number
-  color?: string
+  color: string
+}
+
+export interface MalwareDataPoint {
+  name: string
+  value: number
+  trend: 'up' | 'down' | 'stable'
+}
+
+export interface StatusData {
+  name: string
+  value: number
+  color: string
 }
 
 export interface DashboardData {
-  securityMetrics: SecurityMetric
+  securityScore: number
+  securityGrade: string
+  activeThreats: number
+  threatChange: number
+  compromisedAssets: number
+  assetChange: number
   employeesData: ChartDataPoint[]
   compromisedEmployees: Employee[]
   sourcesData: ChartDataPoint[]
-  logsData: ChartDataPoint[]
-  findingsData: ChartDataPoint[]
-  malwareData: {
-    dates: string[]
-    values: number[]
-  }
+  statusData: StatusData[]
+  mentionsData: ChartDataPoint[]
+  malwareData: MalwareDataPoint[]
 }
 
-export type TimeRange = 'quarter' | 'month' | 'week' | 'custom'
+export type TimeRange = '24h' | '7d' | '30d'

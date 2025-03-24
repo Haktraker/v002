@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { DashboardData, TimeRange } from '@/types/dashboard'
 import { dashboardService } from '@/services/dashboard'
 
-export function useDashboard(initialTimeRange: TimeRange = 'month') {
+export function useDashboard(initialTimeRange: TimeRange = '24h') {
   const [timeRange, setTimeRange] = useState<TimeRange>(initialTimeRange)
   const [data, setData] = useState<DashboardData | null>(null)
   const [isLoading, setIsLoading] = useState(true)

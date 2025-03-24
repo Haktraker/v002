@@ -3,25 +3,41 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useTheme } from "next-themes"
 import dynamic from "next/dynamic"
+import { Skeleton } from "@/components/ui/skeleton"
 
 const ApexChart = dynamic(() => import("@/components/ui/apex-chart"), { ssr: false })
 
 interface StatusDonutProps {
-  title: string
   data: Array<{
     name: string
     value: number
     color: string
   }>
-  total?: number
+  isLoading?: boolean
 }
 
-export function StatusDonut({ title, data, total }: StatusDonutProps) {
+export function StatusDonut({ data, isLoading = false }: StatusDonutProps) {
   const { theme } = useTheme()
   const isDark = theme === "dark"
 
+  if (isLoading) {
+    return (
+      <Card>
+        <CardContent className="p-6">
+          <div className="space-y-4">
+            <Skeleton className="h-[200px] w-full rounded-full" />
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-24 mx-auto" />
+              <Skeleton className="h-4 w-32 mx-auto" />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
   const series = data.map(d => d.value)
-  const calculatedTotal = total || series.reduce((sum, val) => sum + val, 0)
+  const total = series.reduce((sum, val) => sum + val, 0)
 
   const options = {
     chart: {
@@ -49,33 +65,29 @@ export function StatusDonut({ title, data, total }: StatusDonutProps) {
       pie: {
         donut: {
           size: '85%',
-          background: 'transparent',
           labels: {
             show: true,
             name: {
               show: true,
               fontSize: '14px',
-              color: isDark ? '#fff' : '#1F2937',
-              fontFamily: 'Inter, sans-serif',
-              offsetY: -10
+              color: isDark ? '#e5e7eb' : '#374151'
             },
             value: {
               show: true,
-              fontSize: '24px',
-              color: isDark ? '#fff' : '#1F2937',
-              fontFamily: 'Inter, sans-serif',
+              fontSize: '16px',
+              fontWeight: 600,
+              color: isDark ? '#e5e7eb' : '#374151',
               formatter: function(val: number) {
-                return val.toLocaleString()
+                return Math.round(val).toString()
               }
             },
             total: {
               show: true,
-              label: 'Total Logs',
-              color: isDark ? '#fff' : '#1F2937',
+              label: 'Total',
               fontSize: '14px',
-              fontFamily: 'Inter, sans-serif',
+              color: isDark ? '#e5e7eb' : '#374151',
               formatter: function() {
-                return calculatedTotal.toLocaleString()
+                return total.toString()
               }
             }
           }
@@ -88,52 +100,54 @@ export function StatusDonut({ title, data, total }: StatusDonutProps) {
     legend: {
       show: true,
       position: 'bottom',
-      horizontalAlign: 'left',
       fontSize: '14px',
-      fontFamily: 'Inter, sans-serif',
       labels: {
-        colors: isDark ? '#fff' : '#1F2937'
+        colors: isDark ? '#e5e7eb' : '#374151'
       },
       markers: {
-        width: 8,
-        height: 8,
-        radius: 12
+        width: 12,
+        height: 12,
+        radius: 6
       },
       itemMargin: {
-        horizontal: 15,
-        vertical: 8
+        horizontal: 10,
+        vertical: 5
       }
     },
     tooltip: {
       enabled: true,
       theme: isDark ? 'dark' : 'light',
-      style: {
-        fontSize: '14px',
-        fontFamily: 'Inter, sans-serif'
-      }
-    },
-    states: {
-      hover: {
-        filter: {
-          type: 'darken',
-          value: 0.8
+      y: {
+        formatter: function(val: number) {
+          return Math.round(val).toString()
         }
       }
-    }
+    },
+    responsive: [{
+      breakpoint: 480,
+      options: {
+        chart: {
+          height: 300
+        },
+        legend: {
+          position: 'bottom'
+        }
+      }
+    }]
   }
 
   return (
     <Card className={isDark ? "bg-[#171727] border-0" : "bg-white"}>
       <CardHeader>
-        <CardTitle className={isDark ? "text-white" : "text-gray-900"}>{title}</CardTitle>
+        <CardTitle className={isDark ? "text-white" : "text-gray-900"}>Status Overview</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="h-[300px]">
           <ApexChart
             type="donut"
+            height="100%"
             options={options}
             series={series}
-            height="100%"
           />
         </div>
         <div className="grid grid-cols-2 gap-4 mt-4">
