@@ -18,8 +18,8 @@ export default function DashboardLayout({
         <DashboardSidebar />
         <div className="flex-1 flex flex-col min-w-0">
           <DashboardHeader />
-          <main className="flex-1 overflow-y-auto bg-[hsl(var(--dashboard-bg))] p-3 sm:p-4 md:p-6 lg:p-8">
-            <div className="container mx-auto max-w-[1600px] h-full ">
+          <main className="flex-1 overflow-y-auto bg-[hsl(var(--dashboard-bg))] p-1 sm:p-2 md:p-4 lg:p-6">
+            <div className="container max-w-[1600px] h-full ">
               {children}
             </div>
           </main>

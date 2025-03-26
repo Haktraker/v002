@@ -148,9 +148,9 @@ export function EmployeesDonutChart({ data, isLoading = false }: EmployeesDonutC
   }
 
   return (
-    <Card className={isDark ? "bg-[#171727] border-0" : "bg-white"}>
+    <Card className={isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}>
       <CardHeader>
-        <CardTitle className={isDark ? "text-white" : "text-gray-900"}>Employee Status Distribution</CardTitle>
+        <CardTitle className={isDark ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)'}>Employee Status Distribution</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="h-[300px]">
@@ -168,8 +168,8 @@ export function EmployeesDonutChart({ data, isLoading = false }: EmployeesDonutC
                 className="w-3 h-3 rounded-full" 
                 style={{ backgroundColor: item.color }}
               />
-              <span className={isDark ? "text-sm text-gray-400" : "text-sm text-gray-600"}>{item.name}</span>
-              <span className={isDark ? "text-sm text-white font-medium ml-auto" : "text-sm text-gray-900 font-medium ml-auto"}>{item.value}</span>
+              <span className={isDark ? "text-sm rgba(0, 0, 0, 0.1)" : "text-sm rgba(0, 0, 0, 0.1)"}>{item.name}</span>
+              <span className={isDark ? "text-sm rgba(0, 0, 0, 0.1) font-medium ml-auto" : "text-sm rgba(0, 0, 0, 0.1) font-medium ml-auto"}>{item.value}</span>
             </div>
           ))}
         </div>
