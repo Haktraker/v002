@@ -5,50 +5,107 @@ export interface ApiResponse<T> {
   message?: string;
 }
 
-// IPS Types
-export interface IPS {
-  id: string;
-  eventType: string;
-  sourceIP: string;
-  destinationIP: string;
-  protocol: string;
-  severity: 'low' | 'medium' | 'high';
-  timestamp: string;
-  status: 'new' | 'investigating' | 'resolved';
+// Base Asset Type
+export interface BaseAsset {
+  _id: string;
+  value: string;
+  location: string;
   description?: string;
-  length: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+// IPS Types
+export interface IPS extends BaseAsset {
+  // Additional IPS-specific fields can be added here
+  ips:any[]
 }
 
 export interface CreateIPSDto {
-  eventType: string;
-  sourceIP: string;
-  destinationIP: string;
-  protocol: string;
-  severity: 'low' | 'medium' | 'high';
+  value: string;
+  location: string;
   description?: string;
 }
 
-export interface UpdateIPSDto extends Partial<CreateIPSDto> {
-  status?: 'new' | 'investigating' | 'resolved';
+export interface UpdateIPSDto {
+  value?: string;
+  location?: string;
+  description?: string;
+}
+
+// Domain Types
+export interface Domain extends BaseAsset {
+  // Additional domain-specific fields can be added here
+}
+
+export interface CreateDomainDto {
+  value: string;
+  location: string;
+  description?: string;
+}
+
+export interface UpdateDomainDto {
+  value?: string;
+  location?: string;
+  description?: string;
+}
+
+// Portal Types
+export interface Portal extends BaseAsset {
+  // Additional portal-specific fields can be added here
+}
+
+export interface CreatePortalDto {
+  value: string;
+  location: string;
+  description?: string;
+}
+
+export interface UpdatePortalDto {
+  value?: string;
+  location?: string;
+  description?: string;
 }
 
 // Query params types
 export interface IPSQueryParams {
   status?: string;
-  severity?: string;
+  location?: string;
   startDate?: string;
   endDate?: string;
   page?: number;
   limit?: number;
 }
 
+export interface DomainQueryParams {
+  status?: string;
+  location?: string;
+  startDate?: string;
+  endDate?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface PortalQueryParams {
+  status?: string;
+  location?: string;
+  page?: number;
+  limit?: number;
+}
+
+// Generic Asset Query Params
+export interface AssetQueryParams {
+  type?: 'ips' | 'domains' | 'portals';
+  location?: string;
+  page?: number;
+  limit?: number;
+}
+
 // Pagination response
 export interface PaginatedResponse<T> {
-  items: T[];
   total: number;
   page: number;
   limit: number;
   totalPages: number;
   length: number;
-
 }

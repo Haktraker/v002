@@ -16,11 +16,11 @@ import { CompromisedEmployees } from "../../components/dashboard/compromised-emp
 import { SourcesBarChart } from "../../components/dashboard/sources-bar-chart"
 import { StatusDonut } from "../../components/dashboard/status-donut"
 import { TopMalware } from "../../components/dashboard/top-malware"
-import { IPsCard } from "@/components/dashboard/ips-card"
 
 // Import custom hook and types
 import { useDashboard } from "@/hooks/useDashboard"
 import { TimeRange } from "@/types/dashboard"
+import { AssetsCard } from "@/components/dashboard/assetsCard"
 
 export default function DashboardPage() {
   const {
@@ -86,7 +86,7 @@ export default function DashboardPage() {
             
           <div className="grid  md:grid-cols-1 gap-4 bg-background rounded-lg gap-2">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <IPsCard />
+            <AssetsCard />
               <MetricsCard
                 title="Pending"
                 value={30}

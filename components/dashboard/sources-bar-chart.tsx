@@ -123,7 +123,7 @@ export function SourcesBarChart({ data, isLoading = false }: SourcesBarChartProp
       categories: dataWithColors.map(item => item.name),
       labels: {
         style: {
-          colors: isDark ? '#e5e7eb' : '#374151',
+          colors: isDark ? '#fff' : '#374151',
           fontSize: '12px'
         }
       },
