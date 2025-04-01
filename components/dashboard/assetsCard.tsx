@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useIPSAssets, useDomainAssets, usePortalAssets } from "@/lib/api/endpoints/assets";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Shield } from "lucide-react";
+import Link from "next/link";
 
 export function AssetsCard() {
   const { data: ipsData, isLoading: isLoadingIps } = useIPSAssets();
@@ -42,7 +43,11 @@ export function AssetsCard() {
       <CardContent>
         <div className="text-2xl font-bold">{totalAssets}</div>
         <div className="text-xs text-muted-foreground mt-1">
-          {ipsCount} IPs, {domainsCount} Domains, {portalsCount} Portals
+          <Link href="/dashboard/assets/ips">{ipsCount} IPs</Link>
+          ,&nbsp;
+          <Link href="/dashboard/assets/domains">{domainsCount} Domains</Link>
+          ,&nbsp;
+          <Link href="/dashboard/assets/portals">{portalsCount} Portals</Link>
         </div>
       </CardContent>
     </Card>

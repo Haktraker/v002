@@ -17,6 +17,8 @@ import {
   UpdateDomainDto,
   UpdatePortalDto
 } from '../types';
+import { toast } from 'sonner';
+import { useApiLoading } from '@/lib/utils/api-utils';
 
 // API Keys for Assets
 const ASSETS_KEYS = {
@@ -67,27 +69,27 @@ export const useAllAssets = (params: AssetQueryParams = {}) => {
 
 // ==================== IPS ENDPOINTS ====================
 
-// GET - Fetch all IPS assets
-export const useIPSAssets = (params: IPSQueryParams = {}) => {
+// GET - Fetch all IPS assets with pagination
+export const useIPSAssets = (params?: IPSQueryParams) => {
+  const { withLoading } = useApiLoading();
+  
   return useQuery({
-    queryKey: ASSETS_KEYS.ipsList(params),
+    queryKey: ASSETS_KEYS.ipsList(params || {}),
     queryFn: async () => {
-      const { data } = await apiClient.get<ApiResponse<any>>('/assets/ips', { params });
-      console.log('Fetched IPS assets:', data);
-      // Extract the items array from the response if it exists, otherwise return the data as is
-      return data.data.items || data.data;
+      const { data } = await withLoading(apiClient.get<ApiResponse<PaginatedResponse<IPS>>>('/assets/ips', { params }));
+      return data.data;
     },
-    staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
   });
 };
 
-// GET - Fetch single IPS asset
+// GET - Fetch a single IPS asset by ID
 export const useIPSAsset = (id: string) => {
+  const { withLoading } = useApiLoading();
+  
   return useQuery({
     queryKey: ASSETS_KEYS.ipsDetail(id),
     queryFn: async () => {
-      const { data } = await apiClient.get<ApiResponse<IPS>>(`/assets/ips/${id}`);
-      console.log('Fetched IPS asset:', data);
+      const { data } = await withLoading(apiClient.get<ApiResponse<IPS>>(`/assets/ips/${id}`));
       return data.data;
     },
     enabled: !!id,
@@ -97,16 +99,22 @@ export const useIPSAsset = (id: string) => {
 // POST - Create new IPS asset
 export const useCreateIPSAsset = () => {
   const queryClient = useQueryClient();
+  const { withLoading } = useApiLoading();
 
   return useMutation({
     mutationFn: async (newIPS: CreateIPSDto) => {
-      const { data } = await apiClient.post<ApiResponse<IPS>>('/assets/ips', newIPS);
+      const { data } = await withLoading(apiClient.post<ApiResponse<IPS>>('/assets/ips', newIPS));
       console.log('Created IPS asset:', data);
       return data.data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      toast.success('IP asset created successfully');
       queryClient.invalidateQueries({ queryKey: ASSETS_KEYS.ipsLists() });
       queryClient.invalidateQueries({ queryKey: ASSETS_KEYS.lists() });
+    },
+    onError: (error: any) => {
+      console.error('Failed to create IP asset:', error);
+      toast.error('Failed to create IP asset');
     },
   });
 };
@@ -114,17 +122,23 @@ export const useCreateIPSAsset = () => {
 // PATCH - Update IPS asset
 export const useUpdateIPSAsset = () => {
   const queryClient = useQueryClient();
+  const { withLoading } = useApiLoading();
 
   return useMutation({
     mutationFn: async ({ id, ...updateData }: UpdateIPSDto & { id: string }) => {
-      const { data } = await apiClient.patch<ApiResponse<IPS>>(`/assets/ips/${id}`, updateData);
+      const { data } = await withLoading(apiClient.patch<ApiResponse<IPS>>(`/assets/ips/${id}`, updateData));
       console.log('Updated IPS asset:', data);
       return data.data;
     },
     onSuccess: (_, variables) => {
+      toast.success('IP asset updated successfully');
       queryClient.invalidateQueries({ queryKey: ASSETS_KEYS.ipsDetail(variables.id) });
       queryClient.invalidateQueries({ queryKey: ASSETS_KEYS.ipsLists() });
       queryClient.invalidateQueries({ queryKey: ASSETS_KEYS.lists() });
+    },
+    onError: (error: any) => {
+      console.error('Failed to update IP asset:', error);
+      toast.error('Failed to update IP asset');
     },
   });
 };
@@ -132,43 +146,50 @@ export const useUpdateIPSAsset = () => {
 // DELETE - Delete IPS asset
 export const useDeleteIPSAsset = () => {
   const queryClient = useQueryClient();
+  const { withLoading } = useApiLoading();
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const { data } = await apiClient.delete<ApiResponse<void>>(`/assets/ips/${id}`);
+      const { data } = await withLoading(apiClient.delete<ApiResponse<void>>(`/assets/ips/${id}`));
       console.log('Deleted IPS asset:', id);
       return data;
     },
     onSuccess: (_, id) => {
+      toast.success('IP asset deleted successfully');
       queryClient.removeQueries({ queryKey: ASSETS_KEYS.ipsDetail(id) });
       queryClient.invalidateQueries({ queryKey: ASSETS_KEYS.ipsLists() });
       queryClient.invalidateQueries({ queryKey: ASSETS_KEYS.lists() });
+    },
+    onError: (error: any) => {
+      console.error('Failed to delete IP asset:', error);
+      toast.error('Failed to delete IP asset');
     },
   });
 };
 
 // ==================== DOMAIN ENDPOINTS ====================
 
-// GET - Fetch all domain assets
-export const useDomainAssets = (params: DomainQueryParams = {}) => {
+// GET - Fetch all domain assets with pagination
+export const useDomainAssets = (params?: DomainQueryParams) => {
+  const { withLoading } = useApiLoading();
+  
   return useQuery({
-    queryKey: ASSETS_KEYS.domainsList(params),
+    queryKey: ASSETS_KEYS.domainsList(params || {}),
     queryFn: async () => {
-      const { data } = await apiClient.get<ApiResponse<PaginatedResponse<Domain>>>('/assets/domains', { params });
-      console.log('Fetched domain assets:', data);
+      const { data } = await withLoading(apiClient.get<ApiResponse<PaginatedResponse<Domain>>>('/assets/domains', { params }));
       return data.data;
     },
-    staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
   });
 };
 
-// GET - Fetch single domain asset
+// GET - Fetch a single domain asset by ID
 export const useDomainAsset = (id: string) => {
+  const { withLoading } = useApiLoading();
+  
   return useQuery({
     queryKey: ASSETS_KEYS.domainsDetail(id),
     queryFn: async () => {
-      const { data } = await apiClient.get<ApiResponse<Domain>>(`/assets/domains/${id}`);
-      console.log('Fetched domain asset:', data);
+      const { data } = await withLoading(apiClient.get<ApiResponse<Domain>>(`/assets/domains/${id}`));
       return data.data;
     },
     enabled: !!id,
@@ -178,16 +199,22 @@ export const useDomainAsset = (id: string) => {
 // POST - Create new domain asset
 export const useCreateDomainAsset = () => {
   const queryClient = useQueryClient();
+  const { withLoading } = useApiLoading();
 
   return useMutation({
     mutationFn: async (newDomain: CreateDomainDto) => {
-      const { data } = await apiClient.post<ApiResponse<Domain>>('/assets/domains', newDomain);
+      const { data } = await withLoading(apiClient.post<ApiResponse<Domain>>('/assets/domains', newDomain));
       console.log('Created domain asset:', data);
       return data.data;
     },
     onSuccess: () => {
+      toast.success('Domain asset created successfully');
       queryClient.invalidateQueries({ queryKey: ASSETS_KEYS.domainsLists() });
       queryClient.invalidateQueries({ queryKey: ASSETS_KEYS.lists() });
+    },
+    onError: (error: any) => {
+      console.error('Failed to create domain asset:', error);
+      toast.error('Failed to create domain asset');
     },
   });
 };
@@ -195,17 +222,23 @@ export const useCreateDomainAsset = () => {
 // PATCH - Update domain asset
 export const useUpdateDomainAsset = () => {
   const queryClient = useQueryClient();
+  const { withLoading } = useApiLoading();
 
   return useMutation({
     mutationFn: async ({ id, ...updateData }: UpdateDomainDto & { id: string }) => {
-      const { data } = await apiClient.patch<ApiResponse<Domain>>(`/assets/domains/${id}`, updateData);
+      const { data } = await withLoading(apiClient.patch<ApiResponse<Domain>>(`/assets/domains/${id}`, updateData));
       console.log('Updated domain asset:', data);
       return data.data;
     },
     onSuccess: (_, variables) => {
+      toast.success('Domain asset updated successfully');
       queryClient.invalidateQueries({ queryKey: ASSETS_KEYS.domainsDetail(variables.id) });
       queryClient.invalidateQueries({ queryKey: ASSETS_KEYS.domainsLists() });
       queryClient.invalidateQueries({ queryKey: ASSETS_KEYS.lists() });
+    },
+    onError: (error: any) => {
+      console.error('Failed to update domain asset:', error);
+      toast.error('Failed to update domain asset');
     },
   });
 };
@@ -213,43 +246,50 @@ export const useUpdateDomainAsset = () => {
 // DELETE - Delete domain asset
 export const useDeleteDomainAsset = () => {
   const queryClient = useQueryClient();
+  const { withLoading } = useApiLoading();
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const { data } = await apiClient.delete<ApiResponse<void>>(`/assets/domains/${id}`);
+      const { data } = await withLoading(apiClient.delete<ApiResponse<void>>(`/assets/domains/${id}`));
       console.log('Deleted domain asset:', id);
       return data;
     },
     onSuccess: (_, id) => {
+      toast.success('Domain asset deleted successfully');
       queryClient.removeQueries({ queryKey: ASSETS_KEYS.domainsDetail(id) });
       queryClient.invalidateQueries({ queryKey: ASSETS_KEYS.domainsLists() });
       queryClient.invalidateQueries({ queryKey: ASSETS_KEYS.lists() });
+    },
+    onError: (error: any) => {
+      console.error('Failed to delete domain asset:', error);
+      toast.error('Failed to delete domain asset');
     },
   });
 };
 
 // ==================== PORTAL ENDPOINTS ====================
 
-// GET - Fetch all portal assets
-export const usePortalAssets = (params: PortalQueryParams = {}) => {
+// GET - Fetch all portal assets with pagination
+export const usePortalAssets = (params?: PortalQueryParams) => {
+  const { withLoading } = useApiLoading();
+  
   return useQuery({
-    queryKey: ASSETS_KEYS.portalsList(params),
+    queryKey: ASSETS_KEYS.portalsList(params || {}),
     queryFn: async () => {
-      const { data } = await apiClient.get<ApiResponse<PaginatedResponse<Portal>>>('/assets/portals', { params });
-      console.log('Fetched portal assets:', data);
+      const { data } = await withLoading(apiClient.get<ApiResponse<PaginatedResponse<Portal>>>('/assets/portals', { params }));
       return data.data;
     },
-    staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
   });
 };
 
-// GET - Fetch single portal asset
+// GET - Fetch a single portal asset by ID
 export const usePortalAsset = (id: string) => {
+  const { withLoading } = useApiLoading();
+  
   return useQuery({
     queryKey: ASSETS_KEYS.portalsDetail(id),
     queryFn: async () => {
-      const { data } = await apiClient.get<ApiResponse<Portal>>(`/assets/portals/${id}`);
-      console.log('Fetched portal asset:', data);
+      const { data } = await withLoading(apiClient.get<ApiResponse<Portal>>(`/assets/portals/${id}`));
       return data.data;
     },
     enabled: !!id,
@@ -259,16 +299,22 @@ export const usePortalAsset = (id: string) => {
 // POST - Create new portal asset
 export const useCreatePortalAsset = () => {
   const queryClient = useQueryClient();
+  const { withLoading } = useApiLoading();
 
   return useMutation({
     mutationFn: async (newPortal: CreatePortalDto) => {
-      const { data } = await apiClient.post<ApiResponse<Portal>>('/assets/portals', newPortal);
+      const { data } = await withLoading(apiClient.post<ApiResponse<Portal>>('/assets/portals', newPortal));
       console.log('Created portal asset:', data);
       return data.data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      toast.success('Portal asset created successfully');
       queryClient.invalidateQueries({ queryKey: ASSETS_KEYS.portalsLists() });
       queryClient.invalidateQueries({ queryKey: ASSETS_KEYS.lists() });
+    },
+    onError: (error: any) => {
+      console.error('Failed to create portal asset:', error);
+      toast.error('Failed to create portal asset');
     },
   });
 };
@@ -276,17 +322,23 @@ export const useCreatePortalAsset = () => {
 // PATCH - Update portal asset
 export const useUpdatePortalAsset = () => {
   const queryClient = useQueryClient();
+  const { withLoading } = useApiLoading();
 
   return useMutation({
     mutationFn: async ({ id, ...updateData }: UpdatePortalDto & { id: string }) => {
-      const { data } = await apiClient.patch<ApiResponse<Portal>>(`/assets/portals/${id}`, updateData);
+      const { data } = await withLoading(apiClient.patch<ApiResponse<Portal>>(`/assets/portals/${id}`, updateData));
       console.log('Updated portal asset:', data);
       return data.data;
     },
     onSuccess: (_, variables) => {
+      toast.success('Portal asset updated successfully');
       queryClient.invalidateQueries({ queryKey: ASSETS_KEYS.portalsDetail(variables.id) });
       queryClient.invalidateQueries({ queryKey: ASSETS_KEYS.portalsLists() });
       queryClient.invalidateQueries({ queryKey: ASSETS_KEYS.lists() });
+    },
+    onError: (error: any) => {
+      console.error('Failed to update portal asset:', error);
+      toast.error('Failed to update portal asset');
     },
   });
 };
@@ -294,17 +346,23 @@ export const useUpdatePortalAsset = () => {
 // DELETE - Delete portal asset
 export const useDeletePortalAsset = () => {
   const queryClient = useQueryClient();
+  const { withLoading } = useApiLoading();
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const { data } = await apiClient.delete<ApiResponse<void>>(`/assets/portals/${id}`);
+      const { data } = await withLoading(apiClient.delete<ApiResponse<void>>(`/assets/portals/${id}`));
       console.log('Deleted portal asset:', id);
       return data;
     },
     onSuccess: (_, id) => {
+      toast.success('Portal asset deleted successfully');
       queryClient.removeQueries({ queryKey: ASSETS_KEYS.portalsDetail(id) });
       queryClient.invalidateQueries({ queryKey: ASSETS_KEYS.portalsLists() });
       queryClient.invalidateQueries({ queryKey: ASSETS_KEYS.lists() });
+    },
+    onError: (error: any) => {
+      console.error('Failed to delete portal asset:', error);
+      toast.error('Failed to delete portal asset');
     },
   });
 };

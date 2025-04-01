@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { useIPSAssets, useDeleteIPSAsset } from '@/lib/api/endpoints/assets';
+import { useDomainAssets, useDeleteDomainAsset } from '@/lib/api/endpoints/assets';
 import { Button } from '@/components/ui/button';
 import {
   Table,
@@ -24,7 +24,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Pencil, Trash2, ChevronDown, ChevronsUpDown, ChevronUp, ArrowLeft } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
-import { IPS } from '@/lib/api/types';
+import { Domain } from '@/lib/api/types';
 import Link from 'next/link';
 import {
   ColumnDef,
@@ -38,39 +38,29 @@ import {
   ColumnFiltersState,
 } from "@tanstack/react-table";
 import { Input } from "@/components/ui/input";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
-export default function IPsPage() {
-  const { data: ipsData, isLoading, error, refetch } = useIPSAssets();
-  const deleteIPSAsset = useDeleteIPSAsset();
+export default function DomainsPage() {
+  const { data: domainsData, isLoading, error, refetch } = useDomainAssets();
+  const deleteDomainAsset = useDeleteDomainAsset();
   
   const [isDeleting, setIsDeleting] = useState(false);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
   const handleDelete = async (id: string) => {
-    console.log(id,'id');
-    
     setIsDeleting(true);
     try {
-      await deleteIPSAsset.mutateAsync(id);
+      await deleteDomainAsset.mutateAsync(id);
       toast({
         title: 'Success',
-        description: 'IP asset deleted successfully',
+        description: 'Domain asset deleted successfully',
       });
       refetch();
     } catch (error) {
-      console.error('Failed to delete IP asset:', error);
+      console.error('Failed to delete domain asset:', error);
       toast({
         title: 'Error',
-        description: 'Failed to delete IP asset',
+        description: 'Failed to delete domain asset',
         variant: 'destructive',
       });
     } finally {
@@ -78,9 +68,9 @@ export default function IPsPage() {
     }
   };
 
-  const handleUpdate = (ip: IPS) => {
-    // Redirect to update page or open modal
-    window.location.href = `/assets/ips/${ip._id}/edit`;
+  const handleUpdate = (domain: Domain) => {
+    // Redirect to update page
+    window.location.href = `/assets/domains/${domain._id}/edit`;
   };
 
   // Helper function to format dates safely
@@ -90,7 +80,7 @@ export default function IPsPage() {
   };
 
   // Define columns for the data table
-  const columns = useMemo<ColumnDef<IPS>[]>(
+  const columns = useMemo<ColumnDef<Domain>[]>(
     () => [
       {
         accessorKey: "value",
@@ -100,7 +90,7 @@ export default function IPsPage() {
               variant="ghost"
               onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             >
-              Value
+              Domain
               {column.getIsSorted() === "asc" ? (
                 <ChevronUp className="ml-2 h-4 w-4" />
               ) : column.getIsSorted() === "desc" ? (
@@ -183,14 +173,15 @@ export default function IPsPage() {
         id: "actions",
         header: () => <div className="text-right">Actions</div>,
         cell: ({ row }) => {
-          const ip = row.original;
+          const domain = row.original;
           
           return (
             <div className="flex justify-end gap-2">
+
               <Button 
                 variant="outline" 
                 size="icon" 
-                onClick={() => handleUpdate(ip)}
+                onClick={() => handleUpdate(domain)}
               >
                 <Pencil className="h-4 w-4" />
               </Button>
@@ -209,7 +200,7 @@ export default function IPsPage() {
                   <AlertDialogHeader>
                     <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                     <AlertDialogDescription>
-                      This action cannot be undone. This will permanently delete the IP asset.
+                      This action cannot be undone. This will permanently delete the domain asset.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
@@ -233,9 +224,15 @@ export default function IPsPage() {
 
   // Prepare data for the table
   const data = useMemo(() => {
-    if (!ipsData) return [];
-    return Array.isArray(ipsData) ? ipsData : [];
-  }, [ipsData]);
+    if (!domainsData) return [];
+    // Handle different response structures
+    if (Array.isArray(domainsData)) return domainsData;
+    // Handle PaginatedResponse structure
+    if (domainsData && 'items' in domainsData && Array.isArray(domainsData.items)) {
+      return domainsData.items as Domain[];
+    }
+    return [];
+  }, [domainsData]);
 
   // Initialize the table
   const table = useReactTable({
@@ -258,29 +255,30 @@ export default function IPsPage() {
   }
 
   if (error) {
-    return <div className="text-red-500">Error loading IP assets</div>;
+    return <div className="text-red-500">Error loading domain assets</div>;
   }
 
   return (
     <div className="container mx-auto py-10 my-2">
       <div className="flex justify-between items-center mb-6">
       <div className="mb-6">
-        <Link href="/dashboard" className="flex items-center text-sm text-muted-foreground hover:text-foreground mb-4">
+        <Link href="/dashboard" className="flex items-center mb-4 text-sm text-muted-foreground hover:text-foreground">
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Dashboard
         </Link>
-        <h1 className="text-2xl font-bold">IP Assets</h1>
+        <h1 className="text-2xl font-bold">Domain Assets</h1>
       </div>
-        <Link href="ips/new">
+        
+        <Link href="domains/new">
             <Button>
-              Add New IP
+              Add New Domain
             </Button>
         </Link>
       </div>
       
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter by value..."
+          placeholder="Filter by domain..."
           value={(table.getColumn("value")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table.getColumn("value")?.setFilterValue(event.target.value)
@@ -324,7 +322,7 @@ export default function IPsPage() {
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No IP assets found
+                  No domain assets found
                 </TableCell>
               </TableRow>
             )}
