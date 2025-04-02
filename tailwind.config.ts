@@ -35,6 +35,7 @@ const config = {
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",
+          background: "hsl(var(--destructive-background))",
         },
         muted: {
           DEFAULT: "hsl(var(--muted))",
@@ -51,6 +52,22 @@ const config = {
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
+        },
+        // Toast notification status colors
+        success: {
+          DEFAULT: "hsl(var(--success))",
+          foreground: "hsl(var(--success-foreground))",
+          background: "hsl(var(--success-background))",
+        },
+        warning: {
+          DEFAULT: "hsl(var(--warning))",
+          foreground: "hsl(var(--warning-foreground))",
+          background: "hsl(var(--warning-background))",
+        },
+        info: {
+          DEFAULT: "hsl(var(--info))",
+          foreground: "hsl(var(--info-foreground))",
+          background: "hsl(var(--info-background))",
         },
         // Dark Atlas exact colors
         dark: {
@@ -139,7 +156,7 @@ const config = {
   },
   plugins: [
     require("tailwindcss-animate"),
-    ({ addUtilities, theme }) => {
+    ({ addUtilities, theme }: { addUtilities: (utilities: Record<string, Record<string, string>>) => void, theme: (path: string) => any }) => {
       const newUtilities = {
         ".hover\\:bg-purple-bg-5:hover": {
           backgroundColor: "rgba(138, 44, 226, 0.05)",
@@ -160,4 +177,3 @@ const config = {
 } satisfies Config
 
 export default config
-

@@ -28,6 +28,7 @@
     
     --destructive: 0 84% 60%; /* #ef4444 */
     --destructive-foreground: 0 0% 100%; /* #ffffff */
+    --destructive-background: 0 84% 95%; /* #fee2e2 */
     
     --border: 0 0% 90%; /* #e5e5e5 */
     --input: 0 0% 90%; /* #e5e5e5 */
@@ -35,6 +36,19 @@
     
     --dashboard-bg: 0 0% 97%; /* #f7f7f7 */
     --dashboard-card: 0 0% 100%; /* #ffffff */
+
+    /* Toast notification status colors - Light mode */
+    --success: 142 76% 36%; /* #22c55e */
+    --success-foreground: 0 0% 100%; /* #ffffff */
+    --success-background: 142 76% 95%; /* #dcfce7 */
+    
+    --warning: 38 92% 50%; /* #f59e0b */
+    --warning-foreground: 0 0% 100%; /* #ffffff */
+    --warning-background: 38 92% 95%; /* #fef3c7 */
+    
+    --info: 217 91% 60%; /* #3b82f6 */
+    --info-foreground: 0 0% 100%; /* #ffffff */
+    --info-background: 217 91% 95%; /* #dbeafe */
 
     --radius: 0.5rem;
   }
@@ -64,6 +78,7 @@
     
     --destructive: 0 63% 31%; /* #7f1d1d */
     --destructive-foreground: 0 0% 100%; /* #ffffff */
+    --destructive-background: 0 63% 15%; /* #450a0a */
     
     --border: 240 26% 18%; /* #1e1e33 */
     --input: 240 26% 12%; /* #171727 */
@@ -71,6 +86,19 @@
     
     --dashboard-bg: 240 29% 8%; /* #0f0f1b */
     --dashboard-card: 240 26% 12%; /* #171727 */
+
+    /* Toast notification status colors - Dark mode */
+    --success: 142 76% 45%; /* #22c55e */
+    --success-foreground: 0 0% 100%; /* #ffffff */
+    --success-background: 142 76% 15%; /* #14532d */
+    
+    --warning: 38 92% 50%; /* #f59e0b */
+    --warning-foreground: 0 0% 100%; /* #ffffff */
+    --warning-background: 38 92% 15%; /* #713f12 */
+    
+    --info: 217 91% 60%; /* #3b82f6 */
+    --info-foreground: 0 0% 100%; /* #ffffff */
+    --info-background: 217 91% 15%; /* #1e3a8a */
   }
 }
 
@@ -336,4 +364,3 @@ body,
 .status-neutral {
   @apply bg-gray-400 dark:bg-gray-600 transition-theme;
 }
-

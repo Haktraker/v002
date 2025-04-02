@@ -17,7 +17,7 @@ import {
   UpdateDomainDto,
   UpdatePortalDto
 } from '../types';
-import { toast } from 'sonner';
+import { showToast } from '@/lib/utils/toast-utils';
 import { useApiLoading } from '@/lib/utils/api-utils';
 
 // API Keys for Assets
@@ -108,13 +108,13 @@ export const useCreateIPSAsset = () => {
       return data.data;
     },
     onSuccess: (data) => {
-      toast.success('IP asset created successfully');
+      showToast('IP asset created successfully', 'success');
       queryClient.invalidateQueries({ queryKey: ASSETS_KEYS.ipsLists() });
       queryClient.invalidateQueries({ queryKey: ASSETS_KEYS.lists() });
     },
     onError: (error: any) => {
       console.error('Failed to create IP asset:', error);
-      toast.error('Failed to create IP asset');
+      showToast('Failed to create IP asset', 'error');
     },
   });
 };
@@ -131,14 +131,14 @@ export const useUpdateIPSAsset = () => {
       return data.data;
     },
     onSuccess: (_, variables) => {
-      toast.success('IP asset updated successfully');
+      showToast('IP asset updated successfully', 'success');
       queryClient.invalidateQueries({ queryKey: ASSETS_KEYS.ipsDetail(variables.id) });
       queryClient.invalidateQueries({ queryKey: ASSETS_KEYS.ipsLists() });
       queryClient.invalidateQueries({ queryKey: ASSETS_KEYS.lists() });
     },
     onError: (error: any) => {
       console.error('Failed to update IP asset:', error);
-      toast.error('Failed to update IP asset');
+      showToast('Failed to update IP asset', 'error');
     },
   });
 };
@@ -155,14 +155,14 @@ export const useDeleteIPSAsset = () => {
       return data;
     },
     onSuccess: (_, id) => {
-      toast.success('IP asset deleted successfully');
+      showToast('IP asset deleted successfully', 'success');
       queryClient.removeQueries({ queryKey: ASSETS_KEYS.ipsDetail(id) });
       queryClient.invalidateQueries({ queryKey: ASSETS_KEYS.ipsLists() });
       queryClient.invalidateQueries({ queryKey: ASSETS_KEYS.lists() });
     },
     onError: (error: any) => {
       console.error('Failed to delete IP asset:', error);
-      toast.error('Failed to delete IP asset');
+      showToast('Failed to delete IP asset', 'error');
     },
   });
 };
@@ -208,13 +208,13 @@ export const useCreateDomainAsset = () => {
       return data.data;
     },
     onSuccess: () => {
-      toast.success('Domain asset created successfully');
+      showToast('Domain asset created successfully', 'success');
       queryClient.invalidateQueries({ queryKey: ASSETS_KEYS.domainsLists() });
       queryClient.invalidateQueries({ queryKey: ASSETS_KEYS.lists() });
     },
     onError: (error: any) => {
       console.error('Failed to create domain asset:', error);
-      toast.error('Failed to create domain asset');
+      showToast('Failed to create domain asset', 'error');
     },
   });
 };
@@ -231,14 +231,14 @@ export const useUpdateDomainAsset = () => {
       return data.data;
     },
     onSuccess: (_, variables) => {
-      toast.success('Domain asset updated successfully');
+      showToast('Domain asset updated successfully', 'success');
       queryClient.invalidateQueries({ queryKey: ASSETS_KEYS.domainsDetail(variables.id) });
       queryClient.invalidateQueries({ queryKey: ASSETS_KEYS.domainsLists() });
       queryClient.invalidateQueries({ queryKey: ASSETS_KEYS.lists() });
     },
     onError: (error: any) => {
       console.error('Failed to update domain asset:', error);
-      toast.error('Failed to update domain asset');
+      showToast('Failed to update domain asset', 'error');
     },
   });
 };
@@ -255,14 +255,14 @@ export const useDeleteDomainAsset = () => {
       return data;
     },
     onSuccess: (_, id) => {
-      toast.success('Domain asset deleted successfully');
+      showToast('Domain asset deleted successfully', 'success');
       queryClient.removeQueries({ queryKey: ASSETS_KEYS.domainsDetail(id) });
       queryClient.invalidateQueries({ queryKey: ASSETS_KEYS.domainsLists() });
       queryClient.invalidateQueries({ queryKey: ASSETS_KEYS.lists() });
     },
     onError: (error: any) => {
       console.error('Failed to delete domain asset:', error);
-      toast.error('Failed to delete domain asset');
+      showToast('Failed to delete domain asset', 'error');
     },
   });
 };
@@ -308,13 +308,13 @@ export const useCreatePortalAsset = () => {
       return data.data;
     },
     onSuccess: (data) => {
-      toast.success('Portal asset created successfully');
+      showToast('Portal asset created successfully', 'success');
       queryClient.invalidateQueries({ queryKey: ASSETS_KEYS.portalsLists() });
       queryClient.invalidateQueries({ queryKey: ASSETS_KEYS.lists() });
     },
     onError: (error: any) => {
       console.error('Failed to create portal asset:', error);
-      toast.error('Failed to create portal asset');
+      showToast('Failed to create portal asset', 'error');
     },
   });
 };
@@ -331,14 +331,14 @@ export const useUpdatePortalAsset = () => {
       return data.data;
     },
     onSuccess: (_, variables) => {
-      toast.success('Portal asset updated successfully');
+      showToast('Portal asset updated successfully', 'success');
       queryClient.invalidateQueries({ queryKey: ASSETS_KEYS.portalsDetail(variables.id) });
       queryClient.invalidateQueries({ queryKey: ASSETS_KEYS.portalsLists() });
       queryClient.invalidateQueries({ queryKey: ASSETS_KEYS.lists() });
     },
     onError: (error: any) => {
       console.error('Failed to update portal asset:', error);
-      toast.error('Failed to update portal asset');
+      showToast('Failed to update portal asset', 'error');
     },
   });
 };
@@ -355,14 +355,14 @@ export const useDeletePortalAsset = () => {
       return data;
     },
     onSuccess: (_, id) => {
-      toast.success('Portal asset deleted successfully');
+      showToast('Portal asset deleted successfully', 'success');
       queryClient.removeQueries({ queryKey: ASSETS_KEYS.portalsDetail(id) });
       queryClient.invalidateQueries({ queryKey: ASSETS_KEYS.portalsLists() });
       queryClient.invalidateQueries({ queryKey: ASSETS_KEYS.lists() });
     },
     onError: (error: any) => {
       console.error('Failed to delete portal asset:', error);
-      toast.error('Failed to delete portal asset');
+      showToast('Failed to delete portal asset', 'error');
     },
   });
 };

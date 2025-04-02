@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useAuth } from "@/lib/auth/auth-provider"
 import { validateEmail } from "@/lib/auth/password-utils"
-import { toast } from "sonner"
+import { showToast } from "@/lib/utils/toast-utils"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
@@ -54,11 +54,11 @@ export default function LoginPage() {
 
     try {
       await login(email, password)
-      toast.success("Login successful!")
+      showToast("Login successful!", "success")
     } catch (err: any) {
       const errorMessage = err?.message || "An error occurred during login"
       setFormError(errorMessage)
-      toast.error(errorMessage)
+      showToast(errorMessage, "error")
     }
   }
 

@@ -21,6 +21,10 @@ const Toaster = ({ ...props }: ToasterProps) => {
           description: "group-[.toast]:text-muted-foreground",
           actionButton: "group-[.toast]:bg-primary group-[.toast]:text-primary-foreground",
           cancelButton: "group-[.toast]:bg-muted group-[.toast]:text-muted-foreground",
+          success: "group-[.toaster]:bg-success-background group-[.toaster]:border-success group-[.toaster]:text-success-foreground",
+          error: "group-[.toaster]:bg-destructive-background group-[.toaster]:border-destructive group-[.toaster]:text-destructive-foreground",
+          warning: "group-[.toaster]:bg-warning-background group-[.toaster]:border-warning group-[.toaster]:text-warning-foreground",
+          info: "group-[.toaster]:bg-info-background group-[.toaster]:border-info group-[.toaster]:text-info-foreground",
         },
       }}
       {...props}
@@ -29,4 +33,3 @@ const Toaster = ({ ...props }: ToasterProps) => {
 }
 
 export { Toaster }
-

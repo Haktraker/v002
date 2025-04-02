@@ -3,7 +3,7 @@
 import { useEffect } from "react"
 import { useAuth } from "@/lib/auth/auth-provider"
 import { SessionManager } from "@/lib/auth/session-manager"
-import { toast } from "sonner"
+import { showToast } from "@/lib/utils/toast-utils"
 
 export function SessionInitializer() {
   const { logout } = useAuth()
@@ -13,7 +13,7 @@ export function SessionInitializer() {
     const cleanup = SessionManager.init(() => {
       // This function is called when the session expires
       logout()
-      toast.error("Your session has expired. Please sign in again.")
+      showToast("Your session has expired. Please sign in again.", "error")
     })
 
     return cleanup
@@ -22,4 +22,3 @@ export function SessionInitializer() {
   // This component doesn't render anything
   return null
 }
-

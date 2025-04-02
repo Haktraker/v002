@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { useIPSAssets, useDeleteIPSAsset } from '@/lib/api/endpoints/assets';
+import { usePortalAssets, useDeletePortalAsset } from '@/lib/api/endpoints/assets';
 import { Button } from '@/components/ui/button';
 import {
   Table,
@@ -25,7 +25,7 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { Pencil, Trash2, ChevronDown, ChevronsUpDown, ChevronUp, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
-import { IPS } from '@/lib/api/types';
+import { Portal } from '@/lib/api/types';
 import Link from 'next/link';
 import {
   ColumnDef,
@@ -40,18 +40,10 @@ import {
   RowSelectionState,
 } from "@tanstack/react-table";
 import { Input } from "@/components/ui/input";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
-export default function IPsPage() {
-  const { data: ipsData, isLoading, error, refetch } = useIPSAssets();
-  const deleteIPSAsset = useDeleteIPSAsset();
+export default function PortalsPage() {
+  const { data: portalsData, isLoading, error, refetch } = usePortalAssets();
+  const deletePortalAsset = useDeletePortalAsset();
   
   const [isDeleting, setIsDeleting] = useState(false);
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -60,14 +52,12 @@ export default function IPsPage() {
   const [showBulkDeleteDialog, setShowBulkDeleteDialog] = useState(false);
 
   const handleDelete = async (id: string) => {
-    console.log(id,'id');
-    
     setIsDeleting(true);
     try {
-      await deleteIPSAsset.mutateAsync(id);
+      await deletePortalAsset.mutateAsync(id);
       refetch();
     } catch (error) {
-      console.error('Failed to delete IP asset:', error);
+      console.error('Failed to delete portal asset:', error);
     } finally {
       setIsDeleting(false);
     }
@@ -82,23 +72,23 @@ export default function IPsPage() {
     let errorCount = 0;
     
     try {
-      // Process each IP deletion sequentially
+      // Process each portal deletion sequentially
       for (const id of selectedIds) {
         try {
-          await deleteIPSAsset.mutateAsync(id);
+          await deletePortalAsset.mutateAsync(id);
           successCount++;
         } catch (error) {
-          console.error(`Failed to delete IP asset ${id}:`, error);
+          console.error(`Failed to delete portal asset ${id}:`, error);
           errorCount++;
         }
       }
       
       // Show a summary toast at the end
       if (successCount > 0) {
-        toast.success(`Successfully deleted ${successCount} IP assets${errorCount > 0 ? `, ${errorCount} failed` : ''}`);
+        toast.success(`Successfully deleted ${successCount} portal assets${errorCount > 0 ? `, ${errorCount} failed` : ''}`);
         refetch();
       } else {
-        toast.error('Failed to delete any IP assets');
+        toast.error('Failed to delete any portal assets');
       }
     } catch (error) {
       console.error('Bulk deletion failed:', error);
@@ -110,9 +100,9 @@ export default function IPsPage() {
     }
   };
 
-  const handleUpdate = (ip: IPS) => {
-    // Redirect to update page or open modal
-    window.location.href = `/dashboard/assets/ips/${ip._id}/edit`;
+  const handleUpdate = (portal: Portal) => {
+    // Redirect to update page
+    window.location.href = `/dashboard/assets/portals/${portal._id}/edit`;
   };
 
   // Helper function to format dates safely
@@ -122,7 +112,7 @@ export default function IPsPage() {
   };
 
   // Define columns for the data table
-  const columns = useMemo<ColumnDef<IPS>[]>(
+  const columns = useMemo<ColumnDef<Portal>[]>(
     () => [
       {
         id: "select",
@@ -154,7 +144,7 @@ export default function IPsPage() {
               variant="ghost"
               onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             >
-              Value
+              URL
               {column.getIsSorted() === "asc" ? (
                 <ChevronUp className="ml-2 h-4 w-4" />
               ) : column.getIsSorted() === "desc" ? (
@@ -165,7 +155,6 @@ export default function IPsPage() {
             </Button>
           )
         },
-        cell: ({ row }) => <div className="font-medium">{row.getValue("value")}</div>,
       },
       {
         accessorKey: "location",
@@ -213,38 +202,18 @@ export default function IPsPage() {
         cell: ({ row }) => formatDate(row.getValue("createdAt")),
       },
       {
-        accessorKey: "updatedAt",
-        header: ({ column }) => {
-          return (
-            <Button
-              variant="ghost"
-              onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            >
-              Updated At
-              {column.getIsSorted() === "asc" ? (
-                <ChevronUp className="ml-2 h-4 w-4" />
-              ) : column.getIsSorted() === "desc" ? (
-                <ChevronDown className="ml-2 h-4 w-4" />
-              ) : (
-                <ChevronsUpDown className="ml-2 h-4 w-4" />
-              )}
-            </Button>
-          )
-        },
-        cell: ({ row }) => formatDate(row.getValue("updatedAt")),
-      },
-      {
         id: "actions",
         header: () => <div className="text-right">Actions</div>,
         cell: ({ row }) => {
-          const ip = row.original;
+          const portal = row.original;
           
           return (
             <div className="flex justify-end gap-2">
+
               <Button 
                 variant="outline" 
                 size="icon" 
-                onClick={() => handleUpdate(ip)}
+                onClick={() => handleUpdate(portal)}
               >
                 <Pencil className="h-4 w-4" />
               </Button>
@@ -263,7 +232,7 @@ export default function IPsPage() {
                   <AlertDialogHeader>
                     <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                     <AlertDialogDescription>
-                      This action cannot be undone. This will permanently delete the IP asset.
+                      This action cannot be undone. This will permanently delete the portal asset.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
@@ -287,15 +256,15 @@ export default function IPsPage() {
 
   // Prepare data for the table
   const data = useMemo(() => {
-    if (!ipsData) return [];
+    if (!portalsData) return [];
     // Handle different response structures
-    if (Array.isArray(ipsData)) return ipsData;
+    if (Array.isArray(portalsData)) return portalsData;
     // Handle PaginatedResponse structure
-    if (ipsData && 'items' in ipsData && Array.isArray(ipsData.items)) {
-      return ipsData.items as IPS[];
+    if (portalsData && 'items' in portalsData && Array.isArray(portalsData.items)) {
+      return portalsData.items as Portal[];
     }
     return [];
-  }, [ipsData]);
+  }, [portalsData]);
 
   // Initialize the table
   const table = useReactTable({
@@ -322,29 +291,30 @@ export default function IPsPage() {
   }
 
   if (error) {
-    return <div className="text-red-500">Error loading IP assets</div>;
+    return <div className="text-red-500">Error loading portal assets</div>;
   }
 
   return (
     <div className="container mx-auto py-10 my-2">
       <div className="flex justify-between items-center mb-6">
       <div className="mb-6">
-        <Link href="/dashboard" className="flex items-center text-sm text-muted-foreground hover:text-foreground mb-4">
+        <Link href="/dashboard" className="flex items-center mb-4 text-sm text-muted-foreground hover:text-foreground">
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Dashboard
         </Link>
-        <h1 className="text-2xl font-bold">IP Assets</h1>
+        <h1 className="text-2xl font-bold">Portal Assets</h1>
       </div>
-        <Link href="ips/new">
+        
+        <Link href="portals/new">
             <Button>
-              Add New IP
+              Add New Portal
             </Button>
         </Link>
       </div>
       
       <div className="flex items-center justify-between py-4">
         <Input
-          placeholder="Filter by value..."
+          placeholder="Filter by portal URL..."
           value={(table.getColumn("value")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table.getColumn("value")?.setFilterValue(event.target.value)
@@ -363,7 +333,7 @@ export default function IPsPage() {
               <AlertDialogHeader>
                 <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  This action cannot be undone. This will permanently delete {selectedRowCount} selected IP assets.
+                  This action cannot be undone. This will permanently delete {selectedRowCount} selected portal assets.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
@@ -415,7 +385,7 @@ export default function IPsPage() {
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No IP assets found
+                  No portal assets found
                 </TableCell>
               </TableRow>
             )}
