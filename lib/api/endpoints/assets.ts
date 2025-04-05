@@ -60,7 +60,6 @@ export const useAllAssets = (params: AssetQueryParams = {}) => {
         domains: PaginatedResponse<Domain>,
         portals: PaginatedResponse<Portal>
       }>>('/assets', { params });
-      console.log('Fetched all assets:', data);
       return data.data;
     },
     staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
@@ -104,7 +103,6 @@ export const useCreateIPSAsset = () => {
   return useMutation({
     mutationFn: async (newIPS: CreateIPSDto) => {
       const { data } = await withLoading(apiClient.post<ApiResponse<IPS>>('/assets/ips', newIPS));
-      console.log('Created IPS asset:', data);
       return data.data;
     },
     onSuccess: (data) => {
@@ -127,7 +125,6 @@ export const useUpdateIPSAsset = () => {
   return useMutation({
     mutationFn: async ({ id, ...updateData }: UpdateIPSDto & { id: string }) => {
       const { data } = await withLoading(apiClient.patch<ApiResponse<IPS>>(`/assets/ips/${id}`, updateData));
-      console.log('Updated IPS asset:', data);
       return data.data;
     },
     onSuccess: (_, variables) => {
@@ -151,7 +148,6 @@ export const useDeleteIPSAsset = () => {
   return useMutation({
     mutationFn: async (id: string) => {
       const { data } = await withLoading(apiClient.delete<ApiResponse<void>>(`/assets/ips/${id}`));
-      console.log('Deleted IPS asset:', id);
       return data;
     },
     onSuccess: (_, id) => {
@@ -204,7 +200,6 @@ export const useCreateDomainAsset = () => {
   return useMutation({
     mutationFn: async (newDomain: CreateDomainDto) => {
       const { data } = await withLoading(apiClient.post<ApiResponse<Domain>>('/assets/domains', newDomain));
-      console.log('Created domain asset:', data);
       return data.data;
     },
     onSuccess: () => {
@@ -227,7 +222,6 @@ export const useUpdateDomainAsset = () => {
   return useMutation({
     mutationFn: async ({ id, ...updateData }: UpdateDomainDto & { id: string }) => {
       const { data } = await withLoading(apiClient.patch<ApiResponse<Domain>>(`/assets/domains/${id}`, updateData));
-      console.log('Updated domain asset:', data);
       return data.data;
     },
     onSuccess: (_, variables) => {
@@ -251,7 +245,6 @@ export const useDeleteDomainAsset = () => {
   return useMutation({
     mutationFn: async (id: string) => {
       const { data } = await withLoading(apiClient.delete<ApiResponse<void>>(`/assets/domains/${id}`));
-      console.log('Deleted domain asset:', id);
       return data;
     },
     onSuccess: (_, id) => {
@@ -304,7 +297,6 @@ export const useCreatePortalAsset = () => {
   return useMutation({
     mutationFn: async (newPortal: CreatePortalDto) => {
       const { data } = await withLoading(apiClient.post<ApiResponse<Portal>>('/assets/portals', newPortal));
-      console.log('Created portal asset:', data);
       return data.data;
     },
     onSuccess: (data) => {
@@ -327,7 +319,6 @@ export const useUpdatePortalAsset = () => {
   return useMutation({
     mutationFn: async ({ id, ...updateData }: UpdatePortalDto & { id: string }) => {
       const { data } = await withLoading(apiClient.patch<ApiResponse<Portal>>(`/assets/portals/${id}`, updateData));
-      console.log('Updated portal asset:', data);
       return data.data;
     },
     onSuccess: (_, variables) => {
@@ -351,7 +342,6 @@ export const useDeletePortalAsset = () => {
   return useMutation({
     mutationFn: async (id: string) => {
       const { data } = await withLoading(apiClient.delete<ApiResponse<void>>(`/assets/portals/${id}`));
-      console.log('Deleted portal asset:', id);
       return data;
     },
     onSuccess: (_, id) => {

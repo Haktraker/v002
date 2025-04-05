@@ -15,14 +15,15 @@ export function AssetsCard() {
 
   if (isLoading) {
     return (
-      <Card>
+      <Card className="h-full">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">
-            <Skeleton className="h-4 w-20" />
-          </CardTitle>
+          <div className="flex items-center space-x-2">
+            <Shield className="h-5 w-5" />
+            <CardTitle className="text-md font-normal">Total Assets</CardTitle>
+          </div>
         </CardHeader>
         <CardContent>
-          <Skeleton className="h-8 w-16" />
+          <Skeleton className="h-10 w-16 mb-4" />
         </CardContent>
       </Card>
     );
@@ -33,23 +34,21 @@ export function AssetsCard() {
   const domainsCount = domainsData?.length || 0;
   const portalsCount = portalsData?.length || 0;
   const totalAssets = ipsCount + domainsCount + portalsCount;
-  console.log('Total assets:', totalAssets);
+
   return (
-    <Card>
+    <Link href="/dashboard/assets">
+    <Card className="h-full">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">Total Assets</CardTitle>
-        <Shield className="h-4 w-4 text-muted-foreground" />
+        <div className="flex items-center space-x-2">
+          <Shield className="h-5 w-5" />
+          <CardTitle className="text-md font-normal py-1">Assets</CardTitle>
+        </div>
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold">{totalAssets}</div>
-        <div className="text-xs text-muted-foreground mt-1">
-          <Link href="/dashboard/assets/ips">{ipsCount} IPs</Link>
-          ,&nbsp;
-          <Link href="/dashboard/assets/domains">{domainsCount} Domains</Link>
-          ,&nbsp;
-          <Link href="/dashboard/assets/portals">{portalsCount} Portals</Link>
-        </div>
+        <div className="text-4xl font-bold text-center">{totalAssets}</div>
       </CardContent>
     </Card>
+    </Link>
+
   );
 }

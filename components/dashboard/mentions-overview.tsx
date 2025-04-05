@@ -19,26 +19,26 @@ interface MentionsOverviewProps {
 export function MentionsOverview({ data, isLoading }: MentionsOverviewProps) {
   if (isLoading) {
     return (
-      <Card className="h-full">
+      <Card className="">
         <CardHeader>
           <CardTitle>Mentions Overview</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <Skeleton className="h-[200px] w-full" />
+        <CardContent className="">
+          <Skeleton className=" w-full" />
         </CardContent>
       </Card>
     )
   }
 
   return (
-    <Card className="h-full">
+    <Card className="">
       <CardHeader>
         <CardTitle>Mentions Overview</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="flex items-start justify-between">
           {/* Arc Chart */}
-          <div className="relative w-[180px] h-[180px]">
+          <div className="relative">
             {data.map((item, index) => {
               const radius = 70 - index * 20 // Decreasing radius for each arc
               const circumference = 2 * Math.PI * radius
@@ -75,7 +75,7 @@ export function MentionsOverview({ data, isLoading }: MentionsOverviewProps) {
           </div>
 
           {/* Stats */}
-          <div className="flex flex-col space-y-6 pl-4">
+          <div className="flex flex-col ">
             {data.map((item) => (
               <div key={item.type} className="flex flex-col">
                 <div className="flex items-baseline gap-2">

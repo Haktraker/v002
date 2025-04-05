@@ -109,3 +109,196 @@ export interface PaginatedResponse<T> {
   totalPages: number;
   length: number;
 }
+
+// Threat Intelligence Types
+
+// Suspicious IPs
+export interface SuspiciousIP {
+  _id: string;
+  value: string;
+  source: string;
+  description: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CreateSuspiciousIPDto {
+  value: string;
+  source: string;
+  description: string;
+  time: string;
+}
+
+export interface UpdateSuspiciousIPDto {
+  value?: string;
+  source?: string;
+  description?: string;
+}
+
+// IOCs (Indicators of Compromise)
+export interface IOC {
+  _id: string;
+  iOCType: string;
+  indicatorValue: string;
+  threatType: string;
+  source: string;
+  description: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CreateIOCDto {
+  iOCType: string;
+  indicatorValue: string;
+  threatType: string;
+  source: string;
+  description: string;
+  time: string;
+}
+
+export interface UpdateIOCDto {
+  iOCType?: string;
+  indicatorValue?: string;
+  threatType?: string;
+  source?: string;
+  description?: string;
+}
+
+// APT Feeds
+export interface APTFeed {
+  _id: string;
+  aptGroupName: string;
+  threatType: string;
+  ttps: string;
+  targetSectors: string;
+  geographicFocus: string;
+  iocs: string;
+  source: string;
+  description: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CreateAPTFeedDto {
+  aptGroupName: string;
+  threatType: string;
+  ttps: string;
+  targetSectors: string;
+  geographicFocus: string;
+  iocs: string;
+  source: string;
+  description: string;
+  time: string;
+}
+
+export interface UpdateAPTFeedDto {
+  aptGroupName?: string;
+  threatType?: string;
+  ttps?: string;
+  targetSectors?: string;
+  geographicFocus?: string;
+  iocs?: string;
+  source?: string;
+  description?: string;
+}
+
+// Threat Intelligence Feeds
+export interface ThreatIntelligenceFeed {
+  _id: string;
+  threatType: string;
+  severity: string;
+  source: string;
+  description: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CreateThreatIntelligenceFeedDto {
+  threatType: string;
+  severity: string;
+  source: string;
+  description: string;
+  time: string;
+}
+
+export interface UpdateThreatIntelligenceFeedDto {
+  threatType?: string;
+  severity?: string;
+  source?: string;
+  description?: string;
+}
+
+// Threat News
+export interface ThreatNews {
+  _id: string;
+  threatType: string;
+  description: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CreateThreatNewsDto {
+  threatType: string;
+  description: string;
+  time: string;
+}
+
+export interface UpdateThreatNewsDto {
+  threatType?: string;
+  description?: string;
+}
+
+// Geo Watch
+export interface GeoWatch {
+  _id: string;
+  eventType: string;
+  location: string;
+  country: string;
+  region: string;
+  time: string;
+  source: string;
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  assetAffected: string;
+  customAlertsTriggered: boolean;
+  status: 'unresolved' | 'resolved' | 'investigating';
+  actionTaken: string;
+  commentsNotes: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CreateGeoWatchDto {
+  eventType: string;
+  location: string;
+  country: string;
+  region: string;
+  time: string;
+  source: string;
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  assetAffected: string;
+  customAlertsTriggered: boolean;
+  status: 'unresolved' | 'resolved' | 'investigating';
+  actionTaken: string;
+  commentsNotes: string;
+}
+
+export interface UpdateGeoWatchDto {
+  eventType?: string;
+  location?: string;
+  country?: string;
+  region?: string;
+  time?: string;
+  source?: string;
+  severity?: 'low' | 'medium' | 'high' | 'critical';
+  assetAffected?: string;
+  customAlertsTriggered?: boolean;
+  status?: 'unresolved' | 'resolved' | 'investigating';
+  actionTaken?: string;
+  commentsNotes?: string;
+}
+
+// Query params for threat intelligence
+export interface ThreatIntelligenceQueryParams {
+  page?: number;
+  limit?: number;
+}

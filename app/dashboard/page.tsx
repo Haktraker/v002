@@ -16,6 +16,7 @@ import { CompromisedEmployees } from "../../components/dashboard/compromised-emp
 import { SourcesBarChart } from "../../components/dashboard/sources-bar-chart"
 import { StatusDonut } from "../../components/dashboard/status-donut"
 import { TopMalware } from "../../components/dashboard/top-malware"
+import { ThreatIntelligenceCard } from "@/components/dashboard/threatIntelligenceCard"
 
 // Import custom hook and types
 import { useDashboard } from "@/hooks/useDashboard"
@@ -56,9 +57,9 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
         <Tabs defaultValue={timeRange} className="w-full sm:w-auto">
           <TabsList className="grid w-full sm:w-auto grid-cols-3">
             <TabsTrigger value="24h" onClick={() => setTimeRange("24h" as TimeRange)}>24h</TabsTrigger>
@@ -78,36 +79,34 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Dashboard Grid */}
-      <div className="grid gap-4">
-        {/* Top Row */}
-          <div className=" grid md:grid-cols-1 xl:grid-cols-3 gap-4 bg-background rounded-lg gap-2">
-            <SecurityGauge value={data?.securityScore ?? 0} isLoading={isLoading} />
-            
-          <div className="grid  md:grid-cols-1 gap-4 bg-background rounded-lg gap-2">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <AssetsCard />
-              <MetricsCard
-                title="Pending"
-                value={30}
-                change={80}
-                isLoading={isLoading}
-              />
-              <MetricsCard
-                title="Resolved"
-                value={12}
-                change={0}
-                isLoading={isLoading}
-              />
-              <MetricsCard
-                title="False Positive"
-                value={16}
-                change={-50}
-                isLoading={isLoading}
-              />
-            </div>
-          </div>
-          <div className="bg-background rounded-lg h-full">
+      {/* Main Dashboard Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
+        {/* Left Column */}
+        <div className="space-y-4">
+          {/* Security Overview Section */}
+          <SectionWrapper>
+            <SecurityOverview data={data} isLoading={isLoading} />
+          </SectionWrapper>
+
+          <SectionWrapper>
+            <ThreatIntelligenceCard />
+          </SectionWrapper>
+
+
+
+          <SectionWrapper>
+            <EmployeesDonutChart data={data?.employeesData ?? []} isLoading={isLoading} />
+          </SectionWrapper>
+
+          <SectionWrapper>
+            <StatusDonut data={data?.statusData ?? []} isLoading={isLoading} />
+          </SectionWrapper>
+        </div>
+
+        {/* Right Column */}
+        <div className="space-y-4">
+          {/* Mentions Overview Section */}
+          <SectionWrapper>
             <MentionsOverview 
               data={[
                 { type: 'Total Mentions', percentage: 62.2, count: 120, change: 80 },
@@ -116,36 +115,72 @@ export default function DashboardPage() {
               ]} 
               isLoading={isLoading} 
             />
-          </div>
-          </div>
+          </SectionWrapper>
 
-
-
-        {/* Middle Row */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-          <div className="bg-background rounded-lg h-full">
-            <EmployeesDonutChart data={data?.employeesData ?? []} isLoading={isLoading} />
-          </div>
-
-          <div className="bg-background rounded-lg h-full ">
+          {/* Most Compromised Employees Section */}
+          <SectionWrapper>
             <CompromisedEmployees data={data?.compromisedEmployees ?? []} isLoading={isLoading} />
-          </div>
+          </SectionWrapper>
 
-          <div className="bg-background rounded-lg h-full">
+          {/* Top Sources Section */}
+          <SectionWrapper>
             <SourcesBarChart data={data?.sourcesData ?? []} isLoading={isLoading} />
-          </div>
+          </SectionWrapper>
+
+          {/* Top Malware Section */}
+          <SectionWrapper>
+            <TopMalware data={data?.topMalware ?? data?.malwareData ?? []} isLoading={isLoading} />
+          </SectionWrapper>
         </div>
+      </div>
+    </div>
+  )
+}
 
-        {/* Bottom Row */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-background rounded-lg h-full">
-            <StatusDonut data={data?.statusData ?? []} isLoading={isLoading} />
-          </div>
+function SectionWrapper({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="bg-gray-100 dark:bg-[#1e1e3d] rounded-lg p-4 shadow-SM">
+      {children}
+    </div>
+  )
+}
 
-          <div className="bg-background rounded-lg h-full">
-            <TopMalware data={data?.malwareData ?? []} isLoading={isLoading} />
-          </div>
+function SecurityOverview({ data, isLoading }: { data: any, isLoading: boolean }) {
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+      {/* Security Gauge - Left Side */}
+      <div className="lg:col-span-5 flex items-center justify-center ">
+        <SecurityGauge value={data?.securityScore ?? 0} isLoading={isLoading} />
+      </div>
+      {/* Metrics Grid - Right Side */}
+      <div className="lg:col-span-7">
+        <div className="grid grid-cols-2 gap-4">
+          <AssetsCard />
+          <ThreatIntelligenceCard/>
+          <MetricCard title="Resolved" value={12} change={0} changeType="none" color="purple" />
+          <MetricCard title="False Positive" value={16} change={-80} changeType="less" color="red" />
+        </div>
+      </div>
+    </div>
+  )
+}
 
+function MetricCard({ title, value, change, changeType, color }: { title: string, value: number, change: number, changeType: string, color: string }) {
+  return (
+    <div className="bg-gray-200 dark:bg-[#1e1e5d] rounded-lg">
+      <div className="p-3">
+        <div className="flex items-center">
+          <div className={`bg-${color}-500 rounded-full w-4 h-4 mr-2`}></div>
+          <span className="text-2xl font-bold text-gray-900 dark:text-white">{value}</span>
+          <span className="ml-2">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 17L9 11L13 15L21 7" stroke="#FFA500" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </span>
+        </div>
+        <div className="mt-1">
+          <p className={`text-sm text-${color}-600 dark:text-${color}-400`}>{title}</p>
+          <p className="text-xs text-gray-600 dark:text-gray-400">{changeType === 'none' ? 'No Change' : `${change > 0 ? '+' : ''}${change} ${changeType === 'more' ? 'More' : 'less'} than last month`}</p>
         </div>
       </div>
     </div>

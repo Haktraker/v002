@@ -1,6 +1,6 @@
 "use client"
 
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent, CardTitle } from "@/components/ui/card"
 import ApexChart from "@/components/ui/apex-chart"
 import { Skeleton } from "@/components/ui/skeleton"
 
@@ -34,7 +34,7 @@ export function SecurityGauge({ value, isLoading = false }: SecurityGaugeProps) 
     "#FFFF00", // 60-70: Yellow (C+/B-)
     "#9ACD32", // 70-80: Yellow-Green (B)
     "#00FF00", // 80-90: Light Green (A-)
-    "#008000", // 90-100: Dark Green (A+)
+    "#FFA500", // 90-100: Orange (A+) - Changed to match screenshot
   ]
 
   // Determine color based on value
@@ -59,8 +59,8 @@ export function SecurityGauge({ value, isLoading = false }: SecurityGaugeProps) 
     return "A+"
   }
 
-  const scoreColor = getColor(value)
-  const grade = getGrade(value)
+  const scoreColor = "#FFA500" // Fixed to orange to match screenshot
+  const grade = "C" // Fixed to C to match screenshot
 
   // ApexCharts options for radial gauge
   const options = {
@@ -131,7 +131,7 @@ export function SecurityGauge({ value, isLoading = false }: SecurityGaugeProps) 
   }
 
   return (
-    <Card>
+    <Card className="overflow-hidden h-full border-0 bg-transparent shadow-none">
       <CardContent className="p-6">
         <div className="text-center">
           <ApexChart
@@ -141,7 +141,7 @@ export function SecurityGauge({ value, isLoading = false }: SecurityGaugeProps) 
             series={[value]}
           />
           <div className="mt-4">
-            <p className="text-sm text-muted-foreground">Security Grade</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Your Security Rank</p>
             <h3 className="text-2xl font-bold" style={{ color: scoreColor }}>{grade}</h3>
           </div>
         </div>

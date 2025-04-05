@@ -1,9 +1,8 @@
 import axios from 'axios';
 import { TokenService } from '@/lib/auth/token-service';
 
-export const API_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://api-9fi5.onrender.com/api";
+export const API_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL
 
-console.log(API_BASE_URL,"API_BASE_URL");
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
