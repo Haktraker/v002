@@ -15,7 +15,7 @@ interface BreadcrumbItem {
   isActive?: boolean;
 }
 
-export function useBreadcrumb() {
+export default function useBreadcrumb() {
   const pathname = usePathname();
 
   const generateBreadcrumbs = (): BreadcrumbItem[] => {
