@@ -1,5 +1,6 @@
 'use client';
 
+import React from "react";
 import { useState, useMemo } from 'react';
 import { useIPSAssets, useDeleteIPSAsset } from '@/lib/api/endpoints/assets';
 import { Button } from '@/components/ui/button';
@@ -20,13 +21,7 @@ import {
 } from "@tanstack/react-table";
 import { Input } from "@/components/ui/input";
 import { useTableStyle } from '@/hooks/use-table-style';
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
+import { useBreadcrumb } from '@/hooks/use-breadcrumb';
 
 export default function IPsPage() {
   const { data: ipsData, isLoading, error, refetch } = useIPSAssets();
@@ -169,28 +164,11 @@ export default function IPsPage() {
     return <div>Error loading IP assets</div>;
   }
 
+  const { BreadcrumbComponent } = useBreadcrumb();
+
   return (
     <div className="p-6">
-      <Breadcrumb>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/dashboard" className="flex items-center gap-2">
-              <Home className="h-4 w-4" />
-              Dashboard
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/dashboard/assets">Assets</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/dashboard/assets/ips" className="font-semibold">
-              IP Assets
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
+      <BreadcrumbComponent />
 
       <div className="flex items-center justify-between my-6">
         <div className="flex items-center gap-4">

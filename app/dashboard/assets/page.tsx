@@ -49,13 +49,15 @@ function IPsCard() {
         ) : (
           <div className="text-4xl font-bold">{count}</div>
         )}
-        <p className="text-sm text-muted-foreground mt-2">
-          {isLoading ? (
+        {isLoading ? (
+          <div className="mt-2">
             <Skeleton className="h-4 w-full" />
-          ) : (
-            `${count} IP addresses monitored`
-          )}
-        </p>
+          </div>
+        ) : (
+          <div className="text-sm text-muted-foreground mt-2">
+            {`${count} IP addresses monitored`}
+          </div>
+        )}
       </CardContent>
     </Card>
   );
@@ -82,13 +84,15 @@ function DomainsCard() {
         ) : (
           <div className="text-4xl font-bold">{count}</div>
         )}
-        <p className="text-sm text-muted-foreground mt-2">
-          {isLoading ? (
+        {isLoading ? (
+          <div className="mt-2">
             <Skeleton className="h-4 w-full" />
-          ) : (
-            `${count} domains monitored`
-          )}
-        </p>
+          </div>
+        ) : (
+          <div className="text-sm text-muted-foreground mt-2">
+            {`${count} domains monitored`}
+          </div>
+        )}
       </CardContent>
     </Card>
   );
@@ -115,13 +119,15 @@ function PortalsCard() {
         ) : (
           <div className="text-4xl font-bold">{count}</div>
         )}
-        <p className="text-sm text-muted-foreground mt-2">
-          {isLoading ? (
+        {isLoading ? (
+          <div className="mt-2">
             <Skeleton className="h-4 w-full" />
-          ) : (
-            `${count} portals monitored`
-          )}
-        </p>
+          </div>
+        ) : (
+          <div className="text-sm text-muted-foreground mt-2">
+            {`${count} portals monitored`}
+          </div>
+        )}
       </CardContent>
     </Card>
   );
