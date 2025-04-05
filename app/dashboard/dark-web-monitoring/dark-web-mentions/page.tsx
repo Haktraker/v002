@@ -145,7 +145,7 @@ export default function DarkWebMentionsPage() {
       cell: ({ row }) => {
         const impact = row.getValue("impactEvaluation") as string;
         return (
-          <p title={impact} className="truncate">
+          <p title={impact} className="text-foreground">
             {impact}
           </p>
         );
