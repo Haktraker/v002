@@ -17,6 +17,7 @@ import { SourcesBarChart } from "../../components/dashboard/sources-bar-chart"
 import { StatusDonut } from "../../components/dashboard/status-donut"
 import { TopMalware } from "../../components/dashboard/top-malware"
 import { ThreatIntelligenceCard } from "@/components/dashboard/threatIntelligenceCard"
+import { DarkWebMentionsCard } from "@/components/dashboard/darkWebMentionsCard"
 import { PageContainer } from "@/components/layout/page-container"
 
 // Import custom hook and types
@@ -126,6 +127,11 @@ export default function DashboardPage() {
           <SectionWrapper>
             <TopMalware data={data?.topMalware ?? data?.malwareData ?? []} isLoading={isLoading} />
           </SectionWrapper>
+
+          {/* Dark Web Mentions Section */}
+          <SectionWrapper>
+            <DarkWebMentionsCard />
+          </SectionWrapper>
         </div>
       </div>
     </PageContainer>
@@ -152,8 +158,7 @@ function SecurityOverview({ data, isLoading }: { data: any, isLoading: boolean }
         <div className="grid grid-cols-2 gap-4">
           <AssetsCard />
           <ThreatIntelligenceCard/>
-          <MetricCard title="Resolved" value={12} change={0} changeType="none" color="purple" />
-          <MetricCard title="False Positive" value={16} change={-80} changeType="less" color="red" />
+          <DarkWebMentionsCard />
         </div>
       </div>
     </div>
