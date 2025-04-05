@@ -67,7 +67,7 @@ export const useGetSuspiciousIPs = (params?: ThreatIntelligenceQueryParams) => {
   return useQuery({
     queryKey: THREAT_INTELLIGENCE_KEYS.suspiciousIpsLists(),
     queryFn: async () => {
-      const response = await withLoading(apiClient.get<ApiResponse<SuspiciousIP[]>>(`${BASE_URL}/suspicious-ips`, { params }));
+      const response = await withLoading(() => apiClient.get<ApiResponse<SuspiciousIP[]>>(`${BASE_URL}/suspicious-ips`, { params }));
       return response.data.data;
     }
   });
@@ -80,7 +80,7 @@ export const useGetSuspiciousIPById = (id: string) => {
   return useQuery({
     queryKey: THREAT_INTELLIGENCE_KEYS.suspiciousIpsDetail(id),
     queryFn: async () => {
-      const response = await withLoading(apiClient.get<ApiResponse<SuspiciousIP>>(`${BASE_URL}/suspicious-ips/${id}`));
+      const response = await withLoading(() => apiClient.get<ApiResponse<SuspiciousIP>>(`${BASE_URL}/suspicious-ips/${id}`));
       return response.data.data;
     },
     enabled: !!id
@@ -94,7 +94,7 @@ export const useCreateSuspiciousIP = () => {
 
   return useMutation({
     mutationFn: async (newSuspiciousIP: CreateSuspiciousIPDto) => {
-      const response = await withLoading(apiClient.post<ApiResponse<SuspiciousIP>>(`${BASE_URL}/suspicious-ips`, newSuspiciousIP));
+      const response = await withLoading(() => apiClient.post<ApiResponse<SuspiciousIP>>(`${BASE_URL}/suspicious-ips`, newSuspiciousIP));
       return response.data.data;
     },
     onSuccess: (data) => {
@@ -116,7 +116,7 @@ export const useUpdateSuspiciousIP = () => {
 
   return useMutation({
     mutationFn: async ({ id, ...updateData }: UpdateSuspiciousIPDto & { id: string }) => {
-      const response = await withLoading(apiClient.patch<ApiResponse<SuspiciousIP>>(`${BASE_URL}/suspicious-ips/${id}`, updateData));
+      const response = await withLoading(() => apiClient.patch<ApiResponse<SuspiciousIP>>(`${BASE_URL}/suspicious-ips/${id}`, updateData));
       return response.data.data;
     },
     onSuccess: (_, variables) => {
@@ -139,7 +139,7 @@ export const useDeleteSuspiciousIP = () => {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const response = await withLoading(apiClient.delete<ApiResponse<null>>(`${BASE_URL}/suspicious-ips/${id}`));
+      const response = await withLoading(() => apiClient.delete<ApiResponse<null>>(`${BASE_URL}/suspicious-ips/${id}`));
       return response.data;
     },
     onSuccess: (_, id) => {
@@ -164,7 +164,7 @@ export const useGetIOCs = (params?: ThreatIntelligenceQueryParams) => {
   return useQuery({
     queryKey: THREAT_INTELLIGENCE_KEYS.iocsLists(),
     queryFn: async () => {
-      const response = await withLoading(apiClient.get<ApiResponse<IOC[]>>(`${BASE_URL}/iocs`, { params }));
+      const response = await withLoading(() => apiClient.get<ApiResponse<IOC[]>>(`${BASE_URL}/iocs`, { params }));
       return response.data.data;
     }
   });
@@ -177,7 +177,7 @@ export const useGetIOCById = (id: string) => {
   return useQuery({
     queryKey: THREAT_INTELLIGENCE_KEYS.iocsDetail(id),
     queryFn: async () => {
-      const response = await withLoading(apiClient.get<ApiResponse<IOC>>(`${BASE_URL}/iocs/${id}`));
+      const response = await withLoading(() => apiClient.get<ApiResponse<IOC>>(`${BASE_URL}/iocs/${id}`));
       return response.data.data;
     },
     enabled: !!id
@@ -191,7 +191,7 @@ export const useCreateIOC = () => {
 
   return useMutation({
     mutationFn: async (newIOC: CreateIOCDto) => {
-      const response = await withLoading(apiClient.post<ApiResponse<IOC>>(`${BASE_URL}/iocs`, newIOC));
+      const response = await withLoading(() => apiClient.post<ApiResponse<IOC>>(`${BASE_URL}/iocs`, newIOC));
       return response.data.data;
     },
     onSuccess: (data) => {
@@ -213,7 +213,7 @@ export const useUpdateIOC = () => {
 
   return useMutation({
     mutationFn: async ({ id, ...updateData }: UpdateIOCDto & { id: string }) => {
-      const response = await withLoading(apiClient.patch<ApiResponse<IOC>>(`${BASE_URL}/iocs/${id}`, updateData));
+      const response = await withLoading(() => apiClient.patch<ApiResponse<IOC>>(`${BASE_URL}/iocs/${id}`, updateData));
       return response.data.data;
     },
     onSuccess: (_, variables) => {
@@ -236,7 +236,7 @@ export const useDeleteIOC = () => {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const response = await withLoading(apiClient.delete<ApiResponse<null>>(`${BASE_URL}/iocs/${id}`));
+      const response = await withLoading(() => apiClient.delete<ApiResponse<null>>(`${BASE_URL}/iocs/${id}`));
       return response.data;
     },
     onSuccess: (_, id) => {
@@ -261,7 +261,7 @@ export const useGetAPTFeeds = (params?: ThreatIntelligenceQueryParams) => {
   return useQuery({
     queryKey: THREAT_INTELLIGENCE_KEYS.aptFeedsLists(),
     queryFn: async () => {
-      const response = await withLoading(apiClient.get<ApiResponse<APTFeed[]>>(`${BASE_URL}/apt-feeds`, { params }));
+      const response = await withLoading(() => apiClient.get<ApiResponse<APTFeed[]>>(`${BASE_URL}/apt-feeds`, { params }));
       return response.data.data;
     }
   });
@@ -274,7 +274,7 @@ export const useGetAPTFeedById = (id: string) => {
   return useQuery({
     queryKey: THREAT_INTELLIGENCE_KEYS.aptFeedsDetail(id),
     queryFn: async () => {
-      const response = await withLoading(apiClient.get<ApiResponse<APTFeed>>(`${BASE_URL}/apt-feeds/${id}`));
+      const response = await withLoading(() => apiClient.get<ApiResponse<APTFeed>>(`${BASE_URL}/apt-feeds/${id}`));
       return response.data.data;
     },
     enabled: !!id
@@ -288,7 +288,7 @@ export const useCreateAPTFeed = () => {
 
   return useMutation({
     mutationFn: async (newAPTFeed: CreateAPTFeedDto) => {
-      const response = await withLoading(apiClient.post<ApiResponse<APTFeed>>(`${BASE_URL}/apt-feeds`, newAPTFeed));
+      const response = await withLoading(() => apiClient.post<ApiResponse<APTFeed>>(`${BASE_URL}/apt-feeds`, newAPTFeed));
       return response.data.data;
     },
     onSuccess: (data) => {
@@ -310,7 +310,7 @@ export const useUpdateAPTFeed = () => {
 
   return useMutation({
     mutationFn: async ({ id, ...updateData }: UpdateAPTFeedDto & { id: string }) => {
-      const response = await withLoading(apiClient.patch<ApiResponse<APTFeed>>(`${BASE_URL}/apt-feeds/${id}`, updateData));
+      const response = await withLoading(() => apiClient.patch<ApiResponse<APTFeed>>(`${BASE_URL}/apt-feeds/${id}`, updateData));
       return response.data.data;
     },
     onSuccess: (_, variables) => {
@@ -333,7 +333,7 @@ export const useDeleteAPTFeed = () => {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const response = await withLoading(apiClient.delete<ApiResponse<null>>(`${BASE_URL}/apt-feeds/${id}`));
+      const response = await withLoading(() => apiClient.delete<ApiResponse<null>>(`${BASE_URL}/apt-feeds/${id}`));
       return response.data;
     },
     onSuccess: (_, id) => {
@@ -358,7 +358,7 @@ export const useGetThreatIntelligenceFeeds = (params?: ThreatIntelligenceQueryPa
   return useQuery({
     queryKey: THREAT_INTELLIGENCE_KEYS.threatIntelligenceFeedsLists(),
     queryFn: async () => {
-      const response = await withLoading(apiClient.get<ApiResponse<ThreatIntelligenceFeed[]>>(`${BASE_URL}/threat-intelligence-feeds`, { params }));
+      const response = await withLoading(() => apiClient.get<ApiResponse<ThreatIntelligenceFeed[]>>(`${BASE_URL}/threat-intelligence-feeds`, { params }));
       return response.data.data;
     }
   });
@@ -371,7 +371,7 @@ export const useGetThreatIntelligenceFeedById = (id: string) => {
   return useQuery({
     queryKey: THREAT_INTELLIGENCE_KEYS.threatIntelligenceFeedsDetail(id),
     queryFn: async () => {
-      const response = await withLoading(apiClient.get<ApiResponse<ThreatIntelligenceFeed>>(`${BASE_URL}/threat-intelligence-feeds/${id}`));
+      const response = await withLoading(() => apiClient.get<ApiResponse<ThreatIntelligenceFeed>>(`${BASE_URL}/threat-intelligence-feeds/${id}`));
       return response.data.data;
     },
     enabled: !!id
@@ -385,7 +385,7 @@ export const useCreateThreatIntelligenceFeed = () => {
 
   return useMutation({
     mutationFn: async (newThreatIntelligenceFeed: CreateThreatIntelligenceFeedDto) => {
-      const response = await withLoading(apiClient.post<ApiResponse<ThreatIntelligenceFeed>>(`${BASE_URL}/threat-intelligence-feeds`, newThreatIntelligenceFeed));
+      const response = await withLoading(() => apiClient.post<ApiResponse<ThreatIntelligenceFeed>>(`${BASE_URL}/threat-intelligence-feeds`, newThreatIntelligenceFeed));
       return response.data.data;
     },
     onSuccess: (data) => {
@@ -407,7 +407,7 @@ export const useUpdateThreatIntelligenceFeed = () => {
 
   return useMutation({
     mutationFn: async ({ id, ...updateData }: UpdateThreatIntelligenceFeedDto & { id: string }) => {
-      const response = await withLoading(apiClient.patch<ApiResponse<ThreatIntelligenceFeed>>(`${BASE_URL}/threat-intelligence-feeds/${id}`, updateData));
+      const response = await withLoading(() => apiClient.patch<ApiResponse<ThreatIntelligenceFeed>>(`${BASE_URL}/threat-intelligence-feeds/${id}`, updateData));
       return response.data.data;
     },
     onSuccess: (_, variables) => {
@@ -430,7 +430,7 @@ export const useDeleteThreatIntelligenceFeed = () => {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const response = await withLoading(apiClient.delete<ApiResponse<null>>(`${BASE_URL}/threat-intelligence-feeds/${id}`));
+      const response = await withLoading(() => apiClient.delete<ApiResponse<null>>(`${BASE_URL}/threat-intelligence-feeds/${id}`));
       return response.data;
     },
     onSuccess: (_, id) => {
@@ -455,7 +455,7 @@ export const useGetThreatNews = (params?: ThreatIntelligenceQueryParams) => {
   return useQuery({
     queryKey: THREAT_INTELLIGENCE_KEYS.threatNewsLists(),
     queryFn: async () => {
-      const response = await withLoading(apiClient.get<ApiResponse<ThreatNews[]>>(`${BASE_URL}/threat-news`, { params }));
+      const response = await withLoading(() => apiClient.get<ApiResponse<ThreatNews[]>>(`${BASE_URL}/threat-news`, { params }));
       return response.data.data;
     }
   });
@@ -468,7 +468,7 @@ export const useGetThreatNewsById = (id: string) => {
   return useQuery({
     queryKey: THREAT_INTELLIGENCE_KEYS.threatNewsDetail(id),
     queryFn: async () => {
-      const response = await withLoading(apiClient.get<ApiResponse<ThreatNews>>(`${BASE_URL}/threat-news/${id}`));
+      const response = await withLoading(() => apiClient.get<ApiResponse<ThreatNews>>(`${BASE_URL}/threat-news/${id}`));
       return response.data.data;
     },
     enabled: !!id
@@ -482,7 +482,7 @@ export const useCreateThreatNews = () => {
 
   return useMutation({
     mutationFn: async (newThreatNews: CreateThreatNewsDto) => {
-      const response = await withLoading(apiClient.post<ApiResponse<ThreatNews>>(`${BASE_URL}/threat-news`, newThreatNews));
+      const response = await withLoading(() => apiClient.post<ApiResponse<ThreatNews>>(`${BASE_URL}/threat-news`, newThreatNews));
       return response.data.data;
     },
     onSuccess: (data) => {
@@ -504,7 +504,7 @@ export const useUpdateThreatNews = () => {
 
   return useMutation({
     mutationFn: async ({ id, ...updateData }: UpdateThreatNewsDto & { id: string }) => {
-      const response = await withLoading(apiClient.patch<ApiResponse<ThreatNews>>(`${BASE_URL}/threat-news/${id}`, updateData));
+      const response = await withLoading(() => apiClient.patch<ApiResponse<ThreatNews>>(`${BASE_URL}/threat-news/${id}`, updateData));
       return response.data.data;
     },
     onSuccess: (_, variables) => {
@@ -527,7 +527,7 @@ export const useDeleteThreatNews = () => {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const response = await withLoading(apiClient.delete<ApiResponse<null>>(`${BASE_URL}/threat-news/${id}`));
+      const response = await withLoading(() => apiClient.delete<ApiResponse<null>>(`${BASE_URL}/threat-news/${id}`));
       return response.data;
     },
     onSuccess: (_, id) => {
@@ -552,7 +552,7 @@ export const useGetGeoWatch = (params?: ThreatIntelligenceQueryParams) => {
   return useQuery({
     queryKey: THREAT_INTELLIGENCE_KEYS.geoWatchLists(),
     queryFn: async () => {
-      const response = await withLoading(apiClient.get<ApiResponse<GeoWatch[]>>(`${BASE_URL}/geo-watch`, { params }));
+      const response = await withLoading(() => apiClient.get<ApiResponse<GeoWatch[]>>(`${BASE_URL}/geo-watch`, { params }));
       return response.data.data;
     }
   });
@@ -565,7 +565,7 @@ export const useGetGeoWatchById = (id: string) => {
   return useQuery({
     queryKey: THREAT_INTELLIGENCE_KEYS.geoWatchDetail(id),
     queryFn: async () => {
-      const response = await withLoading(apiClient.get<ApiResponse<GeoWatch>>(`${BASE_URL}/geo-watch/${id}`));
+      const response = await withLoading(() => apiClient.get<ApiResponse<GeoWatch>>(`${BASE_URL}/geo-watch/${id}`));
       return response.data.data;
     },
     enabled: !!id
@@ -579,7 +579,7 @@ export const useCreateGeoWatch = () => {
 
   return useMutation({
     mutationFn: async (newGeoWatch: CreateGeoWatchDto) => {
-      const response = await withLoading(apiClient.post<ApiResponse<GeoWatch>>(`${BASE_URL}/geo-watch`, newGeoWatch));
+      const response = await withLoading(() => apiClient.post<ApiResponse<GeoWatch>>(`${BASE_URL}/geo-watch`, newGeoWatch));
       return response.data.data;
     },
     onSuccess: (data) => {
@@ -601,7 +601,7 @@ export const useUpdateGeoWatch = () => {
 
   return useMutation({
     mutationFn: async ({ id, ...updateData }: UpdateGeoWatchDto & { id: string }) => {
-      const response = await withLoading(apiClient.patch<ApiResponse<GeoWatch>>(`${BASE_URL}/geo-watch/${id}`, updateData));
+      const response = await withLoading(() => apiClient.patch<ApiResponse<GeoWatch>>(`${BASE_URL}/geo-watch/${id}`, updateData));
       return response.data.data;
     },
     onSuccess: (_, variables) => {
@@ -624,7 +624,7 @@ export const useDeleteGeoWatch = () => {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const response = await withLoading(apiClient.delete<ApiResponse<null>>(`${BASE_URL}/geo-watch/${id}`));
+      const response = await withLoading(() => apiClient.delete<ApiResponse<null>>(`${BASE_URL}/geo-watch/${id}`));
       return response.data;
     },
     onSuccess: (_, id) => {
