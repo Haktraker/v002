@@ -1,8 +1,7 @@
 "use client"
 
 import React from "react"
-import useBreadcrumb from "@/hooks/use-breadcrumb"
-
+import useBreadcrumb from "../../hooks/use-breadcrumb"
 
 interface PageContainerProps {
   children: React.ReactNode
