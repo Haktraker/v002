@@ -3,35 +3,14 @@
 import { useState, useMemo } from 'react';
 import { useIPSAssets, useDeleteIPSAsset } from '@/lib/api/endpoints/assets';
 import { Button } from '@/components/ui/button';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { 
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Pencil, Trash2, ChevronDown, ChevronsUpDown, ChevronUp, ArrowLeft } from 'lucide-react';
+import { Pencil, Home } from 'lucide-react';
 import { toast } from 'sonner';
 import { IPS } from '@/lib/api/types';
 import Link from 'next/link';
 import {
   ColumnDef,
-  flexRender,
-  getCoreRowModel,
   useReactTable,
+  getCoreRowModel,
   getPaginationRowModel,
   getSortedRowModel,
   SortingState,
@@ -40,14 +19,14 @@ import {
   RowSelectionState,
 } from "@tanstack/react-table";
 import { Input } from "@/components/ui/input";
+import { useTableStyle } from '@/hooks/use-table-style';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 
 export default function IPsPage() {
   const { data: ipsData, isLoading, error, refetch } = useIPSAssets();
@@ -60,14 +39,14 @@ export default function IPsPage() {
   const [showBulkDeleteDialog, setShowBulkDeleteDialog] = useState(false);
 
   const handleDelete = async (id: string) => {
-    console.log(id,'id');
-    
     setIsDeleting(true);
     try {
       await deleteIPSAsset.mutateAsync(id);
       refetch();
+      toast.success('IP asset deleted successfully');
     } catch (error) {
       console.error('Failed to delete IP asset:', error);
+      toast.error('Failed to delete IP asset');
     } finally {
       setIsDeleting(false);
     }
@@ -82,7 +61,6 @@ export default function IPsPage() {
     let errorCount = 0;
     
     try {
-      // Process each IP deletion sequentially
       for (const id of selectedIds) {
         try {
           await deleteIPSAsset.mutateAsync(id);
@@ -93,7 +71,6 @@ export default function IPsPage() {
         }
       }
       
-      // Show a summary toast at the end
       if (successCount > 0) {
         toast.success(`Successfully deleted ${successCount} IP assets${errorCount > 0 ? `, ${errorCount} failed` : ''}`);
         refetch();
@@ -111,195 +88,63 @@ export default function IPsPage() {
   };
 
   const handleUpdate = (ip: IPS) => {
-    // Redirect to update page or open modal
     window.location.href = `/dashboard/assets/ips/${ip._id}/edit`;
   };
 
-  // Helper function to format dates safely
   const formatDate = (dateString?: string) => {
     if (!dateString) return 'N/A';
     return new Date(dateString).toLocaleDateString();
   };
 
-  // Define columns for the data table
+  const tableStyle = useTableStyle<IPS>({
+    enableSelection: true,
+    enableSorting: true,
+    sortableColumns: ['value', 'location', 'createdAt', 'updatedAt'],
+    onDelete: handleDelete,
+    onBulkDelete: handleBulkDelete,
+    isDeleting,
+    showBulkDeleteDialog,
+    setShowBulkDeleteDialog,
+  });
+
   const columns = useMemo<ColumnDef<IPS>[]>(
     () => [
-      {
-        id: "select",
-        header: ({ table }) => (
-          <Checkbox
-            checked={
-              table.getIsAllPageRowsSelected() ||
-              (table.getIsSomePageRowsSelected() && "indeterminate")
-            }
-            onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-            aria-label="Select all"
-          />
-        ),
-        cell: ({ row }) => (
-          <Checkbox
-            checked={row.getIsSelected()}
-            onCheckedChange={(value) => row.toggleSelected(!!value)}
-            aria-label="Select row"
-          />
-        ),
-        enableSorting: false,
-        enableHiding: false,
-      },
-      {
-        accessorKey: "value",
-        header: ({ column }) => {
-          return (
-            <Button
-              variant="ghost"
-              onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            >
-              Value
-              {column.getIsSorted() === "asc" ? (
-                <ChevronUp className="ml-2 h-4 w-4" />
-              ) : column.getIsSorted() === "desc" ? (
-                <ChevronDown className="ml-2 h-4 w-4" />
-              ) : (
-                <ChevronsUpDown className="ml-2 h-4 w-4" />
-              )}
-            </Button>
-          )
-        },
-        cell: ({ row }) => <div className="font-medium">{row.getValue("value")}</div>,
-      },
-      {
-        accessorKey: "location",
-        header: ({ column }) => {
-          return (
-            <Button
-              variant="ghost"
-              onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            >
-              Location
-              {column.getIsSorted() === "asc" ? (
-                <ChevronUp className="ml-2 h-4 w-4" />
-              ) : column.getIsSorted() === "desc" ? (
-                <ChevronDown className="ml-2 h-4 w-4" />
-              ) : (
-                <ChevronsUpDown className="ml-2 h-4 w-4" />
-              )}
-            </Button>
-          )
-        },
-      },
-      {
-        accessorKey: "description",
-        header: "Description",
-      },
-      {
-        accessorKey: "createdAt",
-        header: ({ column }) => {
-          return (
-            <Button
-              variant="ghost"
-              onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            >
-              Created At
-              {column.getIsSorted() === "asc" ? (
-                <ChevronUp className="ml-2 h-4 w-4" />
-              ) : column.getIsSorted() === "desc" ? (
-                <ChevronDown className="ml-2 h-4 w-4" />
-              ) : (
-                <ChevronsUpDown className="ml-2 h-4 w-4" />
-              )}
-            </Button>
-          )
-        },
-        cell: ({ row }) => formatDate(row.getValue("createdAt")),
-      },
-      {
-        accessorKey: "updatedAt",
-        header: ({ column }) => {
-          return (
-            <Button
-              variant="ghost"
-              onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            >
-              Updated At
-              {column.getIsSorted() === "asc" ? (
-                <ChevronUp className="ml-2 h-4 w-4" />
-              ) : column.getIsSorted() === "desc" ? (
-                <ChevronDown className="ml-2 h-4 w-4" />
-              ) : (
-                <ChevronsUpDown className="ml-2 h-4 w-4" />
-              )}
-            </Button>
-          )
-        },
-        cell: ({ row }) => formatDate(row.getValue("updatedAt")),
-      },
-      {
-        id: "actions",
-        header: () => <div className="text-right">Actions</div>,
-        cell: ({ row }) => {
-          const ip = row.original;
-          
-          return (
-            <div className="flex justify-end gap-2">
-              <Button 
-                variant="outline" 
-                size="icon" 
-                onClick={() => handleUpdate(ip)}
-              >
-                <Pencil className="h-4 w-4" />
-              </Button>
-              
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button 
-                    variant="destructive" 
-                    size="icon"
-                    disabled={isDeleting}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      This action cannot be undone. This will permanently delete the IP asset.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction 
-                      onClick={() => handleDelete(row.original._id)}
-                      disabled={isDeleting}
-                    >
-                      Delete
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </div>
-          );
-        },
-      },
+      tableStyle.getSelectionColumn(),
+      tableStyle.getDefaultColumn('value', 'IP Address', {
+        isSortable: true,
+        cellClassName: 'font-medium',
+      }),
+      tableStyle.getDefaultColumn('location', 'Location', {
+        isSortable: true,
+      }),
+      tableStyle.getDefaultColumn('description', 'Description'),
+      tableStyle.getDefaultColumn('createdAt', 'Created At', {
+        isSortable: true,
+        formatter: formatDate,
+      }),
+      tableStyle.getDefaultColumn('updatedAt', 'Updated At', {
+        isSortable: true,
+        formatter: formatDate,
+      }),
+      tableStyle.getActionColumn((ip: IPS) => (
+        <>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => handleUpdate(ip)}
+            className="h-8 w-8 p-0"
+          >
+            <Pencil className="h-4 w-4" />
+          </Button>
+          <tableStyle.DeleteDialog id={ip._id} />
+        </>
+      )),
     ],
-    []
+    [isDeleting]
   );
 
-  // Prepare data for the table
-  const data = useMemo(() => {
-    if (!ipsData) return [];
-    // Handle different response structures
-    if (Array.isArray(ipsData)) return ipsData;
-    // Handle PaginatedResponse structure
-    if (ipsData && 'items' in ipsData && Array.isArray(ipsData.items)) {
-      return ipsData.items as IPS[];
-    }
-    return [];
-  }, [ipsData]);
-
-  // Initialize the table
   const table = useReactTable({
-    data,
+    data: Array.isArray(ipsData) ? ipsData : ipsData?.data || [],
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -315,138 +160,65 @@ export default function IPsPage() {
     },
   });
 
-  const selectedRowCount = Object.keys(rowSelection).length;
-
   if (isLoading) {
-    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+    return <div>Loading...</div>;
   }
 
   if (error) {
-    return <div className="text-red-500">Error loading IP assets</div>;
+    console.log(error);
+    return <div>Error loading IP assets</div>;
   }
 
   return (
-    <div className="container mx-auto py-10 my-2">
-      <div className="flex justify-between items-center mb-6">
-      <div className="mb-6">
-        <Link href="/dashboard" className="flex items-center text-sm text-muted-foreground hover:text-foreground mb-4">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Dashboard
-        </Link>
-        <h1 className="text-2xl font-bold">IP Assets</h1>
-      </div>
-        <Link href="ips/new">
-            <Button>
-              Add New IP
+    <div className="p-6">
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/dashboard" className="flex items-center gap-2">
+              <Home className="h-4 w-4" />
+              Dashboard
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/dashboard/assets">Assets</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/dashboard/assets/ips" className="font-semibold">
+              IP Assets
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+
+      <div className="flex items-center justify-between my-6">
+        <div className="flex items-center gap-4">
+          <h1 className="text-2xl font-semibold">IP Assets</h1>
+          <Input
+            placeholder="Filter IPs..."
+            value={(table.getColumn("value")?.getFilterValue() as string) ?? ""}
+            onChange={(event) =>
+              table.getColumn("value")?.setFilterValue(event.target.value)
+            }
+            className="max-w-sm"
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          {Object.keys(rowSelection).length > 0 && (
+            <Button variant="destructive" onClick={() => setShowBulkDeleteDialog(true)}>
+              Delete Selected ({Object.keys(rowSelection).length})
             </Button>
-        </Link>
-      </div>
-      
-      <div className="flex items-center justify-between py-4">
-        <Input
-          placeholder="Filter by value..."
-          value={(table.getColumn("value")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("value")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
-        
-        {selectedRowCount > 0 && (
-          <AlertDialog open={showBulkDeleteDialog} onOpenChange={setShowBulkDeleteDialog}>
-            <AlertDialogTrigger asChild>
-              <Button variant="destructive" disabled={isDeleting}>
-                Delete Selected ({selectedRowCount})
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This action cannot be undone. This will permanently delete {selectedRowCount} selected IP assets.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction 
-                  onClick={handleBulkDelete}
-                  disabled={isDeleting}
-                >
-                  {isDeleting ? 'Deleting...' : 'Delete Selected'}
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        )}
+          )}
+          <Link href="/dashboard/assets/ips/new">
+            <Button>Add New IP</Button>
+          </Link>
+        </div>
       </div>
 
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No IP assets found
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
-      
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredRowModel().rows.length} asset(s) total
-          {selectedRowCount > 0 && `, ${selectedRowCount} selected`}
-        </div>
-        <div className="space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </Button>
-        </div>
-      </div>
+      {tableStyle.renderTable(table)}
+      {tableStyle.Pagination({ table })}
+      {tableStyle.BulkDeleteDialog()}
     </div>
   );
 }

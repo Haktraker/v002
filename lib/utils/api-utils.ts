@@ -1,16 +1,16 @@
-import { useLoading } from '@/lib/context/loading-context';
+import { useState } from 'react';
 
 export function useApiLoading() {
-  const { startLoading, stopLoading } = useLoading();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const withLoading = async <T,>(promise: Promise<T>): Promise<T> => {
+  const withLoading = async <T>(promise: () => Promise<T>): Promise<T> => {
+    setIsLoading(true);
     try {
-      startLoading();
-      return await promise;
+      return await promise();
     } finally {
-      stopLoading();
+      setIsLoading(false);
     }
   };
 
-  return { withLoading };
+  return { isLoading, withLoading };
 }

@@ -15,7 +15,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { ArrowLeft } from 'lucide-react';
-import { showLoadingToast } from '@/lib/utils/toast-utils';
+import { showToast } from '@/lib/utils/toast-utils';
 import Link from 'next/link';
 import { CreateThreatIntelligenceFeedDto } from '@/lib/api/types';
 import { format } from 'date-fns';
@@ -75,20 +75,15 @@ export default function NewThreatFeedPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
-
     try {
-      await showLoadingToast(
-        withLoading(createThreatFeed.mutateAsync(formData)),
-        {
-          loading: 'Creating threat feed entry...',
-          success: 'Threat feed entry created successfully',
-          error: 'Failed to create threat feed entry',
-        }
-      );
-      router.push('/dashboard/threatintelligence/threat_feeds');
-    } finally {
-      setIsSubmitting(false);
+      await withLoading(async () => {
+        await createThreatFeed.mutateAsync(formData);
+        showToast('Threat feed created successfully', 'success');
+        router.push('/dashboard/threatintelligence/threat_feeds');
+      });
+    } catch (error) {
+      console.error('Failed to create threat feed:', error);
+      showToast('Failed to create threat feed', 'error');
     }
   };
 

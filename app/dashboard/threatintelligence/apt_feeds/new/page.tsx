@@ -21,6 +21,7 @@ import { CreateAPTFeedDto } from '@/lib/api/types';
 import { format } from 'date-fns';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useApiLoading } from '@/lib/utils/api-utils';
+import { showToast } from '@/lib/utils/toast-utils';
 
 export default function NewAPTFeedPage() {
   const router = useRouter();
@@ -63,20 +64,15 @@ export default function NewAPTFeedPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
-
     try {
-      await showLoadingToast(
-        withLoading(createAPTFeed.mutateAsync(formData)),
-        {
-          loading: 'Creating APT feed entry...',
-          success: 'APT feed entry created successfully',
-          error: 'Failed to create APT feed entry',
-        }
-      );
-      router.push('/dashboard/threatintelligence/apt_feeds');
-    } finally {
-      setIsSubmitting(false);
+      await withLoading(async () => {
+        await createAPTFeed.mutateAsync(formData);
+        showToast('APT feed created successfully', 'success');
+        router.push('/dashboard/threatintelligence/apt_feeds');
+      });
+    } catch (error) {
+      console.error('Failed to create APT feed:', error);
+      showToast('Failed to create APT feed', 'error');
     }
   };
 

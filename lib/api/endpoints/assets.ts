@@ -75,7 +75,9 @@ export const useIPSAssets = (params?: IPSQueryParams) => {
   return useQuery({
     queryKey: ASSETS_KEYS.ipsList(params || {}),
     queryFn: async () => {
-      const { data } = await withLoading(apiClient.get<ApiResponse<PaginatedResponse<IPS>>>('/assets/ips', { params }));
+      const { data } = await withLoading(async () => 
+        apiClient.get<ApiResponse<PaginatedResponse<IPS>>>('/assets/ips', { params })
+      );
       return data.data;
     },
   });
@@ -88,7 +90,9 @@ export const useIPSAsset = (id: string) => {
   return useQuery({
     queryKey: ASSETS_KEYS.ipsDetail(id),
     queryFn: async () => {
-      const { data } = await withLoading(apiClient.get<ApiResponse<IPS>>(`/assets/ips/${id}`));
+      const { data } = await withLoading(async () =>
+        apiClient.get<ApiResponse<IPS>>(`/assets/ips/${id}`)
+      );
       return data.data;
     },
     enabled: !!id,
@@ -102,7 +106,9 @@ export const useCreateIPSAsset = () => {
 
   return useMutation({
     mutationFn: async (newIPS: CreateIPSDto) => {
-      const { data } = await withLoading(apiClient.post<ApiResponse<IPS>>('/assets/ips', newIPS));
+      const { data } = await withLoading(async () =>
+        apiClient.post<ApiResponse<IPS>>('/assets/ips', newIPS)
+      );
       return data.data;
     },
     onSuccess: (data) => {
@@ -124,7 +130,9 @@ export const useUpdateIPSAsset = () => {
 
   return useMutation({
     mutationFn: async ({ id, ...updateData }: UpdateIPSDto & { id: string }) => {
-      const { data } = await withLoading(apiClient.patch<ApiResponse<IPS>>(`/assets/ips/${id}`, updateData));
+      const { data } = await withLoading(async () =>
+        apiClient.patch<ApiResponse<IPS>>(`/assets/ips/${id}`, updateData)
+      );
       return data.data;
     },
     onSuccess: (_, variables) => {
@@ -147,7 +155,9 @@ export const useDeleteIPSAsset = () => {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const { data } = await withLoading(apiClient.delete<ApiResponse<void>>(`/assets/ips/${id}`));
+      const { data } = await withLoading(async () =>
+        apiClient.delete<ApiResponse<void>>(`/assets/ips/${id}`)
+      );
       return data;
     },
     onSuccess: (_, id) => {
@@ -172,7 +182,9 @@ export const useDomainAssets = (params?: DomainQueryParams) => {
   return useQuery({
     queryKey: ASSETS_KEYS.domainsList(params || {}),
     queryFn: async () => {
-      const { data } = await withLoading(apiClient.get<ApiResponse<PaginatedResponse<Domain>>>('/assets/domains', { params }));
+      const { data } = await withLoading(async () =>
+        apiClient.get<ApiResponse<PaginatedResponse<Domain>>>('/assets/domains', { params })
+      );
       return data.data;
     },
   });
@@ -185,7 +197,9 @@ export const useDomainAsset = (id: string) => {
   return useQuery({
     queryKey: ASSETS_KEYS.domainsDetail(id),
     queryFn: async () => {
-      const { data } = await withLoading(apiClient.get<ApiResponse<Domain>>(`/assets/domains/${id}`));
+      const { data } = await withLoading(async () =>
+        apiClient.get<ApiResponse<Domain>>(`/assets/domains/${id}`)
+      );
       return data.data;
     },
     enabled: !!id,
@@ -199,7 +213,9 @@ export const useCreateDomainAsset = () => {
 
   return useMutation({
     mutationFn: async (newDomain: CreateDomainDto) => {
-      const { data } = await withLoading(apiClient.post<ApiResponse<Domain>>('/assets/domains', newDomain));
+      const { data } = await withLoading(async () =>
+        apiClient.post<ApiResponse<Domain>>('/assets/domains', newDomain)
+      );
       return data.data;
     },
     onSuccess: () => {
@@ -221,7 +237,9 @@ export const useUpdateDomainAsset = () => {
 
   return useMutation({
     mutationFn: async ({ id, ...updateData }: UpdateDomainDto & { id: string }) => {
-      const { data } = await withLoading(apiClient.patch<ApiResponse<Domain>>(`/assets/domains/${id}`, updateData));
+      const { data } = await withLoading(async () =>
+        apiClient.patch<ApiResponse<Domain>>(`/assets/domains/${id}`, updateData)
+      );
       return data.data;
     },
     onSuccess: (_, variables) => {
@@ -244,7 +262,9 @@ export const useDeleteDomainAsset = () => {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const { data } = await withLoading(apiClient.delete<ApiResponse<void>>(`/assets/domains/${id}`));
+      const { data } = await withLoading(async () =>
+        apiClient.delete<ApiResponse<void>>(`/assets/domains/${id}`)
+      );
       return data;
     },
     onSuccess: (_, id) => {
@@ -269,7 +289,9 @@ export const usePortalAssets = (params?: PortalQueryParams) => {
   return useQuery({
     queryKey: ASSETS_KEYS.portalsList(params || {}),
     queryFn: async () => {
-      const { data } = await withLoading(apiClient.get<ApiResponse<PaginatedResponse<Portal>>>('/assets/portals', { params }));
+      const { data } = await withLoading(async () =>
+        apiClient.get<ApiResponse<PaginatedResponse<Portal>>>('/assets/portals', { params })
+      );
       return data.data;
     },
   });
@@ -282,7 +304,9 @@ export const usePortalAsset = (id: string) => {
   return useQuery({
     queryKey: ASSETS_KEYS.portalsDetail(id),
     queryFn: async () => {
-      const { data } = await withLoading(apiClient.get<ApiResponse<Portal>>(`/assets/portals/${id}`));
+      const { data } = await withLoading(async () =>
+        apiClient.get<ApiResponse<Portal>>(`/assets/portals/${id}`)
+      );
       return data.data;
     },
     enabled: !!id,
@@ -296,7 +320,9 @@ export const useCreatePortalAsset = () => {
 
   return useMutation({
     mutationFn: async (newPortal: CreatePortalDto) => {
-      const { data } = await withLoading(apiClient.post<ApiResponse<Portal>>('/assets/portals', newPortal));
+      const { data } = await withLoading(async () =>
+        apiClient.post<ApiResponse<Portal>>('/assets/portals', newPortal)
+      );
       return data.data;
     },
     onSuccess: (data) => {
@@ -318,7 +344,9 @@ export const useUpdatePortalAsset = () => {
 
   return useMutation({
     mutationFn: async ({ id, ...updateData }: UpdatePortalDto & { id: string }) => {
-      const { data } = await withLoading(apiClient.patch<ApiResponse<Portal>>(`/assets/portals/${id}`, updateData));
+      const { data } = await withLoading(async () =>
+        apiClient.patch<ApiResponse<Portal>>(`/assets/portals/${id}`, updateData)
+      );
       return data.data;
     },
     onSuccess: (_, variables) => {
@@ -341,7 +369,9 @@ export const useDeletePortalAsset = () => {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const { data } = await withLoading(apiClient.delete<ApiResponse<void>>(`/assets/portals/${id}`));
+      const { data } = await withLoading(async () =>
+        apiClient.delete<ApiResponse<void>>(`/assets/portals/${id}`)
+      );
       return data;
     },
     onSuccess: (_, id) => {

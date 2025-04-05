@@ -12,7 +12,7 @@ import Link from 'next/link';
 import { CreateThreatNewsDto } from '@/lib/api/types';
 import { useApiLoading } from '@/lib/utils/api-utils';
 import { format } from 'date-fns';
-import { showLoadingToast } from '@/lib/utils/toast-utils';
+import { showToast } from '@/lib/utils/toast-utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function NewThreatNewsPage() {
@@ -42,22 +42,15 @@ export default function NewThreatNewsPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
-
     try {
-      await showLoadingToast(
-        withLoading(createThreatNews.mutateAsync(formData)),
-        {
-          loading: 'Creating threat news entry...',
-          success: 'Threat news entry created successfully',
-          error: 'Failed to create threat news entry',
-        }
-      );
-      router.push('/dashboard/threatintelligence/threat_news');
+      await withLoading(async () => {
+        await createThreatNews.mutateAsync(formData);
+        showToast('Threat news created successfully', 'success');
+        router.push('/dashboard/threatintelligence/threat_news');
+      });
     } catch (error) {
-      console.error('Failed to create threat news entry:', error);
-    } finally {
-      setIsSubmitting(false);
+      console.error('Failed to create threat news:', error);
+      showToast('Failed to create threat news', 'error');
     }
   };
 
