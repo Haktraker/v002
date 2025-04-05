@@ -40,6 +40,8 @@ import {
   RowSelectionState,
 } from "@tanstack/react-table";
 import { Input } from "@/components/ui/input";
+import { useTableStyle } from '@/hooks/use-table-style';
+import { PageContainer } from '@/components/layout/page-container';
 
 export default function PortalsPage() {
   const { data: portalsData, isLoading, error, refetch } = usePortalAssets();
@@ -291,19 +293,16 @@ export default function PortalsPage() {
   }
 
   if (error) {
-    return <div className="text-red-500">Error loading portal assets</div>;
+    console.log(error);
+    return <div>Error loading portal assets</div>;
   }
 
   return (
-    <div className="container mx-auto py-10 my-2">
-      <div className="flex justify-between items-center mb-6">
-      <div className="mb-6">
-        <Link href="/dashboard" className="flex items-center mb-4 text-sm text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Dashboard
-        </Link>
-        <h1 className="text-2xl font-bold">Portal Assets</h1>
-      </div>
+    <PageContainer>
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-4">
+          <h1 className="text-2xl font-semibold">Portal Assets</h1>
+        </div>
         
         <Link href="portals/new">
             <Button>
@@ -417,6 +416,6 @@ export default function PortalsPage() {
           </Button>
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 }

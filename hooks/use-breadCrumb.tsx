@@ -1,4 +1,5 @@
 import { usePathname } from "next/navigation";
+import Link from "next/link";
 import React from "react";
 import {
   Breadcrumb,
@@ -72,12 +73,11 @@ export function useBreadcrumb() {
                   {item.label}
                 </span>
               ) : (
-                <BreadcrumbLink 
-                  href={item.href} 
-                  className="dark:text-white text-black"
-                >
-                  {item.label}
-                </BreadcrumbLink>
+                <Link href={item.href} passHref legacyBehavior>
+                  <BreadcrumbLink className="dark:text-white text-black">
+                    {item.label}
+                  </BreadcrumbLink>
+                </Link>
               )}
             </BreadcrumbItem>
             {index < breadcrumbs.length - 1 && <BreadcrumbSeparator />}

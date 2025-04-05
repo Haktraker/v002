@@ -69,7 +69,8 @@ export const useGetSuspiciousIPs = (params?: ThreatIntelligenceQueryParams) => {
     queryFn: async () => {
       const response = await withLoading(() => apiClient.get<ApiResponse<SuspiciousIP[]>>(`${BASE_URL}/suspicious-ips`, { params }));
       return response.data.data;
-    }
+    },
+    staleTime: 5 * 60 * 1000 // 5 minutes
   });
 };
 
@@ -83,7 +84,8 @@ export const useGetSuspiciousIPById = (id: string) => {
       const response = await withLoading(() => apiClient.get<ApiResponse<SuspiciousIP>>(`${BASE_URL}/suspicious-ips/${id}`));
       return response.data.data;
     },
-    enabled: !!id
+    enabled: !!id,
+    staleTime: 5 * 60 * 1000 // 5 minutes
   });
 };
 
@@ -166,7 +168,8 @@ export const useGetIOCs = (params?: ThreatIntelligenceQueryParams) => {
     queryFn: async () => {
       const response = await withLoading(() => apiClient.get<ApiResponse<IOC[]>>(`${BASE_URL}/iocs`, { params }));
       return response.data.data;
-    }
+    },
+    staleTime: 5 * 60 * 1000 // 5 minutes
   });
 };
 
@@ -180,7 +183,8 @@ export const useGetIOCById = (id: string) => {
       const response = await withLoading(() => apiClient.get<ApiResponse<IOC>>(`${BASE_URL}/iocs/${id}`));
       return response.data.data;
     },
-    enabled: !!id
+    enabled: !!id,
+    staleTime: 5 * 60 * 1000 // 5 minutes
   });
 };
 
@@ -263,7 +267,8 @@ export const useGetAPTFeeds = (params?: ThreatIntelligenceQueryParams) => {
     queryFn: async () => {
       const response = await withLoading(() => apiClient.get<ApiResponse<APTFeed[]>>(`${BASE_URL}/apt-feeds`, { params }));
       return response.data.data;
-    }
+    },
+    staleTime: 5 * 60 * 1000 // 5 minutes
   });
 };
 
@@ -277,7 +282,8 @@ export const useGetAPTFeedById = (id: string) => {
       const response = await withLoading(() => apiClient.get<ApiResponse<APTFeed>>(`${BASE_URL}/apt-feeds/${id}`));
       return response.data.data;
     },
-    enabled: !!id
+    enabled: !!id,
+    staleTime: 5 * 60 * 1000 // 5 minutes
   });
 };
 
@@ -360,7 +366,8 @@ export const useGetThreatIntelligenceFeeds = (params?: ThreatIntelligenceQueryPa
     queryFn: async () => {
       const response = await withLoading(() => apiClient.get<ApiResponse<ThreatIntelligenceFeed[]>>(`${BASE_URL}/threat-intelligence-feeds`, { params }));
       return response.data.data;
-    }
+    },
+    staleTime: 5 * 60 * 1000 // 5 minutes
   });
 };
 
@@ -374,7 +381,8 @@ export const useGetThreatIntelligenceFeedById = (id: string) => {
       const response = await withLoading(() => apiClient.get<ApiResponse<ThreatIntelligenceFeed>>(`${BASE_URL}/threat-intelligence-feeds/${id}`));
       return response.data.data;
     },
-    enabled: !!id
+    enabled: !!id,
+    staleTime: 5 * 60 * 1000 // 5 minutes
   });
 };
 
@@ -457,7 +465,8 @@ export const useGetThreatNews = (params?: ThreatIntelligenceQueryParams) => {
     queryFn: async () => {
       const response = await withLoading(() => apiClient.get<ApiResponse<ThreatNews[]>>(`${BASE_URL}/threat-news`, { params }));
       return response.data.data;
-    }
+    },
+    staleTime: 5 * 60 * 1000 // 5 minutes
   });
 };
 
@@ -471,7 +480,8 @@ export const useGetThreatNewsById = (id: string) => {
       const response = await withLoading(() => apiClient.get<ApiResponse<ThreatNews>>(`${BASE_URL}/threat-news/${id}`));
       return response.data.data;
     },
-    enabled: !!id
+    enabled: !!id,
+    staleTime: 5 * 60 * 1000 // 5 minutes
   });
 };
 
@@ -554,7 +564,8 @@ export const useGetGeoWatch = (params?: ThreatIntelligenceQueryParams) => {
     queryFn: async () => {
       const response = await withLoading(() => apiClient.get<ApiResponse<GeoWatch[]>>(`${BASE_URL}/geo-watch`, { params }));
       return response.data.data;
-    }
+    },
+    staleTime: 5 * 60 * 1000 // 5 minutes
   });
 };
 
@@ -568,7 +579,8 @@ export const useGetGeoWatchById = (id: string) => {
       const response = await withLoading(() => apiClient.get<ApiResponse<GeoWatch>>(`${BASE_URL}/geo-watch/${id}`));
       return response.data.data;
     },
-    enabled: !!id
+    enabled: !!id,
+    staleTime: 5 * 60 * 1000 // 5 minutes
   });
 };
 

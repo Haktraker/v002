@@ -15,6 +15,7 @@ import { format } from 'date-fns';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useApiLoading } from '@/lib/utils/api-utils';
+import { PageContainer } from '@/components/layout/page-container';
 
 export default function NewSuspiciousIPPage() {
   const router = useRouter();
@@ -52,15 +53,14 @@ export default function NewSuspiciousIPPage() {
     setIsSubmitting(true);
 
     try {
-      await showLoadingToast(
-        withLoading(createSuspiciousIP.mutateAsync(formData)),
-        {
-          loading: 'Creating suspicious IP entry...',
-          success: 'Suspicious IP entry created successfully',
-          error: 'Failed to create suspicious IP entry',
-        }
-      );
-      router.push('/dashboard/threatintelligence/suspicious_ips');
+      await withLoading(async () => {
+        await createSuspiciousIP.mutateAsync(formData);
+        showToast('Suspicious IP entry created successfully', 'success');
+        router.push('/dashboard/threatintelligence/suspicious_ips');
+      });
+    } catch (error) {
+      console.error('Error creating suspicious IP:', error);
+      showToast('Failed to create suspicious IP', 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -156,26 +156,28 @@ export default function NewSuspiciousIPPage() {
     setIsSubmitting(true);
     
     try {
-      let successCount = 0;
-      let errorCount = 0;
-      
-      // Process each entry
-      for (const entry of csvData) {
-        try {
-          await withLoading(createSuspiciousIP.mutateAsync(entry));
-          successCount++;
-        } catch (error) {
-          console.error('Failed to add entry:', error);
-          errorCount++;
+      await withLoading(async () => {
+        let successCount = 0;
+        let errorCount = 0;
+        
+        // Process each entry
+        for (const entry of csvData) {
+          try {
+            await createSuspiciousIP.mutateAsync(entry);
+            successCount++;
+          } catch (error) {
+            console.error('Failed to add entry:', error);
+            errorCount++;
+          }
         }
-      }
-      
-      if (successCount > 0) {
-        showToast(`Successfully added ${successCount} Suspicious IP entries${errorCount > 0 ? `, ${errorCount} failed` : ''}`, 'success');
-        router.push('/dashboard/threatintelligence/suspicious_ips');
-      } else {
-        showToast('Failed to add any Suspicious IP entries', 'error');
-      }
+        
+        if (successCount > 0) {
+          showToast(`Successfully added ${successCount} Suspicious IP entries${errorCount > 0 ? `, ${errorCount} failed` : ''}`, 'success');
+          router.push('/dashboard/threatintelligence/suspicious_ips');
+        } else {
+          showToast('Failed to add any Suspicious IP entries', 'error');
+        }
+      });
     } catch (error) {
       console.error('Bulk import failed:', error);
       showToast('Bulk import process failed', 'error');
@@ -185,25 +187,25 @@ export default function NewSuspiciousIPPage() {
   };
 
   return (
-    <div className="p-6">
+    <PageContainer>
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
           <Link href="/dashboard/threatintelligence/suspicious_ips">
-            <Button variant="ghost" size="icon">
-              <ArrowLeft className="h-5 w-5" />
+            <Button variant="outline">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back
             </Button>
           </Link>
-          <h1 className="text-2xl font-semibold">Suspicious IP</h1>
+          <h1 className="text-2xl font-semibold">Add Suspicious IP</h1>
         </div>
       </div>
 
-      <Tabs defaultValue="single" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="single">Single Entry</TabsTrigger>
-          <TabsTrigger value="bulk">Bulk Import</TabsTrigger>
+      <Tabs defaultValue="basic">
+        <TabsList>
+          <TabsTrigger value="basic">Basic Information</TabsTrigger>
+          <TabsTrigger value="advanced">Advanced Options</TabsTrigger>
         </TabsList>
-        
-        <TabsContent value="single" className="mt-4">
+        <TabsContent value="basic" className="mt-4">
           <Card>
             <CardHeader>
               <CardTitle>Create Suspicious IP Entry</CardTitle>
@@ -270,8 +272,7 @@ export default function NewSuspiciousIPPage() {
             </CardContent>
           </Card>
         </TabsContent>
-        
-        <TabsContent value="bulk" className="mt-4">
+        <TabsContent value="advanced" className="mt-4">
           <Card>
             <CardHeader>
               <CardTitle>Bulk Import Suspicious IPs</CardTitle>
@@ -351,6 +352,6 @@ export default function NewSuspiciousIPPage() {
           </Card>
         </TabsContent>
       </Tabs>
-    </div>
+    </PageContainer>
   );
 }

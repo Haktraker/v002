@@ -21,7 +21,7 @@ import {
 } from "@tanstack/react-table";
 import { Input } from "@/components/ui/input";
 import { useTableStyle } from '@/hooks/use-table-style';
-import { useBreadcrumb } from '@/hooks/use-breadcrumb';
+import { PageContainer } from '@/components/layout/page-container';
 
 export default function IPsPage() {
   const { data: ipsData, isLoading, error, refetch } = useIPSAssets();
@@ -164,13 +164,9 @@ export default function IPsPage() {
     return <div>Error loading IP assets</div>;
   }
 
-  const { BreadcrumbComponent } = useBreadcrumb();
-
   return (
-    <div className="p-6">
-      <BreadcrumbComponent />
-
-      <div className="flex items-center justify-between my-6">
+    <PageContainer>
+      <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-4">
           <h1 className="text-2xl font-semibold">IP Assets</h1>
           <Input
@@ -197,6 +193,6 @@ export default function IPsPage() {
       {tableStyle.renderTable(table)}
       {tableStyle.Pagination({ table })}
       {tableStyle.BulkDeleteDialog()}
-    </div>
+    </PageContainer>
   );
 }

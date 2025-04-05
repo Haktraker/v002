@@ -303,3 +303,74 @@ export interface ThreatIntelligenceQueryParams {
   page?: number;
   limit?: number;
 }
+
+// Dark Web Mentions
+export type DarkWebMentionType = "credentials" | "corporate assets" | "brand mentions";
+export type DarkWebMentionStatus = "investigating" | "resolved" | "unresolved";
+export type RiskLevel = "low" | "medium" | "high" | "critical";
+
+export interface DarkWebMentionDetail {
+  user?: string;
+  password?: string;
+  timestamp?: Date;
+  riskLevel?: RiskLevel;
+  dataType?: string;
+  url?: string;
+}
+
+export interface DarkWebMention {
+  _id: string;
+  month: string;
+  year: string;
+  mention: string;
+  source: string;
+  chronologyTags: string;
+  impactEvaluation: string;
+  threatGeolocation: string;
+  asset: string;
+  mitigationSteps: string;
+  type: DarkWebMentionType;
+  status: DarkWebMentionStatus;
+  details: DarkWebMentionDetail[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CreateDarkWebMentionDto {
+  month: string;
+  year: string;
+  mention: string;
+  source: string;
+  chronologyTags: string;
+  impactEvaluation: string;
+  threatGeolocation: string;
+  asset: string;
+  mitigationSteps: string;
+  type: DarkWebMentionType;
+  status?: DarkWebMentionStatus;
+  details: DarkWebMentionDetail[];
+}
+
+export interface UpdateDarkWebMentionDto {
+  month?: string;
+  year?: string;
+  mention?: string;
+  source?: string;
+  chronologyTags?: string;
+  impactEvaluation?: string;
+  threatGeolocation?: string;
+  asset?: string;
+  mitigationSteps?: string;
+  type?: DarkWebMentionType;
+  status?: DarkWebMentionStatus;
+  details?: DarkWebMentionDetail[];
+}
+
+export interface DarkWebMentionQueryParams {
+  type?: DarkWebMentionType;
+  status?: DarkWebMentionStatus;
+  startDate?: string;
+  endDate?: string;
+  page?: number;
+  limit?: number;
+}

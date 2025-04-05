@@ -13,31 +13,34 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { AlertTriangle, Globe, Info, Shield, Target, User, Users } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { PageContainer } from "@/components/layout/page-container";
 
 export default function ThreatIntelligencePage() {
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Threat Intelligence</h1>
-        <div className="flex items-center gap-2">
-          <Button asChild variant="outline">
-            <Link href="/dashboard">Dashboard</Link>
-          </Button>
+    <PageContainer>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-3xl font-bold tracking-tight">Threat Intelligence</h1>
+          <div className="flex items-center gap-2">
+            <Button asChild variant="outline">
+              <Link href="/dashboard">Dashboard</Link>
+            </Button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <SuspiciousIPsCard />
+          <IOCsCard />
+          <APTFeedsCard />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <ThreatFeedsCard />
+          <GeoWatchCard />
+          <ThreatNewsCard />
         </div>
       </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <SuspiciousIPsCard />
-        <IOCsCard />
-        <APTFeedsCard />
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <ThreatFeedsCard />
-        <GeoWatchCard />
-        <ThreatNewsCard />
-      </div>
-    </div>
+    </PageContainer>
   );
 }
 

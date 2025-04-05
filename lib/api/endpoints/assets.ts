@@ -80,6 +80,7 @@ export const useIPSAssets = (params?: IPSQueryParams) => {
       );
       return data.data;
     },
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
 
@@ -96,6 +97,7 @@ export const useIPSAsset = (id: string) => {
       return data.data;
     },
     enabled: !!id,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
 
@@ -187,6 +189,7 @@ export const useDomainAssets = (params?: DomainQueryParams) => {
       );
       return data.data;
     },
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
 
@@ -203,6 +206,7 @@ export const useDomainAsset = (id: string) => {
       return data.data;
     },
     enabled: !!id,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
 
@@ -294,6 +298,7 @@ export const usePortalAssets = (params?: PortalQueryParams) => {
       );
       return data.data;
     },
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
 
@@ -310,6 +315,7 @@ export const usePortalAsset = (id: string) => {
       return data.data;
     },
     enabled: !!id,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
 

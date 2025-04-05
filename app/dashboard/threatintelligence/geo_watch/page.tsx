@@ -40,6 +40,8 @@ import {
   RowSelectionState,
 } from "@tanstack/react-table";
 import { Input } from "@/components/ui/input";
+import { useTableStyle } from '@/hooks/use-table-style';
+import { PageContainer } from '@/components/layout/page-container';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -289,20 +291,15 @@ export default function GeoWatchPage() {
   });
 
   if (error) {
-    return <div className="p-4">Error loading Geo Watch data: {error.message}</div>;
+    console.log(error);
+    return <div>Error loading geo watch data</div>;
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
+    <PageContainer>
+      <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-4">
-          <Button asChild variant="outline">
-            <Link href="/dashboard/threatintelligence">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back
-            </Link>
-          </Button>
-          <h1 className="text-2xl font-bold">Geographic Threat Watch</h1>
+          <h1 className="text-2xl font-semibold">Geo Watch</h1>
         </div>
         <div className="flex items-center gap-2">
           {Object.keys(rowSelection).length > 0 && (
@@ -428,6 +425,6 @@ export default function GeoWatchPage() {
           </Button>
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 }

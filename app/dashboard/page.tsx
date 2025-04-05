@@ -17,6 +17,7 @@ import { SourcesBarChart } from "../../components/dashboard/sources-bar-chart"
 import { StatusDonut } from "../../components/dashboard/status-donut"
 import { TopMalware } from "../../components/dashboard/top-malware"
 import { ThreatIntelligenceCard } from "@/components/dashboard/threatIntelligenceCard"
+import { PageContainer } from "@/components/layout/page-container"
 
 // Import custom hook and types
 import { useDashboard } from "@/hooks/useDashboard"
@@ -57,7 +58,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="">
+    <PageContainer className="space-y-8">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
         <Tabs defaultValue={timeRange} className="w-full sm:w-auto">
@@ -87,12 +88,6 @@ export default function DashboardPage() {
           <SectionWrapper>
             <SecurityOverview data={data} isLoading={isLoading} />
           </SectionWrapper>
-
-          <SectionWrapper>
-            <ThreatIntelligenceCard />
-          </SectionWrapper>
-
-
 
           <SectionWrapper>
             <EmployeesDonutChart data={data?.employeesData ?? []} isLoading={isLoading} />
@@ -133,7 +128,7 @@ export default function DashboardPage() {
           </SectionWrapper>
         </div>
       </div>
-    </div>
+    </PageContainer>
   )
 }
 

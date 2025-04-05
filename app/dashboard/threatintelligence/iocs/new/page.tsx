@@ -22,6 +22,7 @@ import { format } from 'date-fns';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useApiLoading } from '@/lib/utils/api-utils';
+import { PageContainer } from '@/components/layout/page-container';
 
 const iocTypeOptions = [
   { value: 'hash', label: 'Hash' },
@@ -112,15 +113,14 @@ export default function NewIOCPage() {
     setIsSubmitting(true);
 
     try {
-      await showLoadingToast(
-        withLoading(createIOC.mutateAsync(formData)),
-        {
-          loading: 'Creating IOC entry...',
-          success: 'IOC entry created successfully',
-          error: 'Failed to create IOC entry',
-        }
-      );
-      router.push('/dashboard/threatintelligence/iocs');
+      await withLoading(async () => {
+        await createIOC.mutateAsync(formData);
+        showToast('IOC entry created successfully', 'success');
+        router.push('/dashboard/threatintelligence/iocs');
+      });
+    } catch (error) {
+      console.error('Error creating IOC:', error);
+      showToast('Failed to create IOC', 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -228,26 +228,28 @@ export default function NewIOCPage() {
     setIsSubmitting(true);
     
     try {
-      let successCount = 0;
-      let errorCount = 0;
-      
-      // Process each entry
-      for (const entry of csvData) {
-        try {
-          await withLoading(createIOC.mutateAsync(entry));
-          successCount++;
-        } catch (error) {
-          console.error('Failed to add entry:', error);
-          errorCount++;
+      await withLoading(async () => {
+        let successCount = 0;
+        let errorCount = 0;
+        
+        // Process each entry
+        for (const entry of csvData) {
+          try {
+            await createIOC.mutateAsync(entry);
+            successCount++;
+          } catch (error) {
+            console.error('Failed to add entry:', error);
+            errorCount++;
+          }
         }
-      }
-      
-      if (successCount > 0) {
-        showToast(`Successfully added ${successCount} IOC entries${errorCount > 0 ? `, ${errorCount} failed` : ''}`, 'success');
-        router.push('/dashboard/threatintelligence/iocs');
-      } else {
-        showToast('Failed to add any IOC entries', 'error');
-      }
+        
+        if (successCount > 0) {
+          showToast(`Successfully added ${successCount} IOC entries${errorCount > 0 ? `, ${errorCount} failed` : ''}`, 'success');
+          router.push('/dashboard/threatintelligence/iocs');
+        } else {
+          showToast('Failed to add any IOC entries', 'error');
+        }
+      });
     } catch (error) {
       console.error('Bulk import failed:', error);
       showToast('Bulk import process failed', 'error');
@@ -257,15 +259,16 @@ export default function NewIOCPage() {
   };
 
   return (
-    <div className="p-6">
+    <PageContainer>
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
           <Link href="/dashboard/threatintelligence/iocs">
-            <Button variant="ghost" size="icon">
-              <ArrowLeft className="h-5 w-5" />
+            <Button variant="outline">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back
             </Button>
           </Link>
-          <h1 className="text-2xl font-semibold">New IOC</h1>
+          <h1 className="text-2xl font-semibold">Add IOC</h1>
         </div>
       </div>
 
@@ -471,6 +474,6 @@ export default function NewIOCPage() {
           </Card>
         </TabsContent>
       </Tabs>
-    </div>
+    </PageContainer>
   );
 }

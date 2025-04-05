@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCreateThreatIntelligenceFeed } from '@/lib/api/endpoints/threat-intelligence';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/components/ui/use-toast';
+import { PageContainer } from '@/components/layout/page-container';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -15,7 +17,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { ArrowLeft } from 'lucide-react';
-import { showToast } from '@/lib/utils/toast-utils';
 import Link from 'next/link';
 import { CreateThreatIntelligenceFeedDto } from '@/lib/api/types';
 import { format } from 'date-fns';
@@ -40,6 +41,7 @@ const threatTypeOptions = [
 
 export default function NewThreatFeedPage() {
   const router = useRouter();
+  const { toast } = useToast();
   const createThreatFeed = useCreateThreatIntelligenceFeed();
   const { withLoading } = useApiLoading();
   
@@ -73,30 +75,42 @@ export default function NewThreatFeedPage() {
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setIsSubmitting(true);
+
     try {
       await withLoading(async () => {
         await createThreatFeed.mutateAsync(formData);
-        showToast('Threat feed created successfully', 'success');
+        toast({
+          title: "Success",
+          description: "Threat feed created successfully",
+        });
         router.push('/dashboard/threatintelligence/threat_feeds');
       });
     } catch (error) {
-      console.error('Failed to create threat feed:', error);
-      showToast('Failed to create threat feed', 'error');
+      console.error('Error creating threat feed:', error);
+      toast({
+        title: "Error",
+        description: "Failed to create threat feed",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="p-6">
+    <PageContainer>
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
           <Link href="/dashboard/threatintelligence/threat_feeds">
-            <Button variant="ghost" size="icon">
-              <ArrowLeft className="h-5 w-5" />
+            <Button variant="outline">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back
             </Button>
           </Link>
-          <h1 className="text-2xl font-semibold">New Threat Feed</h1>
+          <h1 className="text-2xl font-semibold">Add Threat Feed</h1>
         </div>
       </div>
 
@@ -189,6 +203,6 @@ export default function NewThreatFeedPage() {
           </form>
         </CardContent>
       </Card>
-    </div>
+    </PageContainer>
   );
 }

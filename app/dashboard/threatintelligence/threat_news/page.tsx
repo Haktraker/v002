@@ -40,6 +40,8 @@ import {
   RowSelectionState,
 } from "@tanstack/react-table";
 import { Input } from "@/components/ui/input";
+import { useTableStyle } from '@/hooks/use-table-style';
+import { PageContainer } from '@/components/layout/page-container';
 
 export default function ThreatNewsPage() {
   const { data: threatNewsData, isLoading, error, refetch } = useGetThreatNews();
@@ -256,20 +258,15 @@ export default function ThreatNewsPage() {
   });
 
   if (error) {
-    return <div className="p-4">Error loading Threat News data: {error.message}</div>;
+    console.log(error);
+    return <div>Error loading threat news</div>;
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
+    <PageContainer>
+      <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-4">
-          <Button asChild variant="outline">
-            <Link href="/dashboard/threatintelligence">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back
-            </Link>
-          </Button>
-          <h1 className="text-2xl font-bold">Threat News</h1>
+          <h1 className="text-2xl font-semibold">Threat News</h1>
         </div>
         <div className="flex items-center gap-2">
           {Object.keys(rowSelection).length > 0 && (
@@ -387,6 +384,6 @@ export default function ThreatNewsPage() {
           </Button>
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 }

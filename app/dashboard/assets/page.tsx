@@ -6,17 +6,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { User, Globe, Server } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { PageContainer } from '@/components/layout/page-container';
 
 export default function AssetsPage() {
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Assets</h1>
-        <div className="flex items-center gap-2">
-          <Button asChild variant="outline">
-            <Link href="/dashboard">Dashboard</Link>
-          </Button>
-        </div>
+    <PageContainer>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-semibold">Assets</h1>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -24,7 +20,7 @@ export default function AssetsPage() {
         <DomainsCard />
         <PortalsCard />
       </div>
-    </div>
+    </PageContainer>
   );
 }
 
