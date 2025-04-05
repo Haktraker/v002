@@ -9,14 +9,17 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { toast } from '@/components/ui/use-toast';
+import { showToast } from '@/lib/utils/toast-utils';
 import { CreateIPSDto } from '@/lib/api/types';
 import { ArrowLeft, Upload } from 'lucide-react';
+import { useTableData } from '@/hooks/useTableData';
 import Link from 'next/link';
+import { useApiLoading } from '@/lib/utils/api-utils';
 
 export default function NewIPPage() {
   const router = useRouter();
   const createIPSAsset = useCreateIPSAsset();
+  const { withLoading } = useApiLoading();
   
   // State for single IP form
   const [formData, setFormData] = useState<CreateIPSDto>({
@@ -25,11 +28,40 @@ export default function NewIPPage() {
     description: '',
   });
   
-  // State for CSV upload
-  const [csvFile, setCsvFile] = useState<File | null>(null);
-  const [csvData, setCsvData] = useState<CreateIPSDto[]>([]);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  // Table data handling with custom hook
+  const {
+    data: csvData,
+    isProcessing,
+    isSubmitting,
+    csvFile,
+    handleFileChange,
+    handleProcessCSV,
+    resetData,
+    setIsSubmitting,
+    currentPageData,
+    pagination,
+    totalPages,
+    nextPage,
+    previousPage,
+    goToPage,
+    sortConfig,
+    handleSort,
+  } = useTableData<CreateIPSDto>({
+    requiredFields: ['value', 'location', 'description'],
+    validateRow: (row: CreateIPSDto) => {
+      // Add any IP-specific validation here
+      const ipRegex = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/;
+      if (!ipRegex.test(row.value)) {
+        return {
+          isValid: false,
+          error: `Invalid IP address format: ${row.value}`
+        };
+      }
+      return { isValid: true };
+    },
+    defaultSort: { key: 'value', direction: 'asc' },
+    defaultPageSize: 5,
+  });
   
   // Handle form input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -46,306 +78,243 @@ export default function NewIPPage() {
     setIsSubmitting(true);
     
     try {
-      await createIPSAsset.mutateAsync(formData);
-      toast({
-        title: 'Success',
-        description: 'IP asset created successfully',
-      });
+      await withLoading(createIPSAsset.mutateAsync(formData));
+      showToast('IP asset created successfully', 'success');
       router.push('/dashboard/assets/ips');
     } catch (error) {
-      console.error('Failed to create IP asset:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to create IP asset',
-        variant: 'destructive',
-      });
+      showToast('Failed to create IP asset', 'error');
     } finally {
       setIsSubmitting(false);
     }
   };
-  
-  // Handle CSV file selection
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      setCsvFile(e.target.files[0]);
-      setCsvData([]);
-    }
-  };
-  
-  // Parse CSV file
-  const parseCSV = () => {
-    if (!csvFile) {
-      toast({
-        title: 'Error',
-        description: 'Please select a CSV file first',
-        variant: 'destructive',
-      });
-      return;
-    }
-    
-    setIsProcessing(true);
-    
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const text = e.target?.result as string;
-      if (!text) {
-        setIsProcessing(false);
-        return;
-      }
-      
-      try {
-        // Split by lines and remove empty lines
-        const lines = text.split('\n').filter(line => line.trim() !== '');
-        
-        // Check if there's a header row (first row)
-        const firstLine = lines[0].toLowerCase();
-        const hasHeader = firstLine.includes('value') || 
-                          firstLine.includes('ip') || 
-                          firstLine.includes('location') || 
-                          firstLine.includes('description');
-        
-        // Start from index 1 if header exists, otherwise from 0
-        const startIndex = hasHeader ? 1 : 0;
-        
-        const parsedData: CreateIPSDto[] = [];
-        
-        for (let i = startIndex; i < lines.length; i++) {
-          const line = lines[i];
-          const values = line.split(',').map(val => val.trim());
-          
-          // Assuming CSV format: value,location,description
-          // If fewer columns, we'll use defaults
-          const ipData: CreateIPSDto = {
-            value: values[0] || '',
-            location: values[1] || 'Unknown',
-            description: values[2] || '',
-          };
-          
-          // Basic validation for IP format
-          if (ipData.value && /^(\d{1,3}\.){3}\d{1,3}(\/\d{1,2})?$/.test(ipData.value)) {
-            parsedData.push(ipData);
-          }
-        }
-        
-        setCsvData(parsedData);
-        
-        toast({
-          title: 'CSV Parsed',
-          description: `Successfully parsed ${parsedData.length} valid IP entries`,
-        });
-      } catch (error) {
-        console.error('Error parsing CSV:', error);
-        toast({
-          title: 'Error',
-          description: 'Failed to parse CSV file. Please check the format.',
-          variant: 'destructive',
-        });
-      } finally {
-        setIsProcessing(false);
-      }
-    };
-    
-    reader.onerror = () => {
-      toast({
-        title: 'Error',
-        description: 'Failed to read the file',
-        variant: 'destructive',
-      });
-      setIsProcessing(false);
-    };
-    
-    reader.readAsText(csvFile);
-  };
-  
-  // Submit all parsed CSV data
+
+  // Handle bulk submission
   const handleBulkSubmit = async () => {
     if (csvData.length === 0) {
-      toast({
-        title: 'Error',
-        description: 'No valid IP data to submit',
-        variant: 'destructive',
-      });
+      showToast('No valid IP data to submit', 'error');
       return;
     }
     
     setIsSubmitting(true);
-    let successCount = 0;
-    let errorCount = 0;
     
     try {
-      // Process each IP entry sequentially
-      for (const ipData of csvData) {
+      let successCount = 0;
+      let errorCount = 0;
+      
+      // Process each entry
+      for (const entry of csvData) {
         try {
-          await createIPSAsset.mutateAsync(ipData);
+          await withLoading(createIPSAsset.mutateAsync(entry));
           successCount++;
         } catch (error) {
-          console.error(`Failed to create IP asset ${ipData.value}:`, error);
+          console.error('Failed to add entry:', error);
           errorCount++;
         }
       }
       
       if (successCount > 0) {
-        toast({
-          title: 'Bulk Import Complete',
-          description: `Successfully added ${successCount} IP assets${errorCount > 0 ? `, ${errorCount} failed` : ''}`,
-        });
+        showToast(`Successfully added ${successCount} IP entries${errorCount > 0 ? `, ${errorCount} failed` : ''}`, 'success');
         router.push('/dashboard/assets/ips');
       } else {
-        toast({
-          title: 'Error',
-          description: 'Failed to add any IP assets',
-          variant: 'destructive',
-        });
+        showToast('Failed to add any IP entries', 'error');
       }
     } catch (error) {
       console.error('Bulk import failed:', error);
-      toast({
-        title: 'Error',
-        description: 'Bulk import process failed',
-        variant: 'destructive',
-      });
+      showToast('Bulk import process failed', 'error');
     } finally {
       setIsSubmitting(false);
     }
   };
-  
+
   return (
-    <div className="container mx-auto py-10">
-      <div className="mb-6">
-        <Link href="/dashboard/assets/ips" className="flex items-center text-sm text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to IP Assets
-        </Link>
+    <div className="p-6">
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-2">
+          <Link href="/dashboard/assets/ips">
+            <Button variant="ghost" size="icon">
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+          </Link>
+          <h1 className="text-2xl font-semibold">New IP Asset</h1>
+        </div>
       </div>
-      
-      <h1 className="text-2xl font-bold mb-6">Add New IP Asset</h1>
-      
+
       <Tabs defaultValue="single" className="w-full">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="single">Add Single IP</TabsTrigger>
-          <TabsTrigger value="bulk">Bulk Import (CSV)</TabsTrigger>
+          <TabsTrigger value="single">Single Entry</TabsTrigger>
+          <TabsTrigger value="bulk">Bulk Import</TabsTrigger>
         </TabsList>
         
-        <TabsContent value="single">
+        <TabsContent value="single" className="mt-4">
           <Card>
             <CardHeader>
-              <CardTitle>Add IP Asset</CardTitle>
-              <CardDescription>
-                Enter the details for the new IP asset
-              </CardDescription>
+              <CardTitle>Create IP Asset</CardTitle>
+              <CardDescription>Add a new IP address to monitor</CardDescription>
             </CardHeader>
-            <form onSubmit={handleSubmit}>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="value">IP Address</Label>
-                  <Input
-                    id="value"
-                    name="value"
-                    placeholder="e.g. 192.168.1.1"
-                    value={formData.value}
-                    onChange={handleInputChange}
-                    required
-                  />
+            <CardContent>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="value">IP Address</Label>
+                    <Input
+                      id="value"
+                      name="value"
+                      value={formData.value}
+                      onChange={handleInputChange}
+                      placeholder="192.168.1.1"
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="location">Location</Label>
+                    <Input
+                      id="location"
+                      name="location"
+                      value={formData.location}
+                      onChange={handleInputChange}
+                      placeholder="Server Room A"
+                      required
+                    />
+                  </div>
                 </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="location">Location</Label>
-                  <Input
-                    id="location"
-                    name="location"
-                    placeholder="e.g. US East Data Center"
-                    value={formData.location}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="description">Description</Label>
                   <Textarea
                     id="description"
                     name="description"
-                    placeholder="Enter a description..."
                     value={formData.description}
                     onChange={handleInputChange}
-                    rows={3}
+                    placeholder="Details about this IP address"
+                    rows={4}
+                    required
                   />
                 </div>
-              </CardContent>
-              
-              <CardFooter className="flex justify-end">
-                <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? 'Saving...' : 'Save IP Asset'}
-                </Button>
-              </CardFooter>
-            </form>
+
+                <div className="flex justify-end">
+                  <Button type="submit" disabled={isSubmitting}>
+                    Create IP Asset
+                  </Button>
+                </div>
+              </form>
+            </CardContent>
           </Card>
         </TabsContent>
         
-        <TabsContent value="bulk">
+        <TabsContent value="bulk" className="mt-4">
           <Card>
             <CardHeader>
               <CardTitle>Bulk Import IP Assets</CardTitle>
               <CardDescription>
-                Upload a CSV file with IP assets data. The CSV should have columns for IP address, location, and description.
+                Upload a CSV file with multiple entries. The file should contain columns for value (IP address),
+                location, and description.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex items-center gap-4">
-                <Input
-                  type="file"
+              <div className="grid w-full max-w-sm items-center gap-1.5">
+                <Label htmlFor="csvFile">CSV File</Label>
+                <Input 
+                  id="csvFile" 
+                  type="file" 
                   accept=".csv"
                   onChange={handleFileChange}
                   disabled={isProcessing || isSubmitting}
                 />
-                <Button 
-                  type="button" 
-                  onClick={parseCSV} 
-                  disabled={!csvFile || isProcessing || isSubmitting}
-                  variant="secondary"
-                >
-                  {isProcessing ? 'Processing...' : 'Parse CSV'}
-                </Button>
               </div>
               
-              {csvData.length > 0 && (
-                <div className="border rounded-md p-4">
-                  <h3 className="font-medium mb-2">Preview ({csvData.length} entries)</h3>
-                  <div className="max-h-60 overflow-y-auto">
-                    <table className="w-full text-sm">
-                      <thead>
-                        <tr className="border-b">
-                          <th className="text-left py-2">IP Address</th>
-                          <th className="text-left py-2">Location</th>
-                          <th className="text-left py-2">Description</th>
+              <Button 
+                type="button" 
+                onClick={handleProcessCSV}
+                disabled={!csvFile || isProcessing || isSubmitting}
+                className="mt-2"
+              >
+                {isProcessing ? 'Processing...' : 'Process CSV'}
+              </Button>
+              
+              {currentPageData.length > 0 && (
+                <div className="mt-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-medium">Preview ({csvData.length} entries)</h3>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => previousPage()}
+                        disabled={pagination.currentPage === 1}
+                      >
+                        Previous
+                      </Button>
+                      <span className="text-sm">
+                        Page {pagination.currentPage} of {totalPages}
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => nextPage()}
+                        disabled={pagination.currentPage === totalPages}
+                      >
+                        Next
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="border rounded overflow-hidden">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th 
+                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                            onClick={() => handleSort('value')}
+                          >
+                            IP Address
+                            {sortConfig?.key === 'value' && (
+                              <span className="ml-1">
+                                {sortConfig.direction === 'asc' ? '↑' : '↓'}
+                              </span>
+                            )}
+                          </th>
+                          <th 
+                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                            onClick={() => handleSort('location')}
+                          >
+                            Location
+                            {sortConfig?.key === 'location' && (
+                              <span className="ml-1">
+                                {sortConfig.direction === 'asc' ? '↑' : '↓'}
+                              </span>
+                            )}
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Description
+                          </th>
                         </tr>
                       </thead>
-                      <tbody>
-                        {csvData.slice(0, 10).map((item, index) => (
-                          <tr key={index} className="border-b">
-                            <td className="py-2">{item.value}</td>
-                            <td className="py-2">{item.location}</td>
-                            <td className="py-2">{item.description}</td>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {currentPageData.map((entry: CreateIPSDto, index: number) => (
+                          <tr key={index}>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{entry.value}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{entry.location}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{entry.description}</td>
                           </tr>
                         ))}
                       </tbody>
                     </table>
-                    {csvData.length > 10 && (
-                      <p className="text-sm text-muted-foreground mt-2">
-                        Showing 10 of {csvData.length} entries
-                      </p>
-                    )}
                   </div>
                 </div>
               )}
             </CardContent>
-            
-            <CardFooter className="flex justify-end">
-              <Button 
-                onClick={handleBulkSubmit} 
+            <CardFooter className="flex justify-between">
+              <Button
+                variant="outline"
+                onClick={() => router.push('/dashboard/assets/ips')}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleBulkSubmit}
                 disabled={csvData.length === 0 || isSubmitting}
               >
-                {isSubmitting ? 'Importing...' : `Import ${csvData.length} IP Assets`}
+                {isSubmitting ? `Creating Entries (${csvData.length})...` : `Import ${csvData.length} Entries`}
               </Button>
             </CardFooter>
           </Card>
