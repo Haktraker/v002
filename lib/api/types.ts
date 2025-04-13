@@ -469,3 +469,50 @@ export interface ComplianceScoreQueryParams {
   page?: number;
   limit?: number;
 }
+
+// User Risk Distribution
+export interface UserRiskDistribution {
+  _id: string;
+  month: string;
+  year: string;
+  bu: {
+    buName: string;
+    severities: {
+      severity: "Critical" | "High" | "Low" | "Medium";
+      count: number;
+    }[];
+  }[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CreateUserRiskDistributionDto {
+  month: string;
+  year: string;
+  bu: {
+    buName: string;
+    severities: {
+      severity: "Critical" | "High" | "Low" | "Medium";
+      count: number;
+    }[];
+  }[];
+}
+
+export interface UpdateUserRiskDistributionDto {
+  month?: string;
+  year?: string;
+  bu?: {
+    buName: string;
+    severities: {
+      severity: "Critical" | "High" | "Low" | "Medium";
+      count: number;
+    }[];
+  }[];
+}
+
+export interface UserRiskDistributionQueryParams {
+  month?: string;
+  year?: string;
+  page?: number;
+  limit?: number;
+}
