@@ -221,7 +221,7 @@ export function useTableStyle<TData>({
     return (
       <div className="border rounded-md">
         <Table className="w-full">
-          <TableHeader className="bg-gray-50">
+          <TableHeader className="bg-muted/50 dark:bg-background/5">
             {table.getHeaderGroups().map((headerGroup: any) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header: any) => (
@@ -243,7 +243,7 @@ export function useTableStyle<TData>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  className="hover:bg-gray-50"
+                  className="hover:bg-muted/50 dark:hover:bg-background/5"
                 >
                   {row.getVisibleCells().map((cell: any) => (
                     <TableCell key={cell.id} className="p-4">

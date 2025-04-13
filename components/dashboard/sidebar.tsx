@@ -72,6 +72,7 @@ function SidebarContent({ className, isCollapsed, setIsCollapsed }: {
 
   const sidebarItems = [
     { icon: <LayoutDashboard size={20} />, label: "Dashboard", href: "/dashboard" },
+    { icon: <LayoutDashboard size={20} />, label: "Threat Composition", href: "/dashboard/threat-composition" },
     { icon: <Database size={20} />, label: "IPS Events", href: "/dashboard/ips" },
     { icon: <Virus size={20} />, label: "Malware", href: "/dashboard/malware" },
     { icon: <Users size={20} />, label: "Employees", href: "/dashboard/employees" },

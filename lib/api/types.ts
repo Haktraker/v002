@@ -93,6 +93,17 @@ export interface PortalQueryParams {
   limit?: number;
 }
 
+export interface ThreatIntelligenceQueryParams {
+  status?: string;
+  location?: string;
+  startDate?: string;
+  endDate?: string;
+  page?: number;
+  limit?: number;
+  threatType?: string;
+  severityLevel?: string;
+}
+
 // Generic Asset Query Params
 export interface AssetQueryParams {
   type?: 'ips' | 'domains' | 'portals';
@@ -112,6 +123,43 @@ export interface PaginatedResponse<T> {
 }
 
 // Threat Intelligence Types
+
+// Threat Composition
+export interface ThreatComposition {
+  _id: string;
+  month: string;
+  year: string;
+  severityLevel: 'Low' | 'Medium' | 'High' | 'Critical';
+  threatType: 'Phishing Attempts' | 'Intrusion Attempts' | 'Insider Threats' | 'ATO' | 'Trojan and Malware' | '3rd Party leaks' | 'Attack Surfaces';
+  attackVector: 'Email' | 'Network Ports' | 'Social Engineering' | 'Applications' | 'Removable Media';
+  bu: string;
+  affectedAsset: string;
+  incidentCount: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CreateThreatCompositionDto {
+  month: string;
+  year: string;
+  severityLevel: string;
+  threatType: string;
+  attackVector: string;
+  bu: string;
+  affectedAsset: string;
+  incidentCount: number;
+}
+
+export interface UpdateThreatCompositionDto {
+  month?: string;
+  year?: string;
+  severityLevel?: string;
+  threatType?: string;
+  attackVector?: string;
+  bu?: string;
+  affectedAsset?: string;
+  incidentCount?: number;
+}
 
 // Suspicious IPs
 export interface SuspiciousIP {
