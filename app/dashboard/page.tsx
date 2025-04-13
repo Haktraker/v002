@@ -128,10 +128,6 @@ export default function DashboardPage() {
             <TopMalware data={data?.topMalware ?? data?.malwareData ?? []} isLoading={isLoading} />
           </SectionWrapper>
 
-          {/* Dark Web Mentions Section */}
-          <SectionWrapper>
-            <DarkWebMentionsCard />
-          </SectionWrapper>
         </div>
       </div>
     </PageContainer>
