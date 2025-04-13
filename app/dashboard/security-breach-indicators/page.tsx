@@ -8,16 +8,58 @@ export default function securityBreachIndicators() {
     const { data: complianceScores, isLoading: complianceScoresLoading, error: complianceScoresErrors } = useGetComplianceScores();
     const { data: userRiskDistribution, isLoading: userRiskLoading, error: userRiskErrors } = useGetUserRiskDistributions();
 
-    const transformedRiskData = userRiskDistribution?.map(distribution => {
-      const businessUnit = distribution.bu[0];
-      return {
-        businessUnit: businessUnit.buName,
-        critical: businessUnit.severities.find(s => s.severity === "Critical")?.count || 0,
-        high: businessUnit.severities.find(s => s.severity === "High")?.count || 0,
-        medium: businessUnit.severities.find(s => s.severity === "Medium")?.count || 0,
-        low: businessUnit.severities.find(s => s.severity === "Low")?.count || 0
-      };
-    }) || [];
+    // Aggregate severity counts across all months and years for each business unit
+    const transformedRiskData = userRiskDistribution ? (() => {
+      // Create a map to store aggregated data by business unit
+      const buAggregateMap = new Map<string, {
+        businessUnit: string;
+        critical: number;
+        high: number;
+        medium: number;
+        low: number;
+      }>();
+      
+      // Process all distributions and aggregate by business unit
+      userRiskDistribution.forEach(distribution => {
+        // Process each business unit in the distribution
+        distribution.bu.forEach(businessUnit => {
+          const buName = businessUnit.buName;
+          
+          // Get or initialize the aggregate for this business unit
+          const aggregate = buAggregateMap.get(buName) || {
+            businessUnit: buName,
+            critical: 0,
+            high: 0,
+            medium: 0,
+            low: 0
+          };
+          
+          // Add severity counts to the aggregate
+          businessUnit.severities.forEach(severity => {
+            switch(severity.severity) {
+              case "Critical":
+                aggregate.critical += severity.count;
+                break;
+              case "High":
+                aggregate.high += severity.count;
+                break;
+              case "Medium":
+                aggregate.medium += severity.count;
+                break;
+              case "Low":
+                aggregate.low += severity.count;
+                break;
+            }
+          });
+          
+          // Update the map with the new aggregate
+          buAggregateMap.set(buName, aggregate);
+        });
+      });
+      
+      // Convert the map to an array
+      return Array.from(buAggregateMap.values());
+    })() : [];
 
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
