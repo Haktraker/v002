@@ -17,6 +17,7 @@ interface ChartData {
 interface AggregatedCompliance {
   complianceName: string;
   count: number;
+  color: string;
 }
 
 interface ComplianceScoresChartProps {
@@ -188,7 +189,7 @@ const ComplianceScoresChart = ({ data, isLoading, error }: ComplianceScoresChart
     // --- Updated Colors ---
     colors: chartData.labels.map(label => {
       const compliance = aggregatedCompliances.find(comp => comp.complianceName === label);
-      return complianceColorMap.get(compliance?.complianceName || '') || '#6B7280'; // Default to gray if no color assigned
+      return compliance?.color || '#6B7280'; // Default to gray if no color assigned
     }),
     // --- Updated Fill ---
     fill: {

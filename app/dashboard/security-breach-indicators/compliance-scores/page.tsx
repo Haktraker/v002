@@ -6,15 +6,15 @@ import ComplianceScoresChart from '@/components/dashboard/compliance-scores-char
 const ComplianceScoresPage = () => {
   const { data: complianceScores, isLoading, error } = useGetComplianceScores();
 
-  return (
-    <div className="p-6">
-      <ComplianceScoresChart 
-        data={complianceScores} 
-        isLoading={isLoading} 
-        error={error} 
-      />
-    </div>
-  );
+return (
+  <div className="p-6">
+    <ComplianceScoresChart
+      data={complianceScores}
+      isLoading={isLoading}
+      error={error}
+    />
+  </div>
+);
 };
 
 export default ComplianceScoresPage;
