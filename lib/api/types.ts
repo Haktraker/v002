@@ -422,3 +422,50 @@ export interface DarkWebMentionQueryParams {
   page?: number;
   limit?: number;
 }
+
+// Compliance Scores
+export interface ComplianceScore {
+  _id: string;
+  month: string;
+  year: string;
+  bu: {
+    buName: string;
+    compliances: {
+      complianceName: string;
+      count: number;
+    }[];
+  }[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CreateComplianceScoreDto {
+  month: string;
+  year: string;
+  bu: {
+    buName: string;
+    compliances: {
+      complianceName: string;
+      count: number;
+    }[];
+  }[];
+}
+
+export interface UpdateComplianceScoreDto {
+  month?: string;
+  year?: string;
+  bu?: {
+    buName: string;
+    compliances: {
+      complianceName: string;
+      count: number;
+    }[];
+  }[];
+}
+
+export interface ComplianceScoreQueryParams {
+  month?: string;
+  year?: string;
+  page?: number;
+  limit?: number;
+}
