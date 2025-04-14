@@ -296,7 +296,7 @@ const ComplianceScoresChart = ({ data, isLoading, error }: ComplianceScoresChart
 
     // 3. Success State (with data or no data message)
     return (
-        <Card className={isDark ? "bg-[#171727] border-0" : "bg-white"}>
+        <Card className={`flex-1 flex flex-col ${isDark ? "bg-[#171727] border-0" : "bg-white"}`}>
             <CardHeader>
                 <div className="flex items-center justify-between">
                     <div>

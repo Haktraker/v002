@@ -9,7 +9,6 @@ import "aos/dist/aos.css"
 
 // Import components
 import { SecurityGauge } from "../../components/dashboard/security-gauge"
-import { MetricsCard } from "../../components/dashboard/metrics-card"
 import { MentionsOverview } from "../../components/dashboard/mentions-overview"
 import { EmployeesDonutChart } from "../../components/dashboard/employees-donut-chart"
 import { CompromisedEmployees } from "../../components/dashboard/compromised-employees"
@@ -45,7 +44,7 @@ export default function DashboardPage() {
 
   if (error) {
     return (
-      <div className="flex h-full items-center justify-center">
+      <div className="flex  items-center justify-center">
         <div className="text-center">
           <h2 className="text-xl font-semibold text-red-500 mb-2">Error Loading Dashboard</h2>
           <p className="text-gray-500 mb-4">{error.message}</p>
@@ -82,26 +81,16 @@ export default function DashboardPage() {
       </div>
 
       {/* Main Dashboard Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
-        {/* Left Column */}
-        <div className="space-y-4">
-          {/* Security Overview Section */}
+      <div className="grid grid-cols-2 grid-rows-[repeat(7,1fr)] gap-4 mt-4">
+        {/* Security Overview Section */}
+        <div className="[grid-area:1/1/2/2]">
           <SectionWrapper>
             <SecurityOverview data={data} isLoading={isLoading} />
           </SectionWrapper>
-
-          <SectionWrapper>
-            <EmployeesDonutChart data={data?.employeesData ?? []} isLoading={isLoading} />
-          </SectionWrapper>
-
-          <SectionWrapper>
-            <StatusDonut data={data?.statusData ?? []} isLoading={isLoading} />
-          </SectionWrapper>
         </div>
 
-        {/* Right Column */}
-        <div className="space-y-4">
-          {/* Mentions Overview Section */}
+        {/* Mentions Overview Section */}
+        <div className="[grid-area:1/2/2/3]">
           <SectionWrapper>
             <MentionsOverview 
               data={[
@@ -112,22 +101,41 @@ export default function DashboardPage() {
               isLoading={isLoading} 
             />
           </SectionWrapper>
+        </div>
 
-          {/* Most Compromised Employees Section */}
+        {/* Employees Donut Chart */}
+        <div className="[grid-area:2/1/3/2]">
+          <SectionWrapper>
+            <EmployeesDonutChart data={data?.employeesData ?? []} isLoading={isLoading} />
+          </SectionWrapper>
+        </div>
+
+        {/* Compromised Employees Section */}
+        <div className="[grid-area:2/2/3/3]">
           <SectionWrapper>
             <CompromisedEmployees data={data?.compromisedEmployees ?? []} isLoading={isLoading} />
           </SectionWrapper>
+        </div>
 
-          {/* Top Sources Section */}
+        {/* Status Donut */}
+        <div className="[grid-area:3/1/4/2]">
+          <SectionWrapper>
+            <StatusDonut data={data?.statusData ?? []} isLoading={isLoading} />
+          </SectionWrapper>
+        </div>
+
+        {/* Sources Bar Chart */}
+        <div className="[grid-area:3/2/4/3]">
           <SectionWrapper>
             <SourcesBarChart data={data?.sourcesData ?? []} isLoading={isLoading} />
           </SectionWrapper>
+        </div>
 
-          {/* Top Malware Section */}
+        {/* Top Malware Section */}
+        <div className="[grid-area:4/1/5/2]">
           <SectionWrapper>
             <TopMalware data={data?.topMalware ?? data?.malwareData ?? []} isLoading={isLoading} />
           </SectionWrapper>
-
         </div>
       </div>
     </PageContainer>
@@ -136,22 +144,24 @@ export default function DashboardPage() {
 
 function SectionWrapper({ children }: { children: React.ReactNode }) {
   return (
-    <div className="bg-gray-100 dark:bg-[#1e1e3d] rounded-lg p-4 shadow-SM">
-      {children}
+    <div className="bg-gray-100 dark:bg-[#1e1e3d] rounded-lg p-4 md:p-5 shadow-sm h-full min-h-[300px] flex flex-col transition-all duration-200 hover:shadow-md">
+      <div className="flex-1 flex flex-col">
+        {children}
+      </div>
     </div>
   )
 }
 
 function SecurityOverview({ data, isLoading }: { data: any, isLoading: boolean }) {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-5 ">
       {/* Security Gauge - Left Side */}
-      <div className="lg:col-span-5 flex items-center justify-center ">
+      <div className="lg:col-span-5 flex items-center justify-center p-2">
         <SecurityGauge value={data?.securityScore ?? 0} isLoading={isLoading} />
       </div>
       {/* Metrics Grid - Right Side */}
-      <div className="lg:col-span-7">
-        <div className="grid grid-cols-2 gap-4">
+      <div className="lg:col-span-7 ">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5  auto-rows-fr">
           <AssetsCard />
           <ThreatIntelligenceCard/>
           <DarkWebMentionsCard />

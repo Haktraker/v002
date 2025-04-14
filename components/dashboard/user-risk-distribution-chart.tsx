@@ -51,7 +51,7 @@ interface TransformedSeriesData {
 }
 
 interface UserRiskDistributionChartProps {
-    data: RiskDataPoint[] | null | undefined; // Allow null/undefined for initial/error states
+    data: any[] | null | undefined; // Raw user risk distribution data from API
     isLoading?: boolean;
     error?: Error | string | null; // Allow string errors too
 }
@@ -240,9 +240,64 @@ const getChartOptions = (categories: readonly string[], isDark: boolean): ApexCh
 export function UserRiskDistributionChart({ data, isLoading = false, error = null }: UserRiskDistributionChartProps) {
     const { theme } = useTheme();
     const isDark = theme === "dark";
-
+    
+    // Transform the raw data into the format needed for the chart
+    const transformedRiskData = useMemo(() => {
+      if (!data) return [];
+      
+      // Create a map to store aggregated data by business unit
+      const buAggregateMap = new Map<string, {
+        businessUnit: string;
+        critical: number;
+        high: number;
+        medium: number;
+        low: number;
+      }>();
+      
+      // Process all distributions and aggregate by business unit
+      data.forEach(distribution => {
+        // Process each business unit in the distribution
+        distribution.bu.forEach((businessUnit: { buName: string; severities: Array<{ severity: string; count: number }> }) => {
+          const buName = businessUnit.buName;
+          
+          // Get or initialize the aggregate for this business unit
+          const aggregate = buAggregateMap.get(buName) || {
+            businessUnit: buName,
+            critical: 0,
+            high: 0,
+            medium: 0,
+            low: 0
+          };
+          
+          // Add severity counts to the aggregate
+          businessUnit.severities.forEach((severity: { severity: string; count: number }) => {
+            switch(severity.severity) {
+              case "Critical":
+                aggregate.critical += severity.count;
+                break;
+              case "High":
+                aggregate.high += severity.count;
+                break;
+              case "Medium":
+                aggregate.medium += severity.count;
+                break;
+              case "Low":
+                aggregate.low += severity.count;
+                break;
+            }
+          });
+          
+          // Update the map with the new aggregate
+          buAggregateMap.set(buName, aggregate);
+        });
+      });
+      
+      // Convert the map to an array
+      return Array.from(buAggregateMap.values());
+    }, [data]);
+    
     // Memoize transformed data and options to prevent unnecessary recalculations
-    const series = useMemo(() => transformDataForChart(data), [data]);
+    const series = useMemo(() => transformDataForChart(transformedRiskData), [transformedRiskData]);
     const options = useMemo(() => getChartOptions(SEVERITY_LEVELS, isDark), [isDark]);
 
     const renderContent = () => {
@@ -253,7 +308,7 @@ export function UserRiskDistributionChart({ data, isLoading = false, error = nul
         if (error) {
             return (
                 <Alert variant="destructive">
-                    <AlertCircle className="h-4 w-4" />
+                    <AlertCircle className="" />
                     <AlertTitle>Error Loading Chart</AlertTitle>
                     <AlertDescription>
                         {typeof error === 'string' ? error : error.message || "An unknown error occurred."}
@@ -278,7 +333,7 @@ export function UserRiskDistributionChart({ data, isLoading = false, error = nul
         return (
              <ApexChart
                 type="bar"
-                height={options.chart?.height || 300} // Use height from options
+                height={450} // Use height from options
                 options={options}
                 series={series}
              />
@@ -286,7 +341,7 @@ export function UserRiskDistributionChart({ data, isLoading = false, error = nul
     };
 
     return (
-        <Card>
+        <Card className={`flex-1 flex flex-col ${isDark ? "bg-[#171727] border-0" : "bg-white"}`}>
             <CardHeader>
                 <CardTitle>User Risk Distribution by Severity</CardTitle> {/* Updated Title */}
             </CardHeader>
