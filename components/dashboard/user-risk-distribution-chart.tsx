@@ -6,7 +6,9 @@ import dynamic from "next/dynamic"
 import { useMemo } from "react"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { AlertCircle, Info } from "lucide-react"
+import { AlertCircle, Info, Pencil } from "lucide-react"
+import Link from "next/link"
+import { Button } from "../ui/button"
 
 // Dynamically import ApexChart to avoid SSR issues
 const ApexChart = dynamic(() => import("@/components/ui/apex-chart"), {
@@ -240,62 +242,62 @@ const getChartOptions = (categories: readonly string[], isDark: boolean): ApexCh
 export function UserRiskDistributionChart({ data, isLoading = false, error = null }: UserRiskDistributionChartProps) {
     const { theme } = useTheme();
     const isDark = theme === "dark";
-    
+
     // Transform the raw data into the format needed for the chart
     const transformedRiskData = useMemo(() => {
-      if (!data) return [];
-      
-      // Create a map to store aggregated data by business unit
-      const buAggregateMap = new Map<string, {
-        businessUnit: string;
-        critical: number;
-        high: number;
-        medium: number;
-        low: number;
-      }>();
-      
-      // Process all distributions and aggregate by business unit
-      data.forEach(distribution => {
-        // Process each business unit in the distribution
-        distribution.bu.forEach((businessUnit: { buName: string; severities: Array<{ severity: string; count: number }> }) => {
-          const buName = businessUnit.buName;
-          
-          // Get or initialize the aggregate for this business unit
-          const aggregate = buAggregateMap.get(buName) || {
-            businessUnit: buName,
-            critical: 0,
-            high: 0,
-            medium: 0,
-            low: 0
-          };
-          
-          // Add severity counts to the aggregate
-          businessUnit.severities.forEach((severity: { severity: string; count: number }) => {
-            switch(severity.severity) {
-              case "Critical":
-                aggregate.critical += severity.count;
-                break;
-              case "High":
-                aggregate.high += severity.count;
-                break;
-              case "Medium":
-                aggregate.medium += severity.count;
-                break;
-              case "Low":
-                aggregate.low += severity.count;
-                break;
-            }
-          });
-          
-          // Update the map with the new aggregate
-          buAggregateMap.set(buName, aggregate);
+        if (!data) return [];
+
+        // Create a map to store aggregated data by business unit
+        const buAggregateMap = new Map<string, {
+            businessUnit: string;
+            critical: number;
+            high: number;
+            medium: number;
+            low: number;
+        }>();
+
+        // Process all distributions and aggregate by business unit
+        data.forEach(distribution => {
+            // Process each business unit in the distribution
+            distribution.bu.forEach((businessUnit: { buName: string; severities: Array<{ severity: string; count: number }> }) => {
+                const buName = businessUnit.buName;
+
+                // Get or initialize the aggregate for this business unit
+                const aggregate = buAggregateMap.get(buName) || {
+                    businessUnit: buName,
+                    critical: 0,
+                    high: 0,
+                    medium: 0,
+                    low: 0
+                };
+
+                // Add severity counts to the aggregate
+                businessUnit.severities.forEach((severity: { severity: string; count: number }) => {
+                    switch (severity.severity) {
+                        case "Critical":
+                            aggregate.critical += severity.count;
+                            break;
+                        case "High":
+                            aggregate.high += severity.count;
+                            break;
+                        case "Medium":
+                            aggregate.medium += severity.count;
+                            break;
+                        case "Low":
+                            aggregate.low += severity.count;
+                            break;
+                    }
+                });
+
+                // Update the map with the new aggregate
+                buAggregateMap.set(buName, aggregate);
+            });
         });
-      });
-      
-      // Convert the map to an array
-      return Array.from(buAggregateMap.values());
+
+        // Convert the map to an array
+        return Array.from(buAggregateMap.values());
     }, [data]);
-    
+
     // Memoize transformed data and options to prevent unnecessary recalculations
     const series = useMemo(() => transformDataForChart(transformedRiskData), [transformedRiskData]);
     const options = useMemo(() => getChartOptions(SEVERITY_LEVELS, isDark), [isDark]);
@@ -331,19 +333,22 @@ export function UserRiskDistributionChart({ data, isLoading = false, error = nul
 
         // Render the chart if data is available
         return (
-             <ApexChart
+            <ApexChart
                 type="bar"
                 height={450} // Use height from options
                 options={options}
                 series={series}
-             />
+            />
         );
     };
 
     return (
         <Card className={`flex-1 flex flex-col ${isDark ? "bg-[#171727] border-0" : "bg-white"}`}>
-            <CardHeader>
-                <CardTitle>User Risk Distribution by Severity</CardTitle> {/* Updated Title */}
+            <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle>User Risk Distribution</CardTitle> {/* Updated Title */}
+                <Link href="/dashboard/security-breach-indicators/user-risk-distribution">
+                    <Button variant="outline" size="sm">Manage All</Button>
+                </Link>
             </CardHeader>
             <CardContent className="p-6">
                 {renderContent()}

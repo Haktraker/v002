@@ -301,9 +301,6 @@ const ComplianceScoresChart = ({ data, isLoading, error }: ComplianceScoresChart
                 <div className="flex items-center justify-between">
                     <div>
                         <CardTitle className={isDark ? "text-white" : "text-gray-900"}>Compliance Scores Distribution</CardTitle>
-                        <CardDescription className={isDark ? "text-gray-400" : ""}>
-                            Visualization of compliance scores across business units
-                        </CardDescription>
                     </div>
                     <Link href="/dashboard/security-breach-indicators/compliance-scores">
                         <Button variant="outline" size="sm">Manage All</Button>
