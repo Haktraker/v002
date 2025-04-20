@@ -286,7 +286,7 @@ const ComplianceScoresChart = ({ data, isLoading, error }: ComplianceScoresChart
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <p className={isDark ? "text-gray-400" : "text-muted-foreground" + " text-sm"}>
+                    <p className={`${isDark ? "text-gray-400" : "text-muted-foreground"} text-sm`}>
                         Please try refreshing the page. If the problem persists, contact support.
                     </p>
                 </CardContent>

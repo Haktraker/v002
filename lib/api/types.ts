@@ -122,6 +122,21 @@ export interface PaginatedResponse<T> {
   length: number;
 }
 
+// Network Anomaly Types
+export interface NetworkAnomalyDay {
+  dayNumber: number;
+  score: number;
+}
+
+export interface NetworkAnomaly {
+  _id: string;
+  month: string;
+  year: string;
+  days: NetworkAnomalyDay[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 // Threat Intelligence Types
 
 // Threat Composition
@@ -513,6 +528,40 @@ export interface UpdateUserRiskDistributionDto {
 export interface UserRiskDistributionQueryParams {
   month?: string;
   year?: string;
+  page?: number;
+  limit?: number;
+}
+
+// Network Anomalies Types
+export interface NetworkAnomalyDay {
+  dayNumber: number;
+  score: number;
+}
+
+export interface NetworkAnomaly {
+  _id: string;
+  year: string;
+  month: string;
+  days: NetworkAnomalyDay[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CreateNetworkAnomalyDto {
+  year: string;
+  month: string;
+  days: NetworkAnomalyDay[];
+}
+
+export interface UpdateNetworkAnomalyDto {
+  year?: string;
+  month?: string;
+  days?: NetworkAnomalyDay[];
+}
+
+export interface NetworkAnomalyQueryParams {
+  year?: string;
+  month?: string;
   page?: number;
   limit?: number;
 }
