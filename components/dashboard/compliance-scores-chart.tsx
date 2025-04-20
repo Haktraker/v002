@@ -157,7 +157,7 @@ const ComplianceScoresChart = ({ data, isLoading, error }: ComplianceScoresChart
     const chartOptions: ApexCharts.ApexOptions = { // Use ApexCharts.ApexOptions for better type checking if available
         chart: {
             type: 'donut',
-            toolbar: { show: true },
+            toolbar: { show: false },
             background: 'transparent',
             foreColor: isDark ? '#f8fafc' : '#334155', // Text color for labels etc.
             animations: { enabled: true, speed: 500, animateGradually: { enabled: true, delay: 150 }, dynamicAnimation: { enabled: true, speed: 350 } }

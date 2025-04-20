@@ -78,8 +78,8 @@ console.log(selectedAnomalyData,"selectedAnomalyData" );
     grid: {
       borderColor: isDark ? '#334155' : '#e2e8f0',
       strokeDashArray: 4,
-      xaxis: { lines: { show: true } },
-      yaxis: { lines: { show: true } },
+      xaxis: { lines: { show: false } },
+      yaxis: { lines: { show: false } },
     },
     xaxis: {
       type: 'numeric',

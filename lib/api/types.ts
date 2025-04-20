@@ -565,3 +565,55 @@ export interface NetworkAnomalyQueryParams {
   page?: number;
   limit?: number;
 }
+
+export type IncidentName = "Malware" | "Phishing" | "DDos" | "Data Breach" | "Ransomware";
+
+export interface Incident {
+  incident_name: IncidentName;
+  incident_score: number;
+}
+
+export interface BusinessUnitIncidents {
+  bu_name: string;
+  incidents: Incident[];
+}
+
+export interface SecurityIncidentTrend {
+  _id: string;
+  month: string;
+  year: string;
+  bu: BusinessUnitIncidents[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CreateSecurityIncidentTrendDto {
+  month: string;
+  year: string;
+  bu: {
+    bu_name: string;
+    incidents: {
+      incident_name: IncidentName;
+      incident_score: number;
+    }[];
+  }[];
+}
+
+export interface UpdateSecurityIncidentTrendDto {
+  month?: string;
+  year?: string;
+  bu?: {
+    bu_name: string;
+    incidents: {
+      incident_name: IncidentName;
+      incident_score: number;
+    }[];
+  }[];
+}
+
+export interface SecurityIncidentTrendQueryParams {
+  month?: string;
+  year?: string;
+  page?: number;
+  limit?: number;
+}

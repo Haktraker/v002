@@ -96,7 +96,7 @@ const getChartOptions = (categories: readonly string[], isDark: boolean): ApexCh
             height: 300,
             background: 'transparent',
             toolbar: {
-                show: true, // Enable toolbar for zoom, pan, download etc.
+                show: false, // Enable toolbar for zoom, pan, download etc.
                 tools: {
                     download: true,
                     selection: false,
