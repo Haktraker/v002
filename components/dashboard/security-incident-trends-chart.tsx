@@ -1,5 +1,5 @@
 'use client';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import  ApexChart  from '@/components/ui/apex-chart';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -7,12 +7,18 @@ import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle, Info } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { SecurityIncidentTrend } from '@/lib/api/types';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 type SecurityIncidentTrendsChartProps = {
   data?: SecurityIncidentTrend[]; // Changed prop type
   isLoading?: boolean;
   error?: Error | string | null;
 };
+
+const MONTHS = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'
+];
 
 export function SecurityIncidentTrendsChart({ 
   data, 
@@ -21,16 +27,28 @@ export function SecurityIncidentTrendsChart({
 }: SecurityIncidentTrendsChartProps) {
   const { theme } = useTheme();
   const isDark = theme === "dark";
+  const currentYear = (new Date().getFullYear()).toString();
+  const currentMonth = MONTHS[new Date().getMonth()];
+  const [selectedYear, setSelectedYear] = useState(currentYear);
+  const [selectedMonth, setSelectedMonth] = useState(currentMonth);
 
   // Transform data for ApexCharts
   const series = useMemo(() => {
     if (!data) return [];
 
-    const allIncidents = data.flatMap(trend =>
+    // Filter data by selected year and month
+    const filteredData = selectedYear === 'All' && selectedMonth === 'All' 
+      ? data 
+      : data.filter(trend => 
+          (selectedYear === 'All' || trend.year === selectedYear) && 
+          (selectedMonth === 'All' || trend.month === selectedMonth)
+        );
+
+    const allIncidents = filteredData.flatMap(trend =>
       trend.bu.flatMap(bu =>
         bu.incidents.map(incident => ({
           month: trend.month,
-          year: trend.year, // Keep year if needed for sorting/filtering
+          year: trend.year,
           incidentType: incident.incident_name,
           count: incident.incident_score
         }))
@@ -56,7 +74,7 @@ export function SecurityIncidentTrendsChart({
         })
       };
     });
-  }, [data]);
+  }, [data, selectedYear, selectedMonth]);
 
   const options = useMemo(() => ({
     chart: {
@@ -80,6 +98,7 @@ export function SecurityIncidentTrendsChart({
       // Use the sorted months derived in the 'series' memo
       categories: data ? Array.from(new Set(data.flatMap(trend => trend.month)))
                       .sort((a, b) => +new Date(`01 ${a} ${data[0]?.year || new Date().getFullYear()}`) - +new Date(`01 ${b} ${data[0]?.year || new Date().getFullYear()}`)) : [], // Ensure consistent sorting
+      title: { text: selectedMonth, style: { color: isDark ? '#e5e7eb' : '#374151' } },
       labels: { style: { colors: isDark ? '#e5e7eb' : '#374151' } }
     },
     yaxis: {
@@ -147,8 +166,51 @@ export function SecurityIncidentTrendsChart({
 
   return (
     <Card className={`flex-1 flex flex-col ${isDark ? "bg-[#171727] border-0" : "bg-white"}`}>
-      <CardHeader>
-        <CardTitle>Security Incident Trends</CardTitle>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-base font-medium">
+          Security Incident Trends
+        </CardTitle>
+        <div className="flex items-center space-x-2">
+          <Select
+            value={selectedYear}
+            onValueChange={setSelectedYear}
+          >
+            <SelectTrigger className="w-[120px]">
+              <SelectValue placeholder="Year" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem key="All" value="All">
+                All
+              </SelectItem>
+              {Array.from({ length: 5 }, (_, i) => (
+                <SelectItem
+                  key={+currentYear - i}
+                  value={(+currentYear - i).toString()}
+                >
+                  {+currentYear - i}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select
+            value={selectedMonth}
+            onValueChange={setSelectedMonth}
+          >
+            <SelectTrigger className="w-[140px]">
+              <SelectValue placeholder="Month" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem key="All" value="All">
+                All
+              </SelectItem>
+              {MONTHS.map((month) => (
+                <SelectItem key={month} value={month}>
+                  {month}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </CardHeader>
       <CardContent>
         {renderContent()}
