@@ -1,14 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useTheme } from 'next-themes';
-import ApexChart from '@/components/ui/apex-chart'; // Assuming correct path
+import ApexChart from '@/components/ui/apex-chart';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ComplianceScore } from '@/lib/api/types'; // Assuming this type definition is correct and path is valid
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ComplianceScore } from '@/lib/api/types';
+// Remove Select imports as they are no longer needed here
 
 // Define interfaces for component props and internal data structures
 interface ChartData {
@@ -23,146 +23,103 @@ interface AggregatedCompliance {
 }
 
 interface ComplianceScoresChartProps {
-    data: ComplianceScore[] | undefined; // Use the specific type from your API definitions
+    data: ComplianceScore[] | undefined; // Data is now expected to be pre-filtered by month/year
     isLoading: boolean;
     error: Error | null;
 }
 
-// Define a unique, non-empty value for the "All" option in the Select dropdown
-const ALL_TYPES_VALUE = "__ALL_COMPLIANCE_TYPES__";
+// Remove ALL_TYPES_VALUE constant
 
 // --- COMPONENT START ---
 const ComplianceScoresChart = ({ data, isLoading, error }: ComplianceScoresChartProps) => {
     const { theme } = useTheme();
     const [chartData, setChartData] = useState<ChartData>({ labels: [], series: [] });
     const [aggregatedCompliances, setAggregatedCompliances] = useState<AggregatedCompliance[]>([]);
-    const [complianceList, setComplianceList] = useState<string[]>([]);
-    // Initial state remains '' to signify "All" internally
-    const [selectedCompliance, setSelectedCompliance] = useState<string>('');
+    // Remove complianceList and selectedCompliance state
 
     // Define a color map for compliance types
-    const complianceColorMap = new Map<string, string>([
-        ['ISO 27001', '#10B981'],  // Emerald
-        ['HIPAA', '#3B82F6'],      // Blue
-        ['PCI DSS', '#F59E0B'],    // Amber
-        ['SOC 2', '#8B5CF6'],      // Violet
-        ['GDPR', '#EC4899'],       // Pink
-        ['NIST', '#6366F1'],       // Indigo
-        ['SOX', '#06B6D4'],        // Cyan
-        ['CCPA', '#F97316'],       // Orange
-        ['FedRAMP', '#14B8A6'],    // Teal
-    ]);
+    const complianceColorMap = useMemo(() => new Map<string, string>([
+        ['ISO 27001', '#10B981'],
+        ['HIPAA', '#3B82F6'],
+        ['PCI DSS', '#F59E0B'],
+        ['SOC 2', '#8B5CF6'],
+        ['GDPR', '#EC4899'],
+        ['NIST', '#6366F1'],
+        ['SOX', '#06B6D4'],
+        ['CCPA', '#F97316'],
+        ['FedRAMP', '#14B8A6'],
+    ]), []); // Use useMemo for the color map
 
-    // --- Effect to process incoming data ---
+    // --- Effect to process incoming data --- (Simplified)
     useEffect(() => {
-        // Check if data is valid
         if (data && Array.isArray(data)) {
             const complianceMap = new Map<string, number>();
             const colorAssignments = new Map<string, string>();
 
-            // Process all data entries, not just the first one
+            // Process all data entries (assuming data is already filtered by month/year)
             data.forEach(dataEntry => {
                 if (dataEntry?.bu && Array.isArray(dataEntry.bu)) {
                     dataEntry.bu.forEach(bu => {
-                        // Ensure bu.compliances is an array before iterating
                         if (bu && Array.isArray(bu.compliances)) {
                             bu.compliances.forEach(comp => {
-                                // Basic validation for compliance entry
                                 if (!comp || typeof comp !== 'object') {
-                                    console.warn('Skipping invalid compliance entry (not an object):', comp);
+                                    console.warn('Skipping invalid compliance entry:', comp);
                                     return;
                                 }
-
-                                // Handle potentially missing or non-string complianceName
                                 let complianceName = typeof comp.complianceName === 'string' ? comp.complianceName.trim() : '';
                                 if (!complianceName) {
-                                    complianceName = 'Unspecified Compliance'; // Assign a default name for empty/missing ones
+                                    complianceName = 'Unspecified Compliance';
                                 }
-
-                                // Handle potentially missing, null, or non-finite counts, defaulting to 0
                                 const count = (typeof comp.count === 'number' && Number.isFinite(comp.count)) ? comp.count : 0;
 
-                                // Aggregate counts
                                 const currentCount = complianceMap.get(complianceName) || 0;
                                 complianceMap.set(complianceName, currentCount + count);
 
-                                // Assign color if not already assigned
                                 if (!colorAssignments.has(complianceName)) {
                                     const predefinedColor = complianceColorMap.get(complianceName);
                                     colorAssignments.set(complianceName, predefinedColor || `hsl(${colorAssignments.size * 45}, 70%, 50%)`);
                                 }
                             });
-                        } else {
-                            // Log if a business unit doesn't have a valid compliances array
-                            console.warn('Business unit missing or has invalid compliances array:', bu);
                         }
                     });
                 }
             });
 
-            // Convert map to array, sort by count descending
             const aggregated = Array.from(complianceMap.entries()).map(([complianceName, count]) => ({
                 complianceName,
                 count,
-                color: colorAssignments.get(complianceName) || '#6B7280' // Default gray color
+                color: colorAssignments.get(complianceName) || '#6B7280'
             }));
             aggregated.sort((a, b) => b.count - a.count);
 
-            // Update state with aggregated data
             setAggregatedCompliances(aggregated);
 
-            // Extract unique, non-empty compliance names for the filter dropdown list
-            const allCompliances = aggregated
-                .map(comp => comp.complianceName) // Already handled empty names above
-                .filter(name => name && name.trim() !== ''); // Ensure not null/empty again
-
-            // Use Set for efficient uniqueness guarantee
-            setComplianceList(Array.from(new Set(allCompliances)));
-
-            // Reset filter to 'All' (represented by empty string state) when data changes
-            setSelectedCompliance('');
+            // Update chart data directly from aggregated data
+            const labels = aggregated.map(comp => comp.complianceName || 'Unspecified');
+            const series = aggregated.map(comp => comp.count);
+            setChartData({ labels, series });
 
         } else {
-            // Handle cases where data is empty, undefined, null, or malformed
-            console.warn('Compliance data is empty or has unexpected structure:', data);
+            console.warn('Compliance data is empty or invalid:', data);
             setAggregatedCompliances([]);
-            setComplianceList([]);
-            setChartData({ labels: [], series: [] }); // Clear chart
-            setSelectedCompliance(''); // Reset filter
+            setChartData({ labels: [], series: [] });
         }
-    }, [data]); // Re-run this effect only when the input 'data' prop changes
+    }, [data, complianceColorMap]); // Depend on data and the memoized color map
 
-    // --- Effect to update chart when filter or aggregated data changes ---
-    useEffect(() => {
-        // Prepare data for the chart based on the current filter and aggregated list
-        let filteredData = aggregatedCompliances;
-
-        // Apply filter only if a specific compliance type (non-empty string) is selected
-        if (selectedCompliance && selectedCompliance !== '') {
-            filteredData = aggregatedCompliances.filter(comp => comp.complianceName === selectedCompliance);
-        }
-
-        // Map filtered data to chart labels and series
-        const labels = filteredData.map(comp => comp.complianceName || 'Unspecified'); // Fallback for safety
-        const series = filteredData.map(comp => comp.count);
-
-        // Update the chart data state
-        setChartData({ labels, series });
-
-    }, [selectedCompliance, aggregatedCompliances]); // Re-run when filter or base data changes
+    // Remove the effect that updated chart based on selectedCompliance
 
     // --- Chart Configuration ---
     const isDark = theme === 'dark';
 
-    const chartOptions: ApexCharts.ApexOptions = { // Use ApexCharts.ApexOptions for better type checking if available
+    const chartOptions: ApexCharts.ApexOptions = useMemo(() => ({ // Wrap options in useMemo
         chart: {
             type: 'donut',
             toolbar: { show: false },
             background: 'transparent',
-            foreColor: isDark ? '#f8fafc' : '#334155', // Text color for labels etc.
+            foreColor: isDark ? '#f8fafc' : '#334155',
             animations: { enabled: true, speed: 500, animateGradually: { enabled: true, delay: 150 }, dynamicAnimation: { enabled: true, speed: 350 } }
         },
-        labels: chartData.labels, // Use state directly, ApexCharts updates dynamically
+        labels: chartData.labels,
         responsive: [{ breakpoint: 480, options: { chart: { width: 300 }, legend: { position: 'bottom' } } }],
         legend: {
             position: 'bottom',
@@ -170,7 +127,7 @@ const ComplianceScoresChart = ({ data, isLoading, error }: ComplianceScoresChart
             fontSize: '14px',
             fontFamily: 'inherit',
             labels: {
-                colors: isDark ? '#e5e7eb' : '#374151' // Legend text color
+                colors: isDark ? '#e5e7eb' : '#374151'
             },
             itemMargin: { horizontal: 10, vertical: 5 }
         },
@@ -179,187 +136,115 @@ const ComplianceScoresChart = ({ data, isLoading, error }: ComplianceScoresChart
             theme: isDark ? 'dark' : 'light',
             y: {
                 formatter: function (value: number, { seriesIndex, w }: { seriesIndex: number; w: any }) {
-                    // Added safety checks for w, w.globals, w.globals.seriesTotals
                     const totals = w?.globals?.seriesTotals;
                     if (totals && Array.isArray(totals)) {
                         const total = totals.reduce((a: number, b: number) => (a || 0) + (b || 0), 0);
-                        // Ensure value is a number before division
                         const numericValue = typeof value === 'number' ? value : 0;
                         const percentage = total > 0 ? ((numericValue / total) * 100).toFixed(1) : 0;
                         return `${numericValue} (${percentage}%)`;
                     }
-                    return value?.toString() ?? '0'; // Fallback if totals are not available
+                    return value?.toString() ?? '0';
                 }
             },
             style: { fontFamily: 'inherit', fontSize: '14px' }
         },
-        // --- Updated Colors ---
         colors: chartData.labels.map(label => {
             const compliance = aggregatedCompliances.find(comp => comp.complianceName === label);
-            return compliance?.color || '#6B7280'; // Default to gray if no color assigned
+            return compliance?.color || '#6B7280';
         }),
-        // --- Updated Fill ---
-        fill: {
-            type: 'solid', // Use solid colors for clarity
-            opacity: 1,
-        },
-        // --- Optional Stroke ---
-        stroke: {
-            width: 1, // Add a small border between segments
-            colors: [isDark ? '#171727' : '#ffffff'] // Match card background for seamless look
-        },
-        theme: {
-            mode: isDark ? 'dark' : 'light',
-            // palette: 'palette1' // Explicitly defining colors above is generally preferred over palettes
-        },
         plotOptions: {
             pie: {
                 donut: {
-                    size: '75%', // Adjust donut thickness
+                    size: '75%',
                     labels: {
                         show: true,
-                        name: {
+                        total: {
                             show: true,
-                            fontSize: '14px',
-                            fontFamily: 'inherit',
-                            color: isDark ? '#e5e7eb' : '#374151'
+                            label: 'Total Score',
+                            fontSize: '1.5rem',
+                            fontWeight: 600,
+                            color: isDark ? '#cbd5e1' : '#475569',
+                            formatter: function (w: any) {
+                                const totals = w?.globals?.seriesTotals;
+                                if (totals && Array.isArray(totals)) {
+                                    return totals.reduce((a: number, b: number) => (a || 0) + (b || 0), 0).toString();
+                                }
+                                return '0';
+                            }
                         },
                         value: {
                             show: true,
-                            fontSize: '16px',
-                            fontFamily: 'inherit',
-                            fontWeight: 'bold',
-                            color: isDark ? '#ffffff' : '#111827', // Make value more prominent
-                            formatter: function (val: any) { return val?.toString() ?? '0'; }
-                        },
-                        total: {
-                            show: true,
-                            label: 'Total',
-                            fontSize: '14px',
-                            fontFamily: 'inherit',
-                            color: isDark ? '#e5e7eb' : '#374151',
-                            formatter: function (w: any) {
-                                // Added safety checks for totals calculation
-                                const totals = w?.globals?.seriesTotals;
-                                if (totals && Array.isArray(totals)) {
-                                    // Ensure elements are numbers before reducing
-                                    const validTotals = totals.filter(t => typeof t === 'number');
-                                    return validTotals.reduce((a: number, b: number) => a + b, 0).toString();
-                                }
-                                return '0'; // Fallback if totals aren't available or valid
+                            fontSize: '1rem',
+                            fontWeight: 400,
+                            color: isDark ? '#94a3b8' : '#64748b',
+                            offsetY: 8,
+                            formatter: function (val: string) {
+                                // The value passed here is already formatted by the tooltip formatter if enabled
+                                // We just need to display it or potentially reformat if needed.
+                                // If tooltip.y.formatter is complex, you might need simpler logic here.
+                                return val; // Assuming 'val' is the direct series value
                             }
                         }
                     }
                 }
             }
         },
-        dataLabels: {
-            enabled: false // Keep disabled for donut clarity; tooltip/legend provide details
-        }
-    };
+        dataLabels: { enabled: false }, // Keep labels off the donut itself
+        stroke: { show: false }, // No border around segments
+    }), [isDark, chartData, aggregatedCompliances]); // Dependencies for useMemo
 
     // --- Render Logic ---
+    const renderContent = () => {
+        if (isLoading) {
+            return <Skeleton className="h-[350px] w-full" />;
+        }
 
-    // 1. Loading State
-    if (isLoading) {
+        if (error) {
+            return (
+                <div className="text-destructive-foreground bg-destructive p-4 rounded-md">
+                    Error loading compliance scores: {error.message}
+                </div>
+            );
+        }
+
+        if (!chartData || chartData.series.length === 0) {
+            return (
+                <div className="text-center text-muted-foreground py-8">
+                    No compliance data available for the selected period.
+                </div>
+            );
+        }
+
         return (
-            <Card className={isDark ? "bg-[#171727] border-0" : "bg-white"}>
-                <CardHeader>
-                    <Skeleton className="h-8 w-1/3 mb-2" />
-                    <Skeleton className="h-4 w-1/2" />
-                </CardHeader>
-                <CardContent>
-                    <Skeleton className="h-[400px] w-full rounded-md" />
-                </CardContent>
-            </Card>
+            <ApexChart
+                type="donut"
+                height={350}
+                options={chartOptions}
+                series={chartData.series}
+            />
         );
-    }
+    };
 
-    // 2. Error State
-    if (error) {
-        return (
-            <Card className={isDark ? "bg-[#171727] border-0" : "bg-white"}>
-                <CardHeader>
-                    <CardTitle className={isDark ? "text-white" : "text-gray-900"}>Error Loading Data</CardTitle>
-                    <CardDescription className="text-destructive">
-                        {error.message || 'Failed to load compliance score data.'}
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <p className={`${isDark ? "text-gray-400" : "text-muted-foreground"} text-sm`}>
-                        Please try refreshing the page. If the problem persists, contact support.
-                    </p>
-                </CardContent>
-            </Card>
-        );
-    }
-
-    // 3. Success State (with data or no data message)
     return (
         <Card className={`flex-1 flex flex-col ${isDark ? "bg-[#171727] border-0" : "bg-white"}`}>
-            <CardHeader>
-                <div className="flex items-center justify-between">
-                    <div>
-                        <CardTitle className={isDark ? "text-white" : "text-gray-900"}>Compliance Scores Distribution</CardTitle>
-                    </div>
-                    <Link href="/dashboard/security-breach-indicators/compliance-scores">
-                        <Button variant="outline" size="sm">Manage All</Button>
-                    </Link>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <div className="flex flex-col space-y-1.5">
+                    <CardTitle className="text-base font-medium">Compliance Scores</CardTitle>
+                    <CardDescription>Distribution across compliance types</CardDescription>
                 </div>
+                {/* Remove the Select dropdown for filtering */}
             </CardHeader>
-            <CardContent>
-                {/* Conditionally render Select only if there are actual compliance types to filter */}
-                {complianceList.length > 1 && ( // Show filter only if there's more than one type (or "Unspecified")
-                    <div className="mb-6">
-                        <Select
-                            // Use the placeholder value if state is '', otherwise use the state
-                            value={selectedCompliance === '' ? ALL_TYPES_VALUE : selectedCompliance}
-                            onValueChange={(value) => {
-                                // If the placeholder value is selected, set state to '', otherwise set to the actual value
-                                setSelectedCompliance(value === ALL_TYPES_VALUE ? '' : value);
-                            }}
-                        >
-                            <SelectTrigger className={`w-full md:w-[280px] ${isDark ? 'bg-[#2a2a3e] border-gray-600 text-white' : 'bg-white'}`}>
-                                <SelectValue placeholder="Filter by compliance type..." />
-                            </SelectTrigger>
-                            <SelectContent className={isDark ? 'bg-[#2a2a3e] border-gray-600 text-white' : ''}>
-                                {/* Use the placeholder value for the "All" item */}
-                                <SelectItem value={ALL_TYPES_VALUE}>All Compliance Types</SelectItem>
-                                {/* Map over the actual compliance names */}
-                                {complianceList.map((compliance) => (
-                                    // Ensure key and value are valid, non-empty strings
-                                    <SelectItem key={compliance} value={compliance}>
-                                        {compliance}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                )}
-
-                {/* Chart Area */}
-                <div className="h-[400px] w-full">
-                    {chartData.series.length > 0 ? (
-                        <ApexChart
-                            options={chartOptions} // Pass the configured options
-                            series={chartData.series} // Pass the data series
-                            type="donut"
-                            height="100%"
-                            width="100%"
-                        />
-                    ) : (
-                        // Message when there's no data to display (after loading/error checks)
-                        <div className="flex h-full w-full items-center justify-center">
-                            <p className={isDark ? "text-gray-500" : "text-muted-foreground"}>
-                                No compliance data available{selectedCompliance ? ` for "${selectedCompliance}"` : ''}.
-                            </p>
-                        </div>
-                    )}
-                </div>
+            <CardContent className="flex-1 flex flex-col justify-center">
+                {renderContent()}
             </CardContent>
+            {/* Optional: Keep the footer link if relevant */}
+            {/* <CardFooter className="flex justify-center pt-4">
+                <Button variant="link" asChild>
+                    <Link href="/dashboard/compliance-details">View Details</Link>
+                </Button>
+            </CardFooter> */}
         </Card>
     );
 };
-// --- COMPONENT END ---
 
 export default ComplianceScoresChart;

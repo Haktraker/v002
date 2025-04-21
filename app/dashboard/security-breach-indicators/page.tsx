@@ -7,50 +7,52 @@ import { useGetUserRiskDistributions } from "@/lib/api/endpoints/security-breach
 import { useGetNetworkAnomalies } from "@/lib/api/endpoints/security-breach-indicators/network-anomalies/network-anomalies";
 import { useGetSecurityIncidentTrends } from "@/lib/api/endpoints/security-breach-indicators/security-incident-trends/security-incident-trends";
 import { SecurityIncidentTrendsChart } from "@/components/dashboard/security-incident-trends-chart";
+import { useGlobalFilter } from '@/lib/context/GlobalFilterContext'; // Import the hook
+import { GlobalFilterComponent } from '@/components/dashboard/global-filter'; // Import the component
 
-export default function securityBreachIndicators() {
-    const { data: complianceScores, isLoading: complianceScoresLoading, error: complianceScoresErrors } = useGetComplianceScores();
-    const { data: userRiskDistribution, isLoading: userRiskLoading, error: userRiskErrors } = useGetUserRiskDistributions();
-    const { data: networkAnomalies, isLoading: networkAnomaliesLoading, error: networkAnomaliesErrors } = useGetNetworkAnomalies();
-    const { data: securityIncidentTrends, isLoading: securityIncidentTrendsLoading, error: securityIncidentTrendsErrors } = useGetSecurityIncidentTrends();
+export default function SecurityBreachIndicatorsPage() { // Renamed component for clarity
+    const { selectedMonth, selectedYear } = useGlobalFilter(); // Get filter values
 
+    // Prepare parameters for hooks, omitting 'All'
+    const queryParams = {
+      month: selectedMonth === 'All' ? undefined : selectedMonth,
+      year: selectedYear === 'All' ? undefined : selectedYear,
+    };
+
+    // Pass conditional parameters to the hooks
+    const { data: complianceScores, isLoading: complianceScoresLoading, error: complianceScoresErrors } = useGetComplianceScores(queryParams);
+    const { data: userRiskDistribution, isLoading: userRiskLoading, error: userRiskErrors } = useGetUserRiskDistributions(queryParams);
+    const { data: networkAnomalies, isLoading: networkAnomaliesLoading, error: networkAnomaliesErrors } = useGetNetworkAnomalies(queryParams);
+    const { data: securityIncidentTrends, isLoading: securityIncidentTrendsLoading, error: securityIncidentTrendsErrors } = useGetSecurityIncidentTrends(queryParams);
+console.log(securityIncidentTrends,"securityIncidentTrends")
+    // Render components with the conditional parameters
+    // ... (other components)
+    // Wrap content in a div and add the filter component as a child pr
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 p-2">
-        <div className="w-full h-full flex">
-          <div className="w-full h-full flex-1 flex flex-col">
+      <div> {/* Wrap content in a div */} 
+        <GlobalFilterComponent /> {/* Add the filter component here */} 
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 p-2">
             <ComplianceScoresChart 
               data={complianceScores} 
               isLoading={complianceScoresLoading} 
               error={complianceScoresErrors} 
             />
-          </div>
-        </div>
-        <div className="w-full h-full flex">
-          <div className="w-full h-full flex-1 flex flex-col">
             <UserRiskDistributionChart 
               data={userRiskDistribution} 
               isLoading={userRiskLoading} 
               error={userRiskErrors}
             />
-          </div>
-        </div>
-        <div className="w-full h-full flex ">
-          <div className="w-full h-full flex-1 flex flex-col">
+            
             <NetworkAnomaliesChart 
               data={networkAnomalies}
               isLoading={networkAnomaliesLoading}
               error={networkAnomaliesErrors}
             />
-          </div>
-        </div>
-        <div className="w-full h-full flex ">
-          <div className="w-full h-full flex-1 flex flex-col">
             <SecurityIncidentTrendsChart 
               data={securityIncidentTrends}
               isLoading={securityIncidentTrendsLoading}
               error={securityIncidentTrendsErrors}
             />
-          </div>
         </div>
       </div>
     );

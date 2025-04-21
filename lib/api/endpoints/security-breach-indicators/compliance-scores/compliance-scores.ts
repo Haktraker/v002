@@ -8,7 +8,7 @@ import { useApiLoading } from '@/lib/utils/api-utils';
 
 // API Keys for Compliance Scores
 export const COMPLIANCE_SCORES_KEYS = {
-  lists: () => ['complianceScores'] as const,
+  lists: (params?: ComplianceScoreQueryParams) => ['complianceScores', params] as const, // Include params in key
   detail: (id: string) => ['complianceScores', id] as const,
 };
 
@@ -19,8 +19,8 @@ const BASE_URL = '/security-breach-indicators-dashboard/compliance-score';
 export const useGetComplianceScores = (params?: ComplianceScoreQueryParams) => {
   const { withLoading } = useApiLoading();
   
-  return useQuery({
-    queryKey: COMPLIANCE_SCORES_KEYS.lists(),
+  return useQuery<ComplianceScore[]>({ // Add explicit type here
+    queryKey: COMPLIANCE_SCORES_KEYS.lists(params), // Use params in queryKey
     queryFn: async () => {
       const response = await withLoading(() => apiClient.get<ApiResponse<ComplianceScore[]>>(BASE_URL, { params }));
       return response.data.data;
@@ -56,7 +56,7 @@ export const useCreateComplianceScore = () => {
     },
     onSuccess: () => {
       showToast('Compliance score created successfully', 'success');
-      queryClient.invalidateQueries({ queryKey: COMPLIANCE_SCORES_KEYS.lists() });
+      queryClient.invalidateQueries({ queryKey: COMPLIANCE_SCORES_KEYS.lists({}) }); // Invalidate base list
     },
     onError: (error: any) => {
       console.error('Failed to create compliance score:', error);
@@ -78,7 +78,7 @@ export const useUpdateComplianceScore = () => {
     onSuccess: (_, variables) => {
       showToast('Compliance score updated successfully', 'success');
       queryClient.invalidateQueries({ queryKey: COMPLIANCE_SCORES_KEYS.detail(variables.id) });
-      queryClient.invalidateQueries({ queryKey: COMPLIANCE_SCORES_KEYS.lists() });
+      queryClient.invalidateQueries({ queryKey: COMPLIANCE_SCORES_KEYS.lists({}) }); // Invalidate base list
     },
     onError: (error: any) => {
       console.error('Failed to update compliance score:', error);
@@ -100,7 +100,7 @@ export const useDeleteComplianceScore = () => {
     onSuccess: (_, id) => {
       showToast('Compliance score deleted successfully', 'success');
       queryClient.removeQueries({ queryKey: COMPLIANCE_SCORES_KEYS.detail(id) });
-      queryClient.invalidateQueries({ queryKey: COMPLIANCE_SCORES_KEYS.lists() });
+      queryClient.invalidateQueries({ queryKey: COMPLIANCE_SCORES_KEYS.lists({}) }); // Invalidate base list
     },
     onError: (error: any) => {
       console.error('Failed to delete compliance score:', error);

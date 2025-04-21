@@ -8,7 +8,7 @@ import { useApiLoading } from '@/lib/utils/api-utils';
 
 // API Keys for User Risk Distribution
 export const USER_RISK_DISTRIBUTION_KEYS = {
-  lists: () => ['userRiskDistribution'] as const,
+  lists: (params?: UserRiskDistributionQueryParams) => ['userRiskDistribution', params] as const, // Include params in key
   detail: (id: string) => ['userRiskDistribution', id] as const,
 };
 
@@ -20,7 +20,7 @@ export const useGetUserRiskDistributions = (params?: UserRiskDistributionQueryPa
   const { withLoading } = useApiLoading();
   
   return useQuery({
-    queryKey: USER_RISK_DISTRIBUTION_KEYS.lists(),
+    queryKey: USER_RISK_DISTRIBUTION_KEYS.lists(params), // Use params in queryKey
     queryFn: async () => {
       const response = await withLoading(() => apiClient.get<ApiResponse<UserRiskDistribution[]>>(BASE_URL, { params }));
       return response.data.data;
@@ -56,7 +56,7 @@ export const useCreateUserRiskDistribution = () => {
     },
     onSuccess: () => {
       showToast('User risk distribution created successfully', 'success');
-      queryClient.invalidateQueries({ queryKey: USER_RISK_DISTRIBUTION_KEYS.lists() });
+      queryClient.invalidateQueries({ queryKey: USER_RISK_DISTRIBUTION_KEYS.lists({}) }); // Invalidate base list
     },
     onError: (error: any) => {
       console.error('Failed to create user risk distribution:', error);
@@ -78,7 +78,7 @@ export const useUpdateUserRiskDistribution = () => {
     onSuccess: (_, variables) => {
       showToast('User risk distribution updated successfully', 'success');
       queryClient.invalidateQueries({ queryKey: USER_RISK_DISTRIBUTION_KEYS.detail(variables.id) });
-      queryClient.invalidateQueries({ queryKey: USER_RISK_DISTRIBUTION_KEYS.lists() });
+      queryClient.invalidateQueries({ queryKey: USER_RISK_DISTRIBUTION_KEYS.lists({}) }); // Invalidate base list
     },
     onError: (error: any) => {
       console.error('Failed to update user risk distribution:', error);
@@ -100,7 +100,7 @@ export const useDeleteUserRiskDistribution = () => {
     onSuccess: (_, id) => {
       showToast('User risk distribution deleted successfully', 'success');
       queryClient.removeQueries({ queryKey: USER_RISK_DISTRIBUTION_KEYS.detail(id) });
-      queryClient.invalidateQueries({ queryKey: USER_RISK_DISTRIBUTION_KEYS.lists() });
+      queryClient.invalidateQueries({ queryKey: USER_RISK_DISTRIBUTION_KEYS.lists({}) }); // Invalidate base list
     },
     onError: (error: any) => {
       console.error('Failed to delete user risk distribution:', error);

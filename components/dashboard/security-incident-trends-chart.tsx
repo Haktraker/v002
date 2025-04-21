@@ -7,18 +7,15 @@ import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle, Info } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { SecurityIncidentTrend } from '@/lib/api/types';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+// Remove Select imports
 
 type SecurityIncidentTrendsChartProps = {
-  data?: SecurityIncidentTrend[]; // Changed prop type
+  data?: SecurityIncidentTrend[]; // Data is now expected to be pre-filtered by month/year
   isLoading?: boolean;
   error?: Error | string | null;
 };
 
-const MONTHS = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December'
-];
+// Remove MONTHS constant
 
 export function SecurityIncidentTrendsChart({ 
   data, 
@@ -27,28 +24,20 @@ export function SecurityIncidentTrendsChart({
 }: SecurityIncidentTrendsChartProps) {
   const { theme } = useTheme();
   const isDark = theme === "dark";
-  const currentYear = (new Date().getFullYear()).toString();
-  const currentMonth = MONTHS[new Date().getMonth()];
-  const [selectedYear, setSelectedYear] = useState(currentYear);
-  const [selectedMonth, setSelectedMonth] = useState(currentMonth);
+  // Remove currentYear, currentMonth, selectedYear, selectedMonth state
 
-  // Transform data for ApexCharts
+  // Transform data for ApexCharts - Simplified
   const series = useMemo(() => {
     if (!data) return [];
 
-    // Filter data by selected year and month
-    const filteredData = selectedYear === 'All' && selectedMonth === 'All' 
-      ? data 
-      : data.filter(trend => 
-          (selectedYear === 'All' || trend.year === selectedYear) && 
-          (selectedMonth === 'All' || trend.month === selectedMonth)
-        );
+    // Data is assumed to be pre-filtered by month/year
+    const filteredData = data;
 
     const allIncidents = filteredData.flatMap(trend =>
       trend.bu.flatMap(bu =>
         bu.incidents.map(incident => ({
-          month: trend.month,
-          year: trend.year,
+          month: trend.month, // Keep month for potential category grouping if needed
+          year: trend.year, // Keep year for potential category grouping if needed
           incidentType: incident.incident_name,
           count: incident.incident_score
         }))
@@ -57,11 +46,29 @@ export function SecurityIncidentTrendsChart({
 
     if (allIncidents.length === 0) return [];
 
-    // Group by incident type and aggregate counts by month
+    // Group by incident type
     const incidentTypes = Array.from(new Set(allIncidents.map(item => item.incidentType)));
-    // Sort months chronologically (assuming 'Month Year' format or similar)
+    
+    // Determine categories (e.g., Business Units if data represents a single month/year)
+    // Or keep months if data spans multiple months (though filtering should handle this)
+    // For simplicity, let's assume the data passed is for ONE month/year and group by BU
+    const businessUnits = Array.from(new Set(filteredData.flatMap(trend => trend.bu.map(b => b.bu_name))));
+
+    return incidentTypes.map(type => {
+      return {
+        name: type,
+        data: businessUnits.map(buName => {
+          const buTotal = allIncidents
+            .filter(item => item.incidentType === type && filteredData.some(t => t.bu.some(b => b.bu_name === buName)))
+            .reduce((sum, item) => sum + item.count, 0); // This logic might need adjustment based on how data is structured post-filtering
+          return buTotal;
+        })
+      };
+    });
+    // --- OR --- If keeping monthly trend within the filtered data:
+    /*
     const months = Array.from(new Set(allIncidents.map(item => item.month)))
-                     .sort((a, b) => +new Date(`01 ${a} ${data[0]?.year || new Date().getFullYear()}`) - +new Date(`01 ${b} ${data[0]?.year || new Date().getFullYear()}`)); // Basic sort, might need refinement based on actual month/year format
+                     .sort((a, b) => +new Date(`01 ${a} ${filteredData[0]?.year || new Date().getFullYear()}`) - +new Date(`01 ${b} ${filteredData[0]?.year || new Date().getFullYear()}`));
 
     return incidentTypes.map(type => {
       return {
@@ -74,56 +81,63 @@ export function SecurityIncidentTrendsChart({
         })
       };
     });
-  }, [data, selectedYear, selectedMonth]);
+    */
+  }, [data]);
 
-  const options = useMemo(() => ({
-    chart: {
-      type: 'line',
-      height: 350,
-      stacked: false,
-      toolbar: { show: false },
-      zoom: { enabled: true },
-      foreColor: isDark ? '#f8fafc' : '#334155',
-      background: 'transparent',
-    },
-    stroke: {
-      width: 3,
-      curve: 'smooth'
-    },
-    markers: {
-      size: 5,
-      hover: { size: 7 }
-    },
-    xaxis: {
-      // Use the sorted months derived in the 'series' memo
-      categories: data ? Array.from(new Set(data.flatMap(trend => trend.month)))
-                      .sort((a, b) => +new Date(`01 ${a} ${data[0]?.year || new Date().getFullYear()}`) - +new Date(`01 ${b} ${data[0]?.year || new Date().getFullYear()}`)) : [], // Ensure consistent sorting
-      title: { text: selectedMonth, style: { color: isDark ? '#e5e7eb' : '#374151' } },
-      labels: { style: { colors: isDark ? '#e5e7eb' : '#374151' } }
-    },
-    yaxis: {
-      title: { text: 'Incident Count', style: { color: isDark ? '#e5e7eb' : '#374151' } },
-      labels: { style: { colors: isDark ? '#e5e7eb' : '#374151' } }
-    },
-    tooltip: {
-      theme: isDark ? 'dark' : 'light',
-      shared: true,
-      intersect: false
-    },
-    legend: {
-      position: 'top',
-      horizontalAlign: 'right',
-      labels: { colors: isDark ? '#e5e7eb' : '#374151' }
-    },
-    colors: ['#3B82F6', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899'],
-    responsive: [{
-      breakpoint: 768,
-      options: {
-        chart: { height: 300 },
-        legend: { position: 'bottom' }
-      }
-    }]
-  }), [data, isDark]);
+  const options = useMemo(() => {
+    // Determine categories based on how 'series' was calculated
+    const categories = data ? Array.from(new Set(data.flatMap(trend => trend.bu.map(b => b.bu_name)))) : [];
+    // OR if using months: 
+    // const categories = data ? Array.from(new Set(data.flatMap(trend => trend.month))).sort(...) : [];
+
+    return {
+      chart: {
+        type: 'line', // Or 'bar' if grouping by BU makes more sense
+        height: 350,
+        stacked: false,
+        toolbar: { show: false },
+        zoom: { enabled: true },
+        foreColor: isDark ? '#f8fafc' : '#334155',
+        background: 'transparent',
+      },
+      stroke: {
+        width: 3,
+        curve: 'smooth'
+      },
+      markers: {
+        size: 5,
+        hover: { size: 7 }
+      },
+      xaxis: {
+        categories: categories, 
+        title: { text: '', style: { color: isDark ? '#e5e7eb' : '#374151' } }, // Remove month title or adjust
+        labels: { style: { colors: isDark ? '#e5e7eb' : '#374151' } },
+        
+      },
+      yaxis: {
+        title: { text: 'Incident Count', style: { color: isDark ? '#e5e7eb' : '#374151' } },
+        labels: { style: { colors: isDark ? '#e5e7eb' : '#374151' } }
+      },
+      tooltip: {
+        theme: isDark ? 'dark' : 'light',
+        shared: true,
+        intersect: false
+      },
+      legend: {
+        position: 'top',
+        horizontalAlign: 'right',
+        labels: { colors: isDark ? '#e5e7eb' : '#374151' }
+      },
+      colors: ['#3B82F6', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899'], // Keep or adjust colors
+      responsive: [{
+        breakpoint: 768,
+        options: {
+          chart: { height: 300 },
+          legend: { position: 'bottom' }
+        }
+      }]
+    };
+  }, [data, isDark]);
 
   const renderContent = () => {
     if (isLoading) {
@@ -148,7 +162,7 @@ export function SecurityIncidentTrendsChart({
           <Info className="h-4 w-4" />
           <AlertTitle>No Data Available</AlertTitle>
           <AlertDescription>
-            There is no security incident trend data to display.
+            There is no security incident trend data to display for the selected period.
           </AlertDescription>
         </Alert>
       );
@@ -156,7 +170,7 @@ export function SecurityIncidentTrendsChart({
 
     return (
       <ApexChart
-        type="line"
+        type="line" // Or 'bar'
         height={350}
         options={options}
         series={series}
@@ -170,47 +184,7 @@ export function SecurityIncidentTrendsChart({
         <CardTitle className="text-base font-medium">
           Security Incident Trends
         </CardTitle>
-        <div className="flex items-center space-x-2">
-          <Select
-            value={selectedYear}
-            onValueChange={setSelectedYear}
-          >
-            <SelectTrigger className="w-[120px]">
-              <SelectValue placeholder="Year" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem key="All" value="All">
-                All
-              </SelectItem>
-              {Array.from({ length: 5 }, (_, i) => (
-                <SelectItem
-                  key={+currentYear - i}
-                  value={(+currentYear - i).toString()}
-                >
-                  {+currentYear - i}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select
-            value={selectedMonth}
-            onValueChange={setSelectedMonth}
-          >
-            <SelectTrigger className="w-[140px]">
-              <SelectValue placeholder="Month" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem key="All" value="All">
-                All
-              </SelectItem>
-              {MONTHS.map((month) => (
-                <SelectItem key={month} value={month}>
-                  {month}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        {/* Remove the Select components for month and year */}
       </CardHeader>
       <CardContent>
         {renderContent()}

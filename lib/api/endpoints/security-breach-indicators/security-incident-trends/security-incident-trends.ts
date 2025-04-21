@@ -8,7 +8,7 @@ import { useApiLoading } from '@/lib/utils/api-utils';
 
 // API Keys for Security Incident Trends
 export const SECURITY_INCIDENT_TRENDS_KEYS = {
-  lists: () => ['securityIncidentTrends'] as const,
+  lists: (params?: SecurityIncidentTrendQueryParams) => ['securityIncidentTrends', params] as const, // Include params in key
   detail: (id: string) => ['securityIncidentTrends', id] as const,
 };
 
@@ -19,8 +19,8 @@ const BASE_URL = '/security-breach-indicators-dashboard/security-incident-trends
 export const useGetSecurityIncidentTrends = (params?: SecurityIncidentTrendQueryParams) => {
   const { withLoading } = useApiLoading();
   
-  return useQuery({
-    queryKey: SECURITY_INCIDENT_TRENDS_KEYS.lists(),
+  return useQuery<SecurityIncidentTrend[]>({ // Add explicit type here
+    queryKey: SECURITY_INCIDENT_TRENDS_KEYS.lists(params), // Use params in queryKey
     queryFn: async () => {
       const response = await withLoading(() => apiClient.get<{results: number, paginateResult: any, data: SecurityIncidentTrend[]}>(BASE_URL, { params }));
       return response.data.data;
@@ -56,7 +56,7 @@ export const useCreateSecurityIncidentTrend = () => {
     },
     onSuccess: () => {
       showToast('Security incident trend created successfully', 'success');
-      queryClient.invalidateQueries({ queryKey: SECURITY_INCIDENT_TRENDS_KEYS.lists() });
+      queryClient.invalidateQueries({ queryKey: SECURITY_INCIDENT_TRENDS_KEYS.lists({}) }); // Invalidate base list
     },
     onError: (error: any) => {
       console.error('Failed to create security incident trend:', error);
@@ -78,7 +78,7 @@ export const useUpdateSecurityIncidentTrend = () => {
     onSuccess: (_, variables) => {
       showToast('Security incident trend updated successfully', 'success');
       queryClient.invalidateQueries({ queryKey: SECURITY_INCIDENT_TRENDS_KEYS.detail(variables.id) });
-      queryClient.invalidateQueries({ queryKey: SECURITY_INCIDENT_TRENDS_KEYS.lists() });
+      queryClient.invalidateQueries({ queryKey: SECURITY_INCIDENT_TRENDS_KEYS.lists({}) }); // Invalidate base list
     },
     onError: (error: any) => {
       console.error('Failed to update security incident trend:', error);
@@ -100,7 +100,7 @@ export const useDeleteSecurityIncidentTrend = () => {
     onSuccess: (_, id) => {
       showToast('Security incident trend deleted successfully', 'success');
       queryClient.removeQueries({ queryKey: SECURITY_INCIDENT_TRENDS_KEYS.detail(id) });
-      queryClient.invalidateQueries({ queryKey: SECURITY_INCIDENT_TRENDS_KEYS.lists() });
+      queryClient.invalidateQueries({ queryKey: SECURITY_INCIDENT_TRENDS_KEYS.lists({}) }); // Invalidate base list
     },
     onError: (error: any) => {
       console.error('Failed to delete security incident trend:', error);

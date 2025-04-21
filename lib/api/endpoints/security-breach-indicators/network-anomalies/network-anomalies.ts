@@ -8,7 +8,7 @@ import { useApiLoading } from '@/lib/utils/api-utils';
 
 // API Keys for Network Anomalies
 export const NETWORK_ANOMALIES_KEYS = {
-  lists: () => ['networkAnomalies'] as const,
+  lists: (params?: NetworkAnomalyQueryParams) => ['networkAnomalies', params] as const, // Include params in key
   detail: (id: string) => ['networkAnomalies', id] as const,
 };
 
@@ -19,8 +19,8 @@ const BASE_URL = '/security-breach-indicators-dashboard/network-anomalies';
 export const useGetNetworkAnomalies = (params?: NetworkAnomalyQueryParams) => {
   const { withLoading } = useApiLoading();
   
-  return useQuery({
-    queryKey: NETWORK_ANOMALIES_KEYS.lists(),
+  return useQuery<NetworkAnomaly[]>({ // Add explicit type here
+    queryKey: NETWORK_ANOMALIES_KEYS.lists(params), // Use params in queryKey
     queryFn: async () => {
       const response = await withLoading(() => apiClient.get<{results: number, paginateResult: any, data: NetworkAnomaly[]}>(BASE_URL, { params }));
       return response.data.data;
@@ -57,7 +57,7 @@ export const useCreateNetworkAnomaly = () => {
     },
     onSuccess: () => {
       showToast('Network anomaly created successfully', 'success');
-      queryClient.invalidateQueries({ queryKey: NETWORK_ANOMALIES_KEYS.lists() });
+      queryClient.invalidateQueries({ queryKey: NETWORK_ANOMALIES_KEYS.lists({}) }); // Invalidate base list
     },
     onError: (error: any) => {
       console.error('Failed to create network anomaly:', error);
@@ -79,7 +79,7 @@ export const useUpdateNetworkAnomaly = () => {
     onSuccess: (_, variables) => {
       showToast('Network anomaly updated successfully', 'success');
       queryClient.invalidateQueries({ queryKey: NETWORK_ANOMALIES_KEYS.detail(variables.id) });
-      queryClient.invalidateQueries({ queryKey: NETWORK_ANOMALIES_KEYS.lists() });
+      queryClient.invalidateQueries({ queryKey: NETWORK_ANOMALIES_KEYS.lists({}) }); // Invalidate base list
     },
     onError: (error: any) => {
       console.error('Failed to update network anomaly:', error);
@@ -101,7 +101,7 @@ export const useDeleteNetworkAnomaly = () => {
     onSuccess: (_, id) => {
       showToast('Network anomaly deleted successfully', 'success');
       queryClient.removeQueries({ queryKey: NETWORK_ANOMALIES_KEYS.detail(id) });
-      queryClient.invalidateQueries({ queryKey: NETWORK_ANOMALIES_KEYS.lists() });
+      queryClient.invalidateQueries({ queryKey: NETWORK_ANOMALIES_KEYS.lists({}) }); // Invalidate base list
     },
     onError: (error: any) => {
       console.error('Failed to delete network anomaly:', error);

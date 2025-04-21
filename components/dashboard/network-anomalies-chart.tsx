@@ -1,23 +1,20 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo } from 'react'; // Import useMemo
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+// Remove Select imports as they are no longer needed here
 import ApexChart from '@/components/ui/apex-chart';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle, Info } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useTheme } from 'next-themes';
-import { useGetNetworkAnomalies } from '@/lib/api/endpoints/security-breach-indicators/network-anomalies/network-anomalies';
+// Remove useGetNetworkAnomalies import
 import { NetworkAnomaly, NetworkAnomalyDay } from '@/lib/api/types';
 
-const MONTHS = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December'
-];
+// Remove MONTHS constant
 
 interface NetworkAnomaliesChartProps {
-  data: NetworkAnomaly[] | undefined;
+  data: NetworkAnomaly[] | undefined; // Data is now expected to be pre-filtered
   isLoading: boolean;
   error: Error | null;
 }
@@ -25,27 +22,23 @@ interface NetworkAnomaliesChartProps {
 const NetworkAnomaliesChart = ({ data: response, isLoading, error }: NetworkAnomaliesChartProps) => {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
-  const currentYear = (new Date().getFullYear()).toString();
-  const currentMonth = MONTHS[new Date().getMonth()];
-// State for selected year and month for filtering the chart data
-const [selectedYear, setSelectedYear] = useState("2025");
-const [selectedMonth, setSelectedMonth] = useState("March");
+  // Remove currentYear and currentMonth calculation
+  // Remove useState for selectedYear and selectedMonth
 
-const { data: responseData, isLoading : isLoadingData, error:errorData } = useGetNetworkAnomalies();
+  // Remove the internal useGetNetworkAnomalies call
 
-// Find the data for the selected year and month
-const selectedAnomalyData = responseData?.find((item: NetworkAnomaly) => 
-  item.year === selectedYear && 
-item.month === selectedMonth
-);
-console.log(selectedAnomalyData,"selectedAnomalyData" );
+  // Process the data passed via props directly
+  // Assuming the 'response' prop now contains only the data for the selected month/year
+  const selectedAnomalyData = response?.[0]; // Get the first (and likely only) item
 
   // Format the data for ApexCharts: [{ x: dayNumber, y: score }, ...]
-  const chartSeriesData = selectedAnomalyData?.days.map(day => ({ x: day.dayNumber, y: day.score })) || [];
+  const chartSeriesData = useMemo(() => 
+    selectedAnomalyData?.days.map(day => ({ x: day.dayNumber, y: day.score })) || [],
+    [selectedAnomalyData]
+  ); // Use useMemo for performance
 
   const chartOptions: ApexCharts.ApexOptions = {
     chart: {
-
       toolbar: { show: false },
       background: 'transparent',
       zoom: {
@@ -53,9 +46,9 @@ console.log(selectedAnomalyData,"selectedAnomalyData" );
         enabled: true,
         autoScaleYaxis: true
       },
-      foreColor: isDark ? '#f8fafc' : '#334155' // Added theme-dependent text color
+      foreColor: isDark ? '#f8fafc' : '#334155'
     },
-    dataLabels: { enabled:false },
+    dataLabels: { enabled: false },
     stroke: {
       curve: 'smooth',
       width: 5,
@@ -83,11 +76,10 @@ console.log(selectedAnomalyData,"selectedAnomalyData" );
     },
     xaxis: {
       type: 'numeric',
-      title: { text: 'Day of Month', style: { color: isDark ? '#94a3b8' : '#64748b' } }, // Added theme-dependent title color
+      title: { text: 'Day of Month', style: { color: isDark ? '#94a3b8' : '#64748b' } },
       labels: {
         style: { colors: isDark ? '#94a3b8' : '#64748b' },
         formatter: (value: string) => {
-          // Convert the string value back to a number for rounding
           const numValue = parseFloat(value);
           return !isNaN(numValue) ? Math.round(numValue).toString() : value;
         }
@@ -96,10 +88,10 @@ console.log(selectedAnomalyData,"selectedAnomalyData" );
       axisTicks: { show: false },
     },
     yaxis: {
-      title: { text: 'Score', style: { color: isDark ? '#94a3b8' : '#64748b' } }, // Added theme-dependent title color
+      title: { text: 'Score', style: { color: isDark ? '#94a3b8' : '#64748b' } },
       labels: {
         style: { colors: isDark ? '#94a3b8' : '#64748b' },
-        formatter: (val:number) => Math.round(val).toString()
+        formatter: (val: number) => Math.round(val).toString()
       }
     },
     tooltip: {
@@ -110,11 +102,11 @@ console.log(selectedAnomalyData,"selectedAnomalyData" );
   };
 
   const renderContent = () => {
-    if (isLoadingData) {
+    if (isLoading) { // Use the isLoading prop
       return <Skeleton className="h-[350px] w-full" />;
     }
 
-    if (errorData) {
+    if (error) { // Use the error prop
       return (
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
@@ -125,8 +117,6 @@ console.log(selectedAnomalyData,"selectedAnomalyData" );
         </Alert>
       );
     }
-
-
 
     // Ensure there's data to display
     if (!chartSeriesData || chartSeriesData.length === 0) {
@@ -157,41 +147,7 @@ console.log(selectedAnomalyData,"selectedAnomalyData" );
         <CardTitle className="text-base font-medium">
           Network Anomalies
         </CardTitle>
-        <div className="flex items-center space-x-2">
-          <Select
-            value={selectedYear}
-            onValueChange={setSelectedYear}
-          >
-            <SelectTrigger className="w-[120px]">
-              <SelectValue placeholder="Year" />
-            </SelectTrigger>
-            <SelectContent>
-              {Array.from({ length: 5 }, (_, i) => (
-                <SelectItem
-                  key={+currentYear - i}
-                  value={(+currentYear - i).toString()}
-                >
-                  {+currentYear - i}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select
-            value={selectedMonth}
-            onValueChange={setSelectedMonth}
-          >
-            <SelectTrigger className="w-[140px]">
-              <SelectValue placeholder="Month" />
-            </SelectTrigger>
-            <SelectContent>
-              {MONTHS.map((month) => (
-                <SelectItem key={month} value={month}>
-                  {month}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        {/* Remove the Select components for month and year */}
       </CardHeader>
       <CardContent>
         {renderContent()}
