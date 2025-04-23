@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation"
 
 interface PageHeaderProps {
   title: string
-  description: string
+  description?: string
 }
 
 export function PageHeader({ title, description }: PageHeaderProps) {

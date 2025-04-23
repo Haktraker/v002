@@ -11,9 +11,13 @@ import { useGlobalFilter } from '@/lib/context/GlobalFilterContext'; // Import t
 import { GlobalFilterComponent } from '@/components/dashboard/global-filter'; // Import the component
 import { useGetSecurityIssues } from '@/lib/api/endpoints/security-breach-indicators/active-security-issues/active-security-issues'; // Import the hook for security issues
 import SecurityIssues from '@/components/dashboard/securityIssues'; // Import the SecurityIssues component
+import {PageContainer} from '@/components/layout/page-container'; // Import PageContainer
+import useBreadcrumb from '@/hooks/use-breadCrumb'; // Import useBreadcrumb hook
+import { PageHeader } from '@/components/ui/page-header'; // Import PageHeader
 
 export default function SecurityBreachIndicatorsPage() { // Renamed component for clarity
     const { selectedMonth, selectedYear } = useGlobalFilter(); // Get filter values
+    const { BreadcrumbComponent } = useBreadcrumb(); // Get BreadcrumbComponent
 
     // Prepare parameters for hooks, omitting 'All'
     const queryParams = {
@@ -28,14 +32,14 @@ export default function SecurityBreachIndicatorsPage() { // Renamed component fo
     const { data: securityIncidentTrends, isLoading: securityIncidentTrendsLoading, error: securityIncidentTrendsErrors } = useGetSecurityIncidentTrends(queryParams);
     const { data: securityIssuesData, isLoading: securityIssuesLoading, error: securityIssuesError } = useGetSecurityIssues(queryParams); // Fetch security issues data
 
-    console.log(securityIssuesData,"securityIssuesData")
     // Render components with the conditional parameters
     // ... (other components)
     // Wrap content in a div and add the filter component as a child pr
     return (
-      <div> {/* Wrap content in a div */} 
+      <PageContainer> {/* Wrap content in PageContainer */} 
+        <PageHeader title="Security Breach Indicators"  /> {/* Add the header here */}
         <GlobalFilterComponent /> {/* Add the filter component here */} 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4"> {/* Adjusted gap and padding */} 
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4"> {/* Removed p-4 */} 
             <ComplianceScoresChart 
               data={complianceScores} 
               isLoading={complianceScoresLoading} 
@@ -64,6 +68,6 @@ export default function SecurityBreachIndicatorsPage() { // Renamed component fo
               error={securityIssuesError} 
             />
         </div>
-      </div>
+      </PageContainer>
     );
 }
