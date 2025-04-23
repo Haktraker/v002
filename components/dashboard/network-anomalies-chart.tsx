@@ -79,6 +79,7 @@ const NetworkAnomaliesChart = ({ data: response, isLoading, error }: NetworkAnom
       title: { text: 'Day of Month', style: { color: isDark ? '#94a3b8' : '#64748b' } },
       labels: {
         style: { colors: isDark ? '#94a3b8' : '#64748b' },
+
         formatter: (value: string) => {
           const numValue = parseFloat(value);
           return !isNaN(numValue) ? Math.round(numValue).toString() : value;

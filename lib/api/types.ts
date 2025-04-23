@@ -617,3 +617,73 @@ export interface SecurityIncidentTrendQueryParams {
   page?: number;
   limit?: number;
 }
+
+// Security Issue Types
+export interface SecurityIssueBu { // Renamed from 'bu' in schema to avoid conflict and be more descriptive
+  buName: string;
+  severity: 'Critical' | 'High' | 'Medium' | 'Low';
+  vendor: string;
+  issue: string;
+  daysOpen: number;
+  description: string;
+  affectedSystems: string[];
+  recommendedAction: string;
+  lastUpdated: string; // Consider using Date type if applicable
+}
+
+export interface SecurityIssue {
+  _id: string;
+  month: string;
+  year: string;
+  bu: SecurityIssueBu[];
+  createdAt?: string; // from timestamps: true
+  updatedAt?: string; // from timestamps: true
+}
+
+// Query params for Security Issues (optional, add if needed for filtering/pagination)
+export interface SecurityIssueQueryParams {
+  month?: string;
+  year?: string;
+  severity?: 'Critical' | 'High' | 'Medium' | 'Low';
+  buName?: string;
+  page?: number;
+  limit?: number;
+}
+
+// DTO for creating a new Security Issue
+export interface CreateSecurityIssueDto {
+  month: string;
+  year: string;
+  bu: SecurityIssueBu[]; // Array of business unit security issues
+}
+
+// DTO for updating an existing Security Issue
+// Note: Mongoose schema suggests updating the whole document or specific 'bu' items.
+// This DTO allows updating top-level fields or replacing the 'bu' array.
+// For more granular updates (e.g., updating a single item within the 'bu' array),
+// a different approach/endpoint might be needed on the backend.
+export interface UpdateSecurityIssueDto {
+  month?: string;
+  year?: string;
+  bu?: SecurityIssueBu[];
+}
+
+
+export interface UpdateSecurityIncidentTrendDto {
+  month?: string;
+  year?: string;
+  bu?: {
+    bu_name: string;
+    incidents: {
+      incident_name: IncidentName;
+      incident_score: number;
+    }[];
+  }[];
+}
+
+export interface SecurityIncidentTrendQueryParams {
+  month?: string;
+  year?: string;
+  page?: number;
+  limit?: number;
+}

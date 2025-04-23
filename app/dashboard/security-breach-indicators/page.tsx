@@ -9,6 +9,8 @@ import { useGetSecurityIncidentTrends } from "@/lib/api/endpoints/security-breac
 import { SecurityIncidentTrendsChart } from "@/components/dashboard/security-incident-trends-chart";
 import { useGlobalFilter } from '@/lib/context/GlobalFilterContext'; // Import the hook
 import { GlobalFilterComponent } from '@/components/dashboard/global-filter'; // Import the component
+import { useGetSecurityIssues } from '@/lib/api/endpoints/security-breach-indicators/active-security-issues/active-security-issues'; // Import the hook for security issues
+import SecurityIssues from '@/components/dashboard/securityIssues'; // Import the SecurityIssues component
 
 export default function SecurityBreachIndicatorsPage() { // Renamed component for clarity
     const { selectedMonth, selectedYear } = useGlobalFilter(); // Get filter values
@@ -24,14 +26,16 @@ export default function SecurityBreachIndicatorsPage() { // Renamed component fo
     const { data: userRiskDistribution, isLoading: userRiskLoading, error: userRiskErrors } = useGetUserRiskDistributions(queryParams);
     const { data: networkAnomalies, isLoading: networkAnomaliesLoading, error: networkAnomaliesErrors } = useGetNetworkAnomalies(queryParams);
     const { data: securityIncidentTrends, isLoading: securityIncidentTrendsLoading, error: securityIncidentTrendsErrors } = useGetSecurityIncidentTrends(queryParams);
-console.log(securityIncidentTrends,"securityIncidentTrends")
+    const { data: securityIssuesData, isLoading: securityIssuesLoading, error: securityIssuesError } = useGetSecurityIssues(queryParams); // Fetch security issues data
+
+    console.log(securityIssuesData,"securityIssuesData")
     // Render components with the conditional parameters
     // ... (other components)
     // Wrap content in a div and add the filter component as a child pr
     return (
       <div> {/* Wrap content in a div */} 
         <GlobalFilterComponent /> {/* Add the filter component here */} 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 p-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4"> {/* Adjusted gap and padding */} 
             <ComplianceScoresChart 
               data={complianceScores} 
               isLoading={complianceScoresLoading} 
@@ -52,6 +56,12 @@ console.log(securityIncidentTrends,"securityIncidentTrends")
               data={securityIncidentTrends}
               isLoading={securityIncidentTrendsLoading}
               error={securityIncidentTrendsErrors}
+            />
+            {/* Render the SecurityIssues component, spanning both columns */} 
+            <SecurityIssues 
+              data={securityIssuesData} 
+              isLoading={securityIssuesLoading} 
+              error={securityIssuesError} 
             />
         </div>
       </div>
