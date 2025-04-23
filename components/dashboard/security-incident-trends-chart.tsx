@@ -112,7 +112,7 @@ export function SecurityIncidentTrendsChart({
                 categories: categories,
                 // title: { text: '', style: { color: isDark ? '#e5e7eb' : '#374151' } }, // Remove month title or adjust
                 labels: {
-                    style: { colors: isDark ? '#e5e7eb' : '#374151' }, rotate: -90,
+                    style: { colors: isDark ? '#e5e7eb' : '#374151' }, rotate: -45,
                     show: true,
                 },
 
