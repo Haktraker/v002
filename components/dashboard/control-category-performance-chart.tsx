@@ -192,7 +192,7 @@ const ControlCategoryPerformanceChart = ({
        <CardTitle className="text-base font-medium">Control Category Performance</CardTitle>
        <CardDescription>Performance scores across different control categories.</CardDescription>
        </div>
-        <Link href="/dashboard/cybersecurity-compliance-dashboard">
+        <Link href="/dashboard/cybersecurity-compliance-dashboard/category-performance">
         <Button variant="outline" size="sm">Manage All</Button>
         </Link>
       </CardHeader>
