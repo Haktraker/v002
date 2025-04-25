@@ -6,6 +6,8 @@ import { useTheme } from 'next-themes';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ControlCategoryPerformance, ControlCategoryName } from '@/lib/api/types';
+import Link from 'next/link';
+import { Button } from '../ui/button';
 
 // Dynamically import ApexCharts to avoid SSR issues
 const ApexChart = dynamic(() => import('@/components/ui/apex-chart'), { ssr: false });
@@ -185,9 +187,14 @@ const ControlCategoryPerformanceChart = ({
 
   return (
     <Card className={`flex-1 flex flex-col ${isDark ? 'bg-[#171727] border-0' : 'bg-white'}`}>
-      <CardHeader>
-        <CardTitle className="text-base font-medium">Control Category Performance</CardTitle>
-        <CardDescription>Performance scores across different control categories.</CardDescription>
+      <CardHeader className="flex flex-row justify-between items-center">
+       <div className="flex flex-col">
+       <CardTitle className="text-base font-medium">Control Category Performance</CardTitle>
+       <CardDescription>Performance scores across different control categories.</CardDescription>
+       </div>
+        <Link href="/dashboard/cybersecurity-compliance-dashboard">
+        <Button variant="outline" size="sm">Manage All</Button>
+        </Link>
       </CardHeader>
       <CardContent className="flex-1 flex flex-col justify-center pt-4">
         {renderContent()}
