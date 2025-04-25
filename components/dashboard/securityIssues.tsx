@@ -127,13 +127,13 @@ export const SecurityIssues: React.FC<SecurityIssuesProps> = ({ data, isLoading,
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead className="w-[50px]"></TableHead> {/* Column for expand icon */}
+                            <TableHead className="w-[50px]"></TableHead>
                             <TableHead>BU Name</TableHead>
                             <TableHead>Severity</TableHead>
                             <TableHead>Vendor</TableHead>
                             <TableHead>Issue</TableHead>
                             <TableHead>Days Open</TableHead>
-                            <TableHead>Last Updated</TableHead> {/* Add Last Updated Header */}
+                            <TableHead>Last Updated</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -155,13 +155,11 @@ export const SecurityIssues: React.FC<SecurityIssuesProps> = ({ data, isLoading,
                                             <TableCell>{item.vendor}</TableCell>
                                             <TableCell>{item.issue}</TableCell>
                                             <TableCell>{item.daysOpen}</TableCell>
-                                            <TableCell>{new Date(item.lastUpdated).toLocaleDateString()}</TableCell> {/* Display Last Updated */}
+                                            <TableCell>{new Date(item.lastUpdated).toLocaleDateString()}</TableCell>
                                         </TableRow>
                                         <CollapsibleContent asChild>
                                             <TableRow className="bg-muted/30">
-                                                {/* Empty cell for the expand icon column */}
                                                 <TableCell></TableCell>
-                                                {/* Content spanning across relevant columns */}
                                                 <TableCell colSpan={6} className="p-4">
                                                     <div className="space-y-3">
                                                         <div>
