@@ -140,23 +140,25 @@ export const SecurityIssues: React.FC<SecurityIssuesProps> = ({ data, isLoading,
                         {flattenedIssues.map((item) => {
                             const isRowOpen = openRowKey === item._id;
                             return (
-                                <Collapsible key={item._id} asChild open={isRowOpen} onOpenChange={() => handleRowToggle(item._id)}>
-                                    <>
-                                        <TableRow className="cursor-pointer hover:bg-muted/50 data-[state=open]:bg-muted/50 transition-colors" onClick={() => handleRowToggle(item._id)}>
-                                            <TableCell>
+                                <React.Fragment key={item._id}>
+                                    <TableRow className="cursor-pointer hover:bg-muted/50 data-[state=open]:bg-muted/50 transition-colors">
+                                        <TableCell>
+                                            <Collapsible asChild open={isRowOpen} onOpenChange={() => handleRowToggle(item._id)}>
                                                 <CollapsibleTrigger asChild>
                                                     <button className="p-1 rounded-md hover:bg-muted">
                                                         {isRowOpen ? <ChevronDown className="h-4 w-4 transition-transform duration-200 rotate-180" /> : <ChevronRight className="h-4 w-4 transition-transform duration-200" />}
                                                     </button>
                                                 </CollapsibleTrigger>
-                                            </TableCell>
-                                            <TableCell>{item.buName}</TableCell>
-                                            <TableCell className={cn(getSeverityClass(item.severity))}>{item.severity}</TableCell>
-                                            <TableCell>{item.vendor}</TableCell>
-                                            <TableCell>{item.issue}</TableCell>
-                                            <TableCell>{item.daysOpen}</TableCell>
-                                            <TableCell>{new Date(item.lastUpdated).toLocaleDateString()}</TableCell>
-                                        </TableRow>
+                                            </Collapsible>
+                                        </TableCell>
+                                        <TableCell>{item.buName}</TableCell>
+                                        <TableCell className={cn(getSeverityClass(item.severity))}>{item.severity}</TableCell>
+                                        <TableCell>{item.vendor}</TableCell>
+                                        <TableCell>{item.issue}</TableCell>
+                                        <TableCell>{item.daysOpen}</TableCell>
+                                        <TableCell>{new Date(item.lastUpdated).toLocaleDateString()}</TableCell>
+                                    </TableRow>
+                                    <Collapsible asChild open={isRowOpen} onOpenChange={() => handleRowToggle(item._id)}>
                                         <CollapsibleContent asChild>
                                             <TableRow className="bg-muted/30">
                                                 <TableCell></TableCell>
@@ -180,8 +182,8 @@ export const SecurityIssues: React.FC<SecurityIssuesProps> = ({ data, isLoading,
                                                 </TableCell>
                                             </TableRow>
                                         </CollapsibleContent>
-                                    </>
-                                </Collapsible>
+                                    </Collapsible>
+                                </React.Fragment>
                             );
                         })}
                     </TableBody>
