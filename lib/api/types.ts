@@ -716,6 +716,46 @@ export interface UpdateSecurityIssueDto {
 }
 
 
+// Compliance Trend Types
+export interface ComplianceTrend {
+  _id: string;
+  month: string;
+  year: string;
+  bu: ComplianceTrendBu[];
+  createdAt?: string; // Added based on schema timestamps
+  updatedAt?: string; // Added based on schema timestamps
+}
+
+export interface ComplianceDetail {
+  complianceName: 'ISO 27001' | 'NIST CSF' | 'PDPL' | 'CIS Controls';
+  complianceScore: number;
+}
+export interface ComplianceTrendBu {
+  bu_name: string;
+  compliance: ComplianceDetail[];
+}
+
+
+
+export interface CreateComplianceTrendDto {
+  month: string;
+  year: string;
+  bu: ComplianceTrendBu[];
+}
+
+export interface UpdateComplianceTrendDto {
+  month?: string;
+  year?: string;
+  bu?: ComplianceTrendBu[];
+}
+
+export interface ComplianceTrendQueryParams {
+  month?: string;
+  year?: string;
+  page?: number;
+  limit?: number;
+}
+
 export interface UpdateSecurityIncidentTrendDto {
   month?: string;
   year?: string;
