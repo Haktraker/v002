@@ -1,0 +1,1 @@
+export const FRAMEWORKS_LIST = ["ISO 27001", "NIST CSF", "PDPL", "CIS Controls"];

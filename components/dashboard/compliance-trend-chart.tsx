@@ -6,6 +6,9 @@ import {
 } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ComplianceTrend } from '@/lib/api/types';
+import Link from 'next/link';
+import { Button } from '../ui/button';
+import { FRAMEWORKS_LIST } from '@/lib/constants/framworks-list';
 
 const ApexChart = dynamic(() => import('@/components/ui/apex-chart'), { ssr: false });
 
@@ -14,8 +17,6 @@ interface ComplianceTrendChartProps {
   isLoading?: boolean;
   error?: any;
 }
-
-const frameworks = ['ISO 27001', 'NIST CSF', 'PDPL', 'CIS Controls'];
 
 const ComplianceTrendChart = ({ data, isLoading, error }: ComplianceTrendChartProps) => {
   const { theme } = useTheme();
@@ -27,7 +28,7 @@ const ComplianceTrendChart = ({ data, isLoading, error }: ComplianceTrendChartPr
     const labels = data.map(item => `${item.month.substring(0, 3)}`); // Use month abbreviation
 
     // Group scores by framework across all BUs for each month
-    const series = frameworks.map(framework => {
+    const series = FRAMEWORKS_LIST.map(framework => {
       const scores = data.map(item => {
         // Sum scores for the current framework across all BUs in this month
         const totalScore = item.bu?.reduce((sum, bu) => {
@@ -88,18 +89,18 @@ const ComplianceTrendChart = ({ data, isLoading, error }: ComplianceTrendChartPr
       tickAmount: 4, // Match screenshot ticks (0, 95, 190, 285, 380)
     },
     fill: {
-        type: 'gradient',
-        gradient: {
-          shade: isDark ? 'dark' : 'light',
-          type: "horizontal",
-          shadeIntensity: 0.5,
-          gradientToColors: undefined, // optional, uses shades of same color
-          inverseColors: true,
-          opacityFrom: 0.8,
-          opacityTo: 0.8,
-          stops: [0, 100]
-        }
-      },
+      type: 'gradient',
+      gradient: {
+        shade: isDark ? 'dark' : 'light',
+        type: "horizontal",
+        shadeIntensity: 0.5,
+        gradientToColors: undefined, // optional, uses shades of same color
+        inverseColors: true,
+        opacityFrom: 0.8,
+        opacityTo: 0.8,
+        stops: [0, 100]
+      }
+    },
     colors: [
       '#00E396', // ISO 27001 (Green)
       '#008FFB', // NIST CSF (Blue)
@@ -150,14 +151,14 @@ const ComplianceTrendChart = ({ data, isLoading, error }: ComplianceTrendChartPr
       borderColor: 'hsl(var(--border))',
       strokeDashArray: 3,
       xaxis: {
-          lines: {
-              show: false // Hide vertical grid lines
-          }
+        lines: {
+          show: false // Hide vertical grid lines
+        }
       },
       yaxis: {
-          lines: {
-              show: true // Show horizontal grid lines
-          }
+        lines: {
+          show: true // Show horizontal grid lines
+        }
       },
     },
     markers: { // Add markers to points like in screenshot
@@ -206,6 +207,11 @@ const ComplianceTrendChart = ({ data, isLoading, error }: ComplianceTrendChartPr
           <CardTitle className="text-base font-medium">Compliance Trend</CardTitle>
           <CardDescription>Scores over time</CardDescription>
         </div>
+        <Link href="/dashboard/cybersecurity-compliance-dashboard/compliance-trends">
+          <Button variant="outline" >
+            Manage All
+          </Button>
+        </Link>
       </CardHeader>
       <CardContent className="flex-1 flex flex-col justify-center pt-4"> {/* Added padding top */}
         {renderContent()}

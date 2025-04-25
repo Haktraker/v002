@@ -774,3 +774,52 @@ export interface SecurityIncidentTrendQueryParams {
   page?: number;
   limit?: number;
 }
+
+// ================= Control Category Performance Types =================
+
+export type ControlCategoryName =
+  | "Access Control"
+  | "Data Protection"
+  | "Network Security"
+  | "Asset Management"
+  | "Incident Response"
+  | "Business Continuity";
+
+export interface ControlCategoryDetail {
+  category: ControlCategoryName;
+  score: number;
+}
+
+export interface ControlCategoryPerformanceBu {
+  bu_name: string;
+  categories: ControlCategoryDetail[];
+}
+
+export interface ControlCategoryPerformance {
+  _id: string;
+  month: string;
+  year: string;
+  bu: ControlCategoryPerformanceBu[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CreateControlCategoryPerformanceDto {
+  month: string;
+  year: string;
+  bu: ControlCategoryPerformanceBu[];
+}
+
+export interface UpdateControlCategoryPerformanceDto {
+  month?: string;
+  year?: string;
+  bu?: ControlCategoryPerformanceBu[];
+}
+
+export interface ControlCategoryPerformanceQueryParams {
+  month?: string;
+  year?: string;
+  buName?: string; // Optional filter by BU
+  page?: number;
+  limit?: number;
+}

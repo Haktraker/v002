@@ -6,42 +6,48 @@ import { useGlobalFilter } from '@/lib/context/GlobalFilterContext';
 import { GlobalFilterComponent } from '@/components/dashboard/global-filter';
 import { PageContainer } from '@/components/layout/page-container';
 import { PageHeader } from '@/components/ui/page-header';
-import useBreadcrumb from '@/hooks/use-breadCrumb';
 import ComplianceTrendChart from '@/components/dashboard/compliance-trend-chart';
 import { useGetComplianceTrends } from '@/lib/api/endpoints/cybersecurity-compliance-dashboard/compliance-trend';
+import ControlCategoryPerformanceChart from '@/components/dashboard/control-category-performance-chart';
+import { useGetControlCategoryPerformances } from '@/lib/api/endpoints/cybersecurity-compliance-dashboard/control-category-performance';
 
 export default function CybersecurityComplianceDashboard() {
-    const { selectedMonth, selectedYear } = useGlobalFilter(); // Get filter values
-    const { BreadcrumbComponent } = useBreadcrumb(); // Get BreadcrumbComponent
+    const { selectedMonth, selectedYear } = useGlobalFilter();
 
-    // Prepare parameters for hooks, omitting 'All'
     const queryParams = {
         month: selectedMonth === 'All' ? undefined : selectedMonth,
         year: selectedYear === 'All' ? undefined : selectedYear,
     };
 
     const { data: complianceData, isLoading: complianceLoading, error: complianceError } = useGetComplianceFrameworks(queryParams);
-    const { data: complianceTrendsData, isLoading: complianceTrendsLoading, error: complianceTrendsErro } = useGetComplianceTrends(queryParams);
+    const { data: complianceTrendsData, isLoading: complianceTrendsLoading, error: complianceTrendsError } = useGetComplianceTrends(queryParams);
+    
+    const { 
+        data: categoryPerformanceData, 
+        isLoading: categoryPerformanceLoading, 
+        error: categoryPerformanceError 
+    } = useGetControlCategoryPerformances(queryParams);
 
-console.log(complianceTrendsData,"complianceTrendsData")
-    // Render components with the conditional parameters
     return (
         <PageContainer>
             <PageHeader title="Cybersecurity Compliance Dashboard" />
             <GlobalFilterComponent />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-background rounded-lg p-4">
-                    <ComplianceOverviewByFrameworkChart
-                        data={complianceData}
-                        isLoading={complianceLoading}
-                        error={complianceError}
-                    />
-                </div>
-                <div className="bg-background rounded-lg p-4">
-                    <ComplianceTrendChart
-                        data={complianceTrendsData}
-                        isLoading={complianceLoading}
-                        error={complianceError}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+                <ComplianceOverviewByFrameworkChart
+                    data={complianceData}
+                    isLoading={complianceLoading}
+                    error={complianceError}
+                />
+                <ComplianceTrendChart
+                    data={complianceTrendsData}
+                    isLoading={complianceTrendsLoading}
+                    error={complianceTrendsError}
+                />
+                <div className="lg:col-span-2">
+                    <ControlCategoryPerformanceChart 
+                        data={categoryPerformanceData}
+                        isLoading={categoryPerformanceLoading}
+                        error={categoryPerformanceError}
                     />
                 </div>
             </div>
