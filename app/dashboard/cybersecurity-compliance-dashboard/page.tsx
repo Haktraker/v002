@@ -10,6 +10,8 @@ import ComplianceTrendChart from '@/components/dashboard/compliance-trend-chart'
 import { useGetComplianceTrends } from '@/lib/api/endpoints/cybersecurity-compliance-dashboard/compliance-trend';
 import ControlCategoryPerformanceChart from '@/components/dashboard/control-category-performance-chart';
 import { useGetControlCategoryPerformances } from '@/lib/api/endpoints/cybersecurity-compliance-dashboard/control-category-performance';
+import ComplianceRiskDistributionChart from '@/components/dashboard/compilance-risk-distribution-chart';
+import { useGetComplianceRiskDistributions } from '@/lib/api/endpoints/cybersecurity-compliance-dashboard/compilance-risk-distribution';
 
 export default function CybersecurityComplianceDashboard() {
     const { selectedMonth, selectedYear } = useGlobalFilter();
@@ -28,6 +30,12 @@ export default function CybersecurityComplianceDashboard() {
         error: categoryPerformanceError 
     } = useGetControlCategoryPerformances(queryParams);
 
+    const {
+        data: riskDistributionData,
+        isLoading: riskDistributionLoading,
+        error: riskDistributionError
+    } = useGetComplianceRiskDistributions(queryParams);
+
     return (
         <PageContainer>
             <PageHeader title="Cybersecurity Compliance Dashboard" />
@@ -38,16 +46,21 @@ export default function CybersecurityComplianceDashboard() {
                     isLoading={complianceLoading}
                     error={complianceError}
                 />
+                <ComplianceRiskDistributionChart 
+                    data={riskDistributionData}
+                    isLoading={riskDistributionLoading}
+                    error={riskDistributionError}
+                />
                 <ComplianceTrendChart
                     data={complianceTrendsData}
                     isLoading={complianceTrendsLoading}
                     error={complianceTrendsError}
                 />
-                    <ControlCategoryPerformanceChart 
-                        data={categoryPerformanceData}
-                        isLoading={categoryPerformanceLoading}
-                        error={categoryPerformanceError}
-                    />
+                <ControlCategoryPerformanceChart 
+                    data={categoryPerformanceData}
+                    isLoading={categoryPerformanceLoading}
+                    error={categoryPerformanceError}
+                />
             </div>
         </PageContainer>
     );

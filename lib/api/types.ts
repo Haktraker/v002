@@ -823,3 +823,46 @@ export interface ControlCategoryPerformanceQueryParams {
   page?: number;
   limit?: number;
 }
+
+// ================= Compliance Risk Distribution Types =================
+
+export type SeverityName = "High" | "Medium" | "Low" | "Critical";
+
+export interface SeverityDetail {
+  severityName: SeverityName;
+  score: number;
+}
+
+export interface ComplianceRiskDistributionBu {
+  buName: string;
+  severity: SeverityDetail; // Based on schema, each BU entry has one severity object
+}
+
+export interface ComplianceRiskDistribution {
+  _id: string;
+  month: string;
+  year: string;
+  bu: ComplianceRiskDistributionBu[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CreateComplianceRiskDistributionDto {
+  month: string;
+  year: string;
+  bu: ComplianceRiskDistributionBu[];
+}
+
+export interface UpdateComplianceRiskDistributionDto {
+  month?: string;
+  year?: string;
+  bu?: ComplianceRiskDistributionBu[];
+}
+
+export interface ComplianceRiskDistributionQueryParams {
+  month?: string;
+  year?: string;
+  buName?: string;
+  page?: number;
+  limit?: number;
+}
