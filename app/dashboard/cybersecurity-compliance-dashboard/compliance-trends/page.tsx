@@ -251,44 +251,13 @@ export default function ComplianceTrendsPage() {
     );
   }
   
-  const currentBuFilter = columnFilters.find(f => f.id === 'buName')?.value as string || '';
-  const currentMonthFilter = columnFilters.find(f => f.id === 'month')?.value as string || '';
+
 
   return (
     <PageContainer>
       <div className="flex items-center justify-between mb-4 gap-4">
         <div className="flex items-center gap-2 flex-wrap">
           <h1 className="text-2xl font-semibold">Compliance Trends</h1>
-          {/* <Select 
-            value={currentMonthFilter}
-            onValueChange={(value) => {
-              table.getColumn('month')?.setFilterValue(value === '' ? undefined : value);
-            }}
-          >
-            <SelectTrigger className="h-9 w-[150px]">
-               <SelectValue placeholder="Filter by Month..." />
-            </SelectTrigger>
-            <SelectContent>
-              {MONTHS.map((month) => (
-                <SelectItem key={month} value={month}>{month}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select 
-            value={currentBuFilter}
-            onValueChange={(value) => {
-              table.getColumn('buName')?.setFilterValue(value === '' ? undefined : value);
-            }}
-          >
-            <SelectTrigger className="h-9 w-[180px]">
-               <SelectValue placeholder="Filter by Business Unit..." />
-            </SelectTrigger>
-            <SelectContent>
-              {BU_LIST.map((bu) => (
-                <SelectItem key={bu} value={bu}>{bu}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select> */}
         </div>
         
         <div className="flex items-center gap-2">
