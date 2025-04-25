@@ -824,6 +824,62 @@ export interface ControlCategoryPerformanceQueryParams {
   limit?: number;
 }
 
+// ================= Business Unit Performance Types =================
+
+// Re-using ControlCategoryName as it matches the schema enum
+// export type ControlCategoryName =
+//   | "Access Control"
+//   | "Data Protection"
+//   | "Network Security"
+//   | "Asset Management"
+//   | "Incident Response"
+//   | "Business Continuity";
+
+// Re-using ControlCategoryDetail as it matches the schema
+// export interface ControlCategoryDetail {
+//   category: ControlCategoryName;
+//   score: number;
+// }
+
+export interface BusinessUnitPerformanceCategoryDetail {
+  category: ControlCategoryName; // Use existing ControlCategoryName type
+  score: number;
+}
+
+export interface BusinessUnitPerformanceBu {
+  bu_name: string;
+  categories: BusinessUnitPerformanceCategoryDetail[];
+}
+
+export interface BusinessUnitPerformance {
+  _id: string;
+  month: string;
+  year: string;
+  bu: BusinessUnitPerformanceBu[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CreateBusinessUnitPerformanceDto {
+  month: string;
+  year: string;
+  bu: BusinessUnitPerformanceBu[];
+}
+
+export interface UpdateBusinessUnitPerformanceDto {
+  month?: string;
+  year?: string;
+  bu?: BusinessUnitPerformanceBu[];
+}
+
+export interface BusinessUnitPerformanceQueryParams {
+  month?: string;
+  year?: string;
+  buName?: string; // Optional filter by BU name (maps to bu.bu_name)
+  page?: number;
+  limit?: number;
+}
+
 // ================= Compliance Risk Distribution Types =================
 
 export type SeverityName = "High" | "Medium" | "Low" | "Critical";

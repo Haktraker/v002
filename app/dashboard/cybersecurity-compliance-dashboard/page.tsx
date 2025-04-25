@@ -12,6 +12,8 @@ import ControlCategoryPerformanceChart from '@/components/dashboard/control-cate
 import { useGetControlCategoryPerformances } from '@/lib/api/endpoints/cybersecurity-compliance-dashboard/control-category-performance';
 import ComplianceRiskDistributionChart from '@/components/dashboard/compilance-risk-distribution-chart';
 import { useGetComplianceRiskDistributions } from '@/lib/api/endpoints/cybersecurity-compliance-dashboard/compilance-risk-distribution';
+import BusinessUnitPerformanceChart from '@/components/dashboard/business-unit-performance-chart';
+import { useGetBusinessUnitPerformances } from '@/lib/api/endpoints/cybersecurity-compliance-dashboard/business-unit-performance';
 
 export default function CybersecurityComplianceDashboard() {
     const { selectedMonth, selectedYear } = useGlobalFilter();
@@ -36,11 +38,18 @@ export default function CybersecurityComplianceDashboard() {
         error: riskDistributionError
     } = useGetComplianceRiskDistributions(queryParams);
 
+    const {
+        data: buPerformanceData,
+        isLoading: buPerformanceLoading,
+        error: buPerformanceError
+    } = useGetBusinessUnitPerformances(queryParams);
+
+
     return (
         <PageContainer>
             <PageHeader title="Cybersecurity Compliance Dashboard" />
             <GlobalFilterComponent />
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 gap-6 mt-6">
                 <ComplianceOverviewByFrameworkChart
                     data={complianceData}
                     isLoading={complianceLoading}
@@ -60,6 +69,11 @@ export default function CybersecurityComplianceDashboard() {
                     data={categoryPerformanceData}
                     isLoading={categoryPerformanceLoading}
                     error={categoryPerformanceError}
+                />
+                <BusinessUnitPerformanceChart
+                    data={buPerformanceData}
+                    isLoading={buPerformanceLoading}
+                    error={buPerformanceError}
                 />
             </div>
         </PageContainer>
