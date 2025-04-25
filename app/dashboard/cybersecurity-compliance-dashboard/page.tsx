@@ -43,13 +43,11 @@ export default function CybersecurityComplianceDashboard() {
                     isLoading={complianceTrendsLoading}
                     error={complianceTrendsError}
                 />
-                <div className="lg:col-span-2">
                     <ControlCategoryPerformanceChart 
                         data={categoryPerformanceData}
                         isLoading={categoryPerformanceLoading}
                         error={categoryPerformanceError}
                     />
-                </div>
             </div>
         </PageContainer>
     );
