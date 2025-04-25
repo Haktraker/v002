@@ -19,10 +19,17 @@ const BASE_URL = '/security-breach-indicators-dashboard/compliance-score';
 export const useGetComplianceScores = (params?: ComplianceScoreQueryParams) => {
   const { withLoading } = useApiLoading();
   
-  return useQuery<ComplianceScore[]>({ // Add explicit type here
-    queryKey: COMPLIANCE_SCORES_KEYS.lists(params), // Use params in queryKey
+  // Filter out null/undefined params
+  const filteredParams = params ? Object.fromEntries(
+    Object.entries(params).filter(([_, value]) => value !== null && value !== undefined)
+  ) : {};
+  
+  return useQuery<ComplianceScore[]>({
+    queryKey: COMPLIANCE_SCORES_KEYS.lists(filteredParams),
     queryFn: async () => {
-      const response = await withLoading(() => apiClient.get<ApiResponse<ComplianceScore[]>>(BASE_URL, { params }));
+      const response = await withLoading(() => apiClient.get<ApiResponse<ComplianceScore[]>>(BASE_URL, { 
+        params: filteredParams 
+      }));
       return response.data.data;
     },
     staleTime: 5 * 60 * 1000 // 5 minutes

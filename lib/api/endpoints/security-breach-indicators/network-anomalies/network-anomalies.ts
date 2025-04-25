@@ -19,10 +19,17 @@ const BASE_URL = '/security-breach-indicators-dashboard/network-anomalies';
 export const useGetNetworkAnomalies = (params?: NetworkAnomalyQueryParams) => {
   const { withLoading } = useApiLoading();
   
+  // Filter out null/undefined params
+  const filteredParams = params ? Object.fromEntries(
+    Object.entries(params).filter(([_, value]) => value !== null && value !== undefined)
+  ) : undefined;
+  
   return useQuery<NetworkAnomaly[]>({ // Add explicit type here
-    queryKey: NETWORK_ANOMALIES_KEYS.lists(params), // Use params in queryKey
+    queryKey: NETWORK_ANOMALIES_KEYS.lists(filteredParams), // Use params in queryKey
     queryFn: async () => {
-      const response = await withLoading(() => apiClient.get<{results: number, paginateResult: any, data: NetworkAnomaly[]}>(BASE_URL, { params }));
+      const response = await withLoading(() => apiClient.get<{results: number, paginateResult: any, data: NetworkAnomaly[]}>(BASE_URL, { 
+        params: filteredParams 
+      }));
       return response.data.data;
     },
     staleTime: 5 * 60 * 1000 // 5 minutes
