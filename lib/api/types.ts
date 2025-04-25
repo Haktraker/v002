@@ -485,6 +485,53 @@ export interface ComplianceScoreQueryParams {
   limit?: number;
 }
 
+// Compliance Framework Overview Types
+export interface FrameworkSeverity {
+  severityName: 'High' | 'Medium' | 'Low' | 'Critical';
+  score: number;
+}
+
+export interface FrameworkCompliance {
+  frameworkName: 'ISO 27001' | 'NIST CSF' | 'PDPL' | 'CIS Controls';
+  frameworkScore: number;
+  status: 'Compliant' | 'Non-Compliant';
+}
+
+export interface ComplianceFrameworkBu {
+  bu_name: string;
+  severity: FrameworkSeverity[];
+  framework: FrameworkCompliance[];
+}
+
+export interface ComplianceFrameworkOverview {
+  _id: string;
+  month: string;
+  year: string;
+  bu: ComplianceFrameworkBu[];
+  details?: any[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CreateComplianceFrameworkDto {
+  month: string;
+  year: string;
+  bu: ComplianceFrameworkBu[];
+}
+
+export interface UpdateComplianceFrameworkDto {
+  month?: string;
+  year?: string;
+  bu?: ComplianceFrameworkBu[];
+}
+
+export interface ComplianceFrameworkQueryParams {
+  month?: string;
+  year?: string;
+  page?: number;
+  limit?: number;
+}
+
 // User Risk Distribution
 export interface UserRiskDistribution {
   _id: string;
