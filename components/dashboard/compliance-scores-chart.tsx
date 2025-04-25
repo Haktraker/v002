@@ -3,9 +3,11 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useTheme } from 'next-themes';
 import ApexChart from '@/components/ui/apex-chart';
+import { TrendingUp, ArrowUpRight } from "lucide-react"; // Added ArrowUpRight
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import Link from 'next/link'; // Added Link
+import { Button } from "@/components/ui/button"; // Added Button
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ComplianceScore } from '@/lib/api/types';
 // Remove Select imports as they are no longer needed here
@@ -232,17 +234,16 @@ const ComplianceScoresChart = ({ data, isLoading, error }: ComplianceScoresChart
                     <CardTitle className="text-base font-medium">Compliance Scores</CardTitle>
                     <CardDescription>Distribution across compliance types</CardDescription>
                 </div>
-                {/* Remove the Select dropdown for filtering */}
+                {/* Added Button Link */}
+                <Link href="/dashboard/security-breach-indicators/compliance-scores">
+                  <Button variant="outline" >
+                    Manage All
+                  </Button>
+                </Link>
             </CardHeader>
             <CardContent className="flex-1 flex flex-col justify-center">
                 {renderContent()}
             </CardContent>
-            {/* Optional: Keep the footer link if relevant */}
-            {/* <CardFooter className="flex justify-center pt-4">
-                <Button variant="link" asChild>
-                    <Link href="/dashboard/compliance-details">View Details</Link>
-                </Button>
-            </CardFooter> */}
         </Card>
     );
 };
