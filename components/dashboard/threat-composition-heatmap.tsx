@@ -74,7 +74,8 @@ export function ThreatCompositionHeatmap({
   };
 
   const heatmapData = processHeatmapData();
-  const { isDarkMode } = useTheme();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
 
   const chartOptions = {
     chart: {
@@ -105,7 +106,7 @@ export function ThreatCompositionHeatmap({
         fontSize: '16px',
         fontWeight: 600,
         fontFamily: 'inherit',
-        color: isDarkMode ? '#fff' : '#333'
+        color: isDark ? '#fff' : '#333'
       }
     },
     plotOptions: {
@@ -114,7 +115,7 @@ export function ThreatCompositionHeatmap({
         enableShades: true,
         shadeIntensity: 0.5,
         colorScale: {
-          ranges: isDarkMode ? [
+          ranges: isDark ? [
             {
               from: 0,
               to: 10,
@@ -178,19 +179,19 @@ export function ThreatCompositionHeatmap({
     xaxis: {
       labels: {
         style: {
-          colors: isDarkMode ? '#fff' : '#333'
+          colors: isDark ? '#fff' : '#333'
         }
       }
     },
     yaxis: {
       labels: {
         style: {
-          colors: isDarkMode ? '#fff' : '#333'
+          colors: isDark ? '#fff' : '#333'
         }
       }
     },
     theme: {
-      mode: isDarkMode ? 'dark' : 'light'
+      mode: isDark ? 'dark' : 'light'
     }
   };
 
