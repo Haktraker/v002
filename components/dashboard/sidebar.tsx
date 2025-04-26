@@ -21,6 +21,9 @@ import {
   ChevronLeft,
   ChevronRight,
   Menu,
+  Bug,
+  Gauge,
+  ShieldAlert,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -72,9 +75,9 @@ function SidebarContent({ className, isCollapsed, setIsCollapsed }: {
 
   const sidebarItems = [
     { icon: <LayoutDashboard size={20} />, label: "Dashboard", href: "/dashboard" },
-    { icon: <LayoutDashboard size={20} />, label: "Threat Composition", href: "/dashboard/threat-composition" },
-    { icon: <Database size={20} />, label: "Security Breach Indicators", href: "/dashboard/security-breach-indicators" },
-    { icon: <Database size={20} />, label: "Compliance Dashboard", href: "/dashboard/cybersecurity-compliance-dashboard" },
+    { icon: <ShieldAlert size={20} />, label: "Threat Composition", href: "/dashboard/threat-composition" },
+    { icon: <Bug size={20} />, label: "Security Breach Indicators", href: "/dashboard/security-breach-indicators" },
+    { icon: <Gauge size={20} />, label: "Compliance Dashboard", href: "/dashboard/cybersecurity-compliance-dashboard" },
     { icon: <Virus size={20} />, label: "Malware", href: "/dashboard/malware" },
     { icon: <Users size={20} />, label: "Employees", href: "/dashboard/employees" },
     { icon: <Shield size={20} />, label: "Security", href: "/dashboard/security" },
