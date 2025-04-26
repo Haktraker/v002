@@ -12,8 +12,9 @@ import ControlCategoryPerformanceChart from '@/components/dashboard/control-cate
 import { useGetControlCategoryPerformances } from '@/lib/api/endpoints/cybersecurity-compliance-dashboard/control-category-performance';
 import ComplianceRiskDistributionChart from '@/components/dashboard/compilance-risk-distribution-chart';
 import { useGetComplianceRiskDistributions } from '@/lib/api/endpoints/cybersecurity-compliance-dashboard/compilance-risk-distribution';
-import BusinessUnitPerformanceChart from '@/components/dashboard/business-unit-performance-chart';
+import  BusinessUnitPerformanceChart  from '@/components/dashboard/business-unit-performance-chart';
 import { useGetBusinessUnitPerformances } from '@/lib/api/endpoints/cybersecurity-compliance-dashboard/business-unit-performance';
+import { FrameWorkInfoDisplay } from '@/components/dashboard/frame-work-info-display';
 
 export default function CybersecurityComplianceDashboard() {
     const { selectedMonth, selectedYear } = useGlobalFilter();
@@ -70,11 +71,14 @@ export default function CybersecurityComplianceDashboard() {
                     isLoading={categoryPerformanceLoading}
                     error={categoryPerformanceError}
                 />
-                <BusinessUnitPerformanceChart
-                    data={buPerformanceData}
-                    isLoading={buPerformanceLoading}
-                    error={buPerformanceError}
-                />
+                <div className="lg:col-span-2 xl:col-span-2">
+                  <BusinessUnitPerformanceChart
+                      data={buPerformanceData}
+                      isLoading={buPerformanceLoading}
+                      error={buPerformanceError}
+                  />
+                </div>
+                <FrameWorkInfoDisplay />
             </div>
         </PageContainer>
     );

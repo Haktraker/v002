@@ -922,3 +922,67 @@ export interface ComplianceRiskDistributionQueryParams {
   page?: number;
   limit?: number;
 }
+
+// ================= Framework Info Types =================
+
+export type FrameworkName = "ISO 27001" | "NIST CSF" | "PDPL" | "CIS Controls";
+export type FrameworkBuStatus = "Compliant" | "Non-Compliant";
+export type FrameworkSeverity = "Critical" | "High" | "Medium" | "Low";
+
+export interface MitigationPlan {
+  short_term_actions: string;
+  long_term_strategy: string;
+  time_line: string;
+  budget: string;
+  progress: number;
+  required_resources: string;
+}
+
+export interface FrameworkBuDetail {
+  bu_name: string;
+  bu_id: string;
+  bu_status: FrameworkBuStatus;
+  gap_discription: string;
+  affected_systems: string[];
+  severity: FrameworkSeverity;
+  mitigation_plan: MitigationPlan;
+}
+
+export interface FrameworkDetail {
+  frame_work_name: FrameworkName;
+  frame_work_header: string;
+  frame_work_subtitle: string;
+  bu: FrameworkBuDetail[];
+}
+
+export interface FrameworkInfo {
+  _id: string;
+  month: string;
+  year: string;
+  frameWorks: FrameworkDetail[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CreateFrameworkInfoDto {
+  month: string;
+  year: string;
+  frameWorks: FrameworkDetail[];
+}
+
+export interface UpdateFrameworkInfoDto {
+  month?: string;
+  year?: string;
+  frameWorks?: FrameworkDetail[];
+}
+
+export interface FrameworkInfoQueryParams {
+  month?: string;
+  year?: string;
+  frameworkName?: FrameworkName;
+  buName?: string;
+  status?: FrameworkBuStatus;
+  severity?: FrameworkSeverity;
+  page?: number;
+  limit?: number;
+}
