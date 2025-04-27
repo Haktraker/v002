@@ -1166,3 +1166,49 @@ export interface CompanyRiskScoreQueryParams {
   page?: number;
   limit?: number;
 }
+
+// ================= Risk Assessment by BU Types =================
+
+export type SeverityLevelName = "Critical" | "High" | "Low" | "Medium";
+
+export interface RiskAssessmentSeverity {
+  _id?: string; // Optional, may be assigned by DB
+  severity: SeverityLevelName;
+  count: number;
+}
+
+export interface RiskAssessmentBu {
+  _id?: string; // Optional, may be assigned by DB
+  name: string;
+  severities: RiskAssessmentSeverity[];
+}
+
+export interface RiskAssessmentByBu {
+  _id: string;
+  month: string;
+  year: string;
+  bu: RiskAssessmentBu[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CreateRiskAssessmentByBuDto {
+  month: string;
+  year: string;
+  bu: RiskAssessmentBu[];
+}
+
+export interface UpdateRiskAssessmentByBuDto {
+  month?: string;
+  year?: string;
+  bu?: RiskAssessmentBu[];
+}
+
+export interface RiskAssessmentByBuQueryParams {
+  month?: string;
+  year?: string;
+  buName?: string; // Allow filtering by specific business unit name
+  severity?: SeverityLevelName; // Allow filtering by severity presence
+  page?: number;
+  limit?: number;
+}

@@ -106,7 +106,6 @@ const AlertSeverityTrendChart: React.FC<AlertSeverityTrendChartProps> = ({
         },
         axisBorder: { color: gridBorderColor },
         axisTicks: { color: gridBorderColor },
-        tooltip: { enabled: false } // Disable x-axis tooltip
       },
       yaxis: {
         title: { 
