@@ -137,7 +137,6 @@ const NetworkSecurityChart: React.FC<NetworkSecurityChartProps> = ({ data: netwo
         yaxis: {
           title: { text: 'Score', style: { color: textColor, fontFamily: 'inherit' } },
           labels: { style: { colors: textColor, fontFamily: 'inherit' } },
-          min: 10 
         },
         fill: { 
             opacity: 1,
@@ -148,6 +147,8 @@ const NetworkSecurityChart: React.FC<NetworkSecurityChartProps> = ({ data: netwo
           theme: chartThemeMode, 
           y: { formatter: (val) => val + " score" },
           style: { fontFamily: 'inherit', fontSize: '12px' },
+          shared: true,       // Show data for all series at that x-axis point
+          intersect: false,   // Trigger tooltip based on x-axis category hover
         },
         legend: {
           position: 'top',

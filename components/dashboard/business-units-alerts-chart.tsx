@@ -88,7 +88,28 @@ const BusinessUnitsAlertsChart: React.FC<BusinessUnitsAlertsChartProps> = ({
         },
       },
       dataLabels: {
-        enabled: false, // Keep bars clean
+        enabled: true, // Enable data labels
+        // offsetY: -5, // Optional: Adjust vertical offset if needed
+        style: { 
+            fontSize: '10px', // Set smaller font size
+            fontFamily: 'inherit', 
+            colors: [isDark ? '#fff' : '#333'] // Use theme-aware contrasting colors
+        },
+        formatter: function (val, opts) { // Only show label if value is significant
+          const numericVal = Number(val); // Ensure val is treated as a number
+          if (!isNaN(numericVal) && numericVal > 5) { // Check if it's a number and meets threshold
+            return numericVal.toFixed(0);
+          }
+          return ""; // Return empty string otherwise
+        },
+        dropShadow: { // Optional: Add shadow for better readability on bars
+            enabled: true,
+            top: 1,
+            left: 1,
+            blur: 1,
+            color: '#000',
+            opacity: 0.45
+        }
       },
       stroke: {
         show: false,
