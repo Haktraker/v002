@@ -486,10 +486,12 @@ export interface ComplianceScoreQueryParams {
 }
 
 // Compliance Framework Overview Types
+/* // Commenting out the first definition of FrameworkSeverity
 export interface FrameworkSeverity {
   severityName: 'High' | 'Medium' | 'Low' | 'Critical';
   score: number;
 }
+*/
 
 export interface FrameworkCompliance {
   frameworkName: 'ISO 27001' | 'NIST CSF' | 'PDPL' | 'CIS Controls';
@@ -499,7 +501,7 @@ export interface FrameworkCompliance {
 
 export interface ComplianceFrameworkBu {
   bu_name: string;
-  severity: FrameworkSeverity[];
+  severity: FrameworkSeverity[]; // Ensure this uses the correct type (defined later)
   framework: FrameworkCompliance[];
 }
 
@@ -1081,6 +1083,86 @@ export interface BuAlertsQueryParams {
   month?: string;
   year?: string;
   bu?: string;
+  page?: number;
+  limit?: number;
+}
+
+// ================= Alert Severity Trend Types =================
+
+export interface AlertSeverityTrend {
+  _id: string;
+  month: string;
+  year: string;
+  critical: number;
+  high: number;
+  medium: number;
+  low: number;
+  bu: string; // Assuming one BU per trend record based on schema
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CreateAlertSeverityTrendDto {
+  month: string;
+  year: string;
+  critical: number;
+  high: number;
+  medium: number;
+  low: number;
+  bu: string;
+}
+
+export interface UpdateAlertSeverityTrendDto {
+  month?: string;
+  year?: string;
+  critical?: number;
+  high?: number;
+  medium?: number;
+  low?: number;
+  bu?: string;
+}
+
+export interface AlertSeverityTrendQueryParams {
+  month?: string;
+  year?: string;
+  bu?: string;
+  page?: number;
+  limit?: number;
+}
+
+// ================= Company Risk Scores Types =================
+
+export interface CompanyRiskScoreBu {
+  _id?: string; // Optional, may be assigned by DB
+  name: string;
+  count: number;
+}
+
+export interface CompanyRiskScore {
+  _id: string;
+  month: string;
+  year: string;
+  bus: CompanyRiskScoreBu[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CreateCompanyRiskScoreDto {
+  month: string;
+  year: string;
+  bus: CompanyRiskScoreBu[];
+}
+
+export interface UpdateCompanyRiskScoreDto {
+  month?: string;
+  year?: string;
+  bus?: CompanyRiskScoreBu[];
+}
+
+export interface CompanyRiskScoreQueryParams {
+  month?: string;
+  year?: string;
+  buName?: string; // Allow filtering by specific business unit name
   page?: number;
   limit?: number;
 }
