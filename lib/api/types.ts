@@ -986,3 +986,50 @@ export interface FrameworkInfoQueryParams {
   page?: number;
   limit?: number;
 }
+
+// ================= Network Security Types =================
+
+export type NetworkSecurityActivityName =
+  | "Active Connections"
+  | "Blocked Traffic"
+  | "SSL/TLS Traffic"
+  | "DNS Queries";
+
+export interface NetworkSecurityActivity {
+  activityName: NetworkSecurityActivityName;
+  score: number;
+}
+
+export interface NetworkSecurityBu {
+  buName: string;
+  activity: NetworkSecurityActivity[];
+}
+
+export interface NetworkSecurity {
+  _id: string;
+  month: string;
+  year: string;
+  bu: NetworkSecurityBu[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CreateNetworkSecurityDto {
+  month: string;
+  year: string;
+  bu: NetworkSecurityBu[];
+}
+
+export interface UpdateNetworkSecurityDto {
+  month?: string;
+  year?: string;
+  bu?: NetworkSecurityBu[];
+}
+
+export interface NetworkSecurityQueryParams {
+  month?: string;
+  year?: string;
+  buName?: string; // Optional filter by BU name
+  page?: number;
+  limit?: number;
+}

@@ -24,6 +24,7 @@ import {
   Bug,
   Gauge,
   ShieldAlert,
+  Network,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -77,6 +78,7 @@ function SidebarContent({ className, isCollapsed, setIsCollapsed }: {
     { icon: <LayoutDashboard size={20} />, label: "Dashboard", href: "/dashboard" },
     { icon: <ShieldAlert size={20} />, label: "Threat Composition", href: "/dashboard/threat-composition" },
     { icon: <Bug size={20} />, label: "Security Breach Indicators", href: "/dashboard/security-breach-indicators" },
+    { icon: <Network size={20} />, label: "BusinessUnits Security", href: "/dashboard/business-units-security" },
     { icon: <Gauge size={20} />, label: "Compliance Dashboard", href: "/dashboard/cybersecurity-compliance-dashboard" },
     { icon: <Virus size={20} />, label: "Malware", href: "/dashboard/malware" },
     { icon: <Users size={20} />, label: "Employees", href: "/dashboard/employees" },
