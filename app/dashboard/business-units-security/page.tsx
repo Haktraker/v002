@@ -65,7 +65,7 @@ export default function BusinessUnitsSecurityPage() {
         <PageContainer>
             <PageHeader title="Business Units Security" />
             <GlobalFilterComponent />
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 gap-6 mt-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2  gap-6 mt-6">
                 <div className='lg:col-span-2 xl:col-span-2'>
                     <NetworkSecurityChart
                         data={networkSecurityData}
