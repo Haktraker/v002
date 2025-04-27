@@ -1033,3 +1033,54 @@ export interface NetworkSecurityQueryParams {
   page?: number;
   limit?: number;
 }
+
+// ================= Business Units Alerts Types =================
+
+export interface BuAlertsSeverityDetail {
+  count: number;
+  highComment?: string;    // Renamed for clarity based on schema field name
+  mediumComment?: string;  // Renamed for clarity
+  lowComment?: string;     // Renamed for clarity
+  criticalComment?: string; // Renamed for clarity
+}
+
+export interface BuAlerts {
+  _id: string;
+  bu: string;
+  high: BuAlertsSeverityDetail;
+  medium: BuAlertsSeverityDetail;
+  low: BuAlertsSeverityDetail;
+  critical: BuAlertsSeverityDetail;
+  month: string;
+  year: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CreateBuAlertsDto {
+  bu: string;
+  high: BuAlertsSeverityDetail;
+  medium: BuAlertsSeverityDetail;
+  low: BuAlertsSeverityDetail;
+  critical: BuAlertsSeverityDetail;
+  month: string;
+  year: string;
+}
+
+export interface UpdateBuAlertsDto {
+  bu?: string;
+  high?: BuAlertsSeverityDetail;
+  medium?: BuAlertsSeverityDetail;
+  low?: BuAlertsSeverityDetail;
+  critical?: BuAlertsSeverityDetail;
+  month?: string;
+  year?: string;
+}
+
+export interface BuAlertsQueryParams {
+  month?: string;
+  year?: string;
+  bu?: string;
+  page?: number;
+  limit?: number;
+}
