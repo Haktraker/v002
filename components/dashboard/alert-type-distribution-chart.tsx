@@ -15,6 +15,8 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ApexOptions } from 'apexcharts';
+import Link from 'next/link';
+import { Button } from '../ui/button';
 
 // Dynamically import ApexCharts
 const ApexChart = dynamic(() => import('react-apexcharts'), { ssr: false });
@@ -195,11 +197,21 @@ const AlertTypeDistributionChart: React.FC<AlertTypeDistributionChartProps> = ({
 
   return (
     <Card className={cn("w-full", className)}>
-      <CardHeader>
+      <CardHeader className='flex flex-row justify-between items-center flex-row'>
+        <div className='flex flex-col'>
+
         <CardTitle>Alert Type Distribution</CardTitle>
         <CardDescription>
           Distribution of alert types across all business units.
         </CardDescription>
+        </div>
+        <div className='flex flex-row gap-2'>
+            <Link href='/dashboard/business-units-security/alert-type-distribution'>
+                <Button variant='outline'>
+                    Manage All
+                </Button>
+            </Link>
+        </div>
       </CardHeader>
       <CardContent className="flex justify-center items-center pt-4 pr-0 pb-2 pl-2">
         {renderContent()}
