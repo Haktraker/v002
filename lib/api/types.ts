@@ -1472,3 +1472,69 @@ export interface UserRiskTimelineQueryParams {
   limit?: number;
 }
 
+// ================= Behavioral Pattern (UBA) Types =================
+
+export type BusinessUnitName = 
+  | "HO/DR"
+  | "CWC"
+  | "RAMAT"
+  | "EFS"
+  | "ETS"
+  | "Alrashed Food"
+  | "Alrashed Tires"
+  | "Jana Marine / Tanajib"
+  | "Industrials (Steel, Fast)"
+  | "Alrashed Wood"
+  | "Admirals"
+  | "YAUMI"
+  | "BMD"
+  | "Saudi Filter"
+  | "cement"
+  | "Insuwrap"
+  | "EFS/ETS"
+  | "Ubmksa"
+  | "Polystyrene";
+
+export interface BehavioralPattern {
+  _id: string; // Mongoose document ID
+  businessUnit: BusinessUnitName;
+  outsideHoursAccess: number;
+  multipleDevices: number;
+  unusualDataTransfer: number;
+  unusualApplications: number;
+  month: string;
+  year: string;
+  createdAt?: string; // From timestamps: true
+  updatedAt?: string; // From timestamps: true
+}
+
+export interface CreateBehavioralPatternDto {
+  businessUnit: BusinessUnitName;
+  outsideHoursAccess: number;
+  multipleDevices: number;
+  unusualDataTransfer: number;
+  unusualApplications: number;
+  month: string;
+  year: string;
+}
+
+// Update DTO allows partial updates
+export interface UpdateBehavioralPatternDto {
+  businessUnit?: BusinessUnitName;
+  outsideHoursAccess?: number;
+  multipleDevices?: number;
+  unusualDataTransfer?: number;
+  unusualApplications?: number;
+  month?: string;
+  year?: string;
+}
+
+// Query Params for fetching behavioral patterns
+export interface BehavioralPatternQueryParams {
+  businessUnit?: BusinessUnitName;
+  month?: string;
+  year?: string;
+  page?: number;
+  limit?: number;
+}
+

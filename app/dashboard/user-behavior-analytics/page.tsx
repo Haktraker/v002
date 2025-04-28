@@ -3,6 +3,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import UserBehaviorAnalyticsChart from '@/components/dashboard/user-behavior-analytics-chart';
 import UserRiskScoreDistributionsChart from '@/components/dashboard/user-risk-score-distributions-chart';
 import UserRiskTimelineChart from '@/components/dashboard/user-risk-timeline-chart';
+import BehavioralPatternChart from '@/components/dashboard/behavioral-pattern-chart';
 import { GlobalFilterComponent } from '@/components/dashboard/global-filter';
 
 export default function UserBehaviorAnalyticsDashboard() {
@@ -19,6 +20,9 @@ export default function UserBehaviorAnalyticsDashboard() {
                 </div>
                 <div className="lg:col-span-1">
                     <UserRiskTimelineChart />
+                </div>
+                <div className="lg:col-span-2">
+                    <BehavioralPatternChart />
                 </div>
             </div>
         </PageContainer>

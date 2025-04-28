@@ -99,6 +99,8 @@ const getChartOptions = (categories: string[], isDark: boolean): ApexOptions => 
         },
         tooltip: {
             theme: chartThemeMode, // Use themed tooltip
+            shared: true, // Show tooltip per stack segment
+            intersect: false,
             y: {
                 formatter: function (val) {
                     // Add check for valid number
