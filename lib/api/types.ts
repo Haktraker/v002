@@ -1278,6 +1278,69 @@ export interface SocTeamPerformanceQueryParams {
   limit?: number;
 }
 
-// ================= Flattened Type for Frontend Use =================
-// ... existing FlatSocTeamPerformanceEntry interface ...
+// ================= Alert Type Distribution Types =================
+
+export type AlertTypeName =
+  | "Malware"
+  | "Phishing"
+  | "Auth Failure"
+  | "Policy Violation"
+  | "Data Exfil";
+
+export interface AlertTypeDistributionAlert {
+  _id?: string; // Mongoose adds _id to subdocuments
+  name: AlertTypeName;
+  count: number;
+}
+
+export interface AlertTypeDistributionBu {
+  _id?: string; // Mongoose adds _id to subdocuments
+  buName: string;
+  alert: AlertTypeDistributionAlert[];
+}
+
+export interface AlertTypeDistribution {
+  _id: string; // Mongoose document ID
+  month: string;
+  year: string;
+  bu: AlertTypeDistributionBu[];
+  createdAt?: string; // From timestamps: true
+  updatedAt?: string; // From timestamps: true
+}
+
+export interface CreateAlertTypeDistributionDto {
+  month: string;
+  year: string;
+  bu: {
+    buName: string;
+    alert: {
+      name: AlertTypeName;
+      count: number;
+    }[];
+  }[];
+}
+
+// Update DTO allows partial updates
+export interface UpdateAlertTypeDistributionDto {
+  month?: string;
+  year?: string;
+  bu?: {
+    _id?: string; // Allow identifying existing BUs if needed for granular updates (though typical REST might replace the whole array)
+    buName?: string;
+    alert?: {
+      _id?: string; // Allow identifying existing alerts if needed
+      name?: AlertTypeName;
+      count?: number;
+    }[];
+  }[];
+}
+
+export interface AlertTypeDistributionQueryParams {
+  month?: string;
+  year?: string;
+  buName?: string;   // Example filter
+  alertName?: AlertTypeName; // Example filter
+  page?: number;
+  limit?: number;
+}
 
