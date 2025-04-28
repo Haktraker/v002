@@ -1393,3 +1393,43 @@ export interface UserBehaviorAnalyticsQueryParams {
   // maxAvgRiskScore?: number;
 }
 
+// ================= Risk Score Distribution (UBA) Types =================
+
+export interface RiskScoreDistribution {
+  _id: string; // Mongoose document ID
+  low: number;
+  medium: number;
+  high: number;
+  critical: number;
+  month: string;
+  year: string;
+  createdAt?: string; // From timestamps: true
+  updatedAt?: string; // From timestamps: true
+}
+
+export interface CreateRiskScoreDistributionDto {
+  low: number;
+  medium: number;
+  high: number;
+  critical: number;
+  month: string;
+  year: string;
+}
+
+// Update DTO allows partial updates
+export interface UpdateRiskScoreDistributionDto {
+  low?: number;
+  medium?: number;
+  high?: number;
+  critical?: number;
+  month?: string;
+  year?: string;
+}
+
+export interface RiskScoreDistributionQueryParams {
+  month?: string;
+  year?: string;
+  page?: number;
+  limit?: number;
+}
+
