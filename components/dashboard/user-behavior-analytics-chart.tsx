@@ -13,6 +13,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ApexOptions } from 'apexcharts';
 import { MONTHS } from '@/lib/constants/months-list'; // Assuming this exists for sorting
 import { useGlobalFilter } from '@/lib/context/GlobalFilterContext'; // Import global filter context
+import { Button } from '../ui/button';
+import Link from 'next/link';
 
 // Dynamically import ApexCharts
 const ApexChart = dynamic(() => import('react-apexcharts'), { ssr: false });
@@ -226,11 +228,20 @@ const UserBehaviorAnalyticsChart: React.FC<UserBehaviorAnalyticsChartProps> = ({
 
   return (
     <Card className={cn("w-full", className)}>
-      <CardHeader>
-        <CardTitle>User Behavior Analytics Trends</CardTitle>
-        <CardDescription>
-          Monthly trends of key UBA metrics.
-        </CardDescription>
+      <CardHeader className='flex flex-row justify-between items-center flex-row'>
+        <div className='flex flex-col'>
+          <CardTitle>User Behavior Analytics Trends</CardTitle>
+          <CardDescription>
+            Monthly trends of key UBA metrics.
+          </CardDescription>
+        </div>
+        <div className='flex flex-row gap-2'>
+          <Link href='/dashboard/user-behavior-analytics/user-behavior-analytics-trends'>
+            <Button variant='outline'>
+              Manage All
+            </Button>
+          </Link>
+        </div>
       </CardHeader>
       <CardContent className="pt-4 pr-2 pb-2 pl-2"> {/* Adjust padding if needed */}
         {renderContent()}
