@@ -1344,3 +1344,52 @@ export interface AlertTypeDistributionQueryParams {
   limit?: number;
 }
 
+// ================= User Behavior Analytics Types =================
+
+export interface UserBehaviorAnalytics {
+  _id: string; // Mongoose document ID
+  criticalAlerts: number;
+  AvgRiskScore: number;
+  suspiciousUsers: number;
+  dataAccessAnomalies: number;
+  networkAnomalies: number;
+  responseTime: number;
+  month: string;
+  year: string;
+  createdAt?: string; // From timestamps: true
+  updatedAt?: string; // From timestamps: true
+}
+
+export interface CreateUserBehaviorAnalyticsDto {
+  criticalAlerts: number;
+  AvgRiskScore: number;
+  suspiciousUsers: number;
+  dataAccessAnomalies: number;
+  networkAnomalies: number;
+  responseTime: number;
+  month: string;
+  year: string;
+}
+
+// Update DTO allows partial updates
+export interface UpdateUserBehaviorAnalyticsDto {
+  criticalAlerts?: number;
+  AvgRiskScore?: number;
+  suspiciousUsers?: number;
+  dataAccessAnomalies?: number;
+  networkAnomalies?: number;
+  responseTime?: number;
+  month?: string;
+  year?: string;
+}
+
+export interface UserBehaviorAnalyticsQueryParams {
+  month?: string;
+  year?: string;
+  page?: number;
+  limit?: number;
+  // Add other potential filters if needed, e.g.:
+  // minCriticalAlerts?: number;
+  // maxAvgRiskScore?: number;
+}
+
