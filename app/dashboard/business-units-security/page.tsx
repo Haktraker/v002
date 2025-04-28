@@ -68,7 +68,7 @@ export default function BusinessUnitsSecurityPage() {
         error: socPerformanceError
     } = useGetSocTeamPerformances(queryParams);
 
-    console.log(companyRiskScoresData);
+    console.log(socPerformanceData,"socPerformanceData");
 
     return (
         <PageContainer>

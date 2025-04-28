@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { SocTeamPerformanceTeam } from '@/lib/api/types'; // Corrected import path
+import { SocTeamPerformanceTeam } from '@/lib/api/types';
 import ApexChart from '@/components/ui/apex-chart';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -23,43 +23,78 @@ const SocTeamPerformanceChart: React.FC<SocTeamPerformanceChartProps> = ({
   const { theme } = useTheme();
   const isDark = theme === "dark";
 
-  // --- Data Transformation ---
+  // --- Data Transformation for Grouped Bar Chart (Team-BU focus) ---
   const chartData = useMemo(() => {
     if (!data || data.length === 0) {
       return { series: [], categories: [] };
     }
 
     const categoriesSet = new Set<string>();
-    const resolutionRateData: { x: string; y: number }[] = [];
+    const resRateData: { x: string; y: number }[] = [];
     const accuracyData: { x: string; y: number }[] = [];
+    const incidentsData: { x: string; y: number }[] = [];
 
     data.forEach(team => {
-      if (team.bu && team.bu.length > 0) {
+      if (team.bu && Array.isArray(team.bu) && team.bu.length > 0) {
         team.bu.forEach(buDetail => {
-          const category = `${team.teamName} - ${buDetail.buName}`;
+          const category = `${team.teamName || 'Team?'} - ${buDetail.buName || 'BU?'}`;
           categoriesSet.add(category);
-          resolutionRateData.push({
+
+          // Validate numeric values before push
+          const resRate = buDetail.resolutionRate;
+          const acc = buDetail.accuracy;
+          const incidents = buDetail.incidentsHandled;
+
+          const validResRate = typeof resRate === 'number' && !isNaN(resRate) ? Math.round(resRate * 100) : 0;
+          const validAccuracy = typeof acc === 'number' && !isNaN(acc) ? Math.round(acc * 100) : 0;
+          const validIncidents = typeof incidents === 'number' && !isNaN(incidents) ? incidents : 0;
+
+          // --- DEBUG LOGS ---
+          console.log('Processing Category:', category);
+          console.log('--- Values:', { validResRate, validAccuracy, validIncidents });
+          console.log('--- Arrays before push:', { 
+              resRateData_isArray: Array.isArray(resRateData),
+              accuracyData_isArray: Array.isArray(accuracyData),
+              incidentsData_isArray: Array.isArray(incidentsData) 
+          });
+          // --- END DEBUG LOGS ---
+
+          resRateData.push({ 
             x: category,
-            y: Math.round((buDetail.resolutionRate || 0) * 100) // Convert to percentage
+            y: validResRate 
           });
           accuracyData.push({
             x: category,
-            y: Math.round((buDetail.accuracy || 0) * 100) // Convert to percentage
+            y: validAccuracy 
+          });
+          incidentsData.push({
+            x: category,
+            y: validIncidents
           });
         });
       }
     });
 
-    const categories = Array.from(categoriesSet);
+    const categories = Array.from(categoriesSet).sort(); // Sort categories alphabetically
 
     const series = [
       {
         name: 'Resolution Rate (%)',
-        data: categories.map(cat => resolutionRateData.find(d => d.x === cat)?.y ?? 0)
+        type: 'column',
+        data: categories.map(cat => resRateData.find(d => d.x === cat)?.y ?? 0),
+        // yaxisIndex: 0 // Assign to first y-axis (implied)
       },
       {
         name: 'Accuracy (%)',
-        data: categories.map(cat => accuracyData.find(d => d.x === cat)?.y ?? 0)
+        type: 'column',
+        data: categories.map(cat => accuracyData.find(d => d.x === cat)?.y ?? 0),
+        // yaxisIndex: 0 // Assign to first y-axis (implied)
+      },
+      {
+        name: 'Incidents Handled',
+        type: 'column',
+        data: categories.map(cat => incidentsData.find(d => d.x === cat)?.y ?? 0),
+        // yaxisIndex: 1 // Assign to second y-axis (implied by order)
       }
     ];
 
@@ -67,26 +102,29 @@ const SocTeamPerformanceChart: React.FC<SocTeamPerformanceChartProps> = ({
 
   }, [data]);
 
-  // --- Chart Options ---
+  // --- Chart Options for Grouped Bar Chart with Dual Y-Axis ---
   const options = useMemo(() => {
+    const primaryColor = isDark ? '#a7a7a7' : '#334155'; // Adjusted for better contrast
+    const secondaryColor = isDark ? '#a7a7a7' : '#334155';
+
     return {
       chart: {
-        type: 'bar',
-        height: 350,
-        stacked: false, // Grouped bars
+        type: 'bar', // Keep as bar for grouped
+        height: 400,
+        stacked: false,
         toolbar: { show: true, tools: { download: true, selection: false, zoom: false, zoomin: false, zoomout: false, pan: false, reset: true } },
-        foreColor: isDark ? '#f8fafc' : '#334155',
+        foreColor: primaryColor,
         background: 'transparent',
       },
       plotOptions: {
         bar: {
           horizontal: false,
-          columnWidth: '55%', // Adjust width as needed
-          endingShape: 'rounded' // Optional: rounded bars
+          columnWidth: '70%', // Adjust for group spacing
+          endingShape: 'rounded'
         },
       },
       dataLabels: {
-        enabled: false // Disable data labels on bars for cleaner look
+        enabled: false
       },
       stroke: {
         show: true,
@@ -95,63 +133,101 @@ const SocTeamPerformanceChart: React.FC<SocTeamPerformanceChartProps> = ({
       },
       xaxis: {
         categories: chartData.categories,
-        title: { text: 'Team - Business Unit', style: { color: isDark ? '#e5e7eb' : '#374151' } },
+        title: { text: 'Team - Business Unit', style: { color: primaryColor } },
         labels: {
-          style: { colors: isDark ? '#e5e7eb' : '#374151' },
-          rotate: -45, // Rotate labels if they overlap
+          style: { colors: primaryColor },
+          rotate: -45,
           trim: true,
           hideOverlappingLabels: true,
         },
-         tickPlacement: 'on'
+        tickPlacement: 'on'
       },
-      yaxis: {
-        title: { text: 'Percentage (%)', style: { color: isDark ? '#e5e7eb' : '#374151' } },
-        min: 0,
-        max: 100, // Set max to 100 for percentage
-        labels: {
-          style: { colors: isDark ? '#e5e7eb' : '#374151' },
-          formatter: function (val: number) {
-             return val.toFixed(0); // Format as integer percentage
-          }
+      yaxis: [
+        {
+          // First Y-axis (Percentages)
+          seriesName: 'Resolution Rate (%)', // Link series by name
+          axisTicks: { show: true },
+          axisBorder: { show: true, color: '#3B82F6' }, // Color matches first series
+          labels: {
+            style: { colors: ['#3B82F6'] },
+            formatter: (val: number) => `${val.toFixed(0)}%`
+          },
+          title: {
+            text: "Rate / Accuracy (%)",
+            style: { color: '#3B82F6' }
+          },
+          min: 0,
+          max: 100,
+          tooltip: {
+             enabled: true
+           }
+        },
+        {
+           // Second Y-axis (Counts)
+           seriesName: 'Incidents Handled', // Link series by name
+           opposite: true,
+           axisTicks: { show: true },
+           axisBorder: { show: true, color: '#F59E0B' }, // Color matches third series
+           labels: {
+             style: { colors: ['#F59E0B'] },
+             formatter: (val: number) => `${val}`
+           },
+           title: {
+             text: "Incidents Handled (Count)",
+             style: { color: '#F59E0B' }
+           },
+            // Let max be determined automatically for counts
+            // min: 0, 
+            tooltip: {
+             enabled: true
+           }
         }
-      },
+      ],
       fill: {
         opacity: 1
       },
       tooltip: {
         theme: isDark ? 'dark' : 'light',
+        shared: true, // Keep shared to show all values on hover
+        intersect: false,
         y: {
-          formatter: function (val: number) {
-            return val + "%"; // Add percentage sign
-          }
-        }
+           formatter: function (val: number, { seriesIndex, w }: any) {
+               // Use seriesIndex to determine the unit
+               if (seriesIndex === 0 || seriesIndex === 1) { // Resolution Rate or Accuracy
+                 return val.toFixed(0) + "%";
+               } else if (seriesIndex === 2) { // Incidents Handled
+                 return val + " incidents";
+               }
+               return val; // Fallback
+           }
+         }
       },
       legend: {
         position: 'top',
         horizontalAlign: 'right',
-        labels: { colors: isDark ? '#e5e7eb' : '#374151' }
+        labels: { colors: primaryColor }
       },
-      colors: ['#3B82F6', '#10B981'], // Example colors: Blue for Resolution, Green for Accuracy
+      colors: ['#3B82F6', '#10B981', '#F59E0B'], // Blue (Res Rate), Green (Accuracy), Orange (Incidents)
       responsive: [{
-        breakpoint: 992, // Adjust breakpoint if needed
+        breakpoint: 1200,
         options: {
            xaxis: {
              labels: {
                rotate: -65,
              }
            },
-           legend: { position: 'bottom' }
         }
       },{
          breakpoint: 768,
          options: {
-             chart: { height: 300 },
+             chart: { height: 350 },
              xaxis: {
                labels: {
                  rotate: -90,
                  style: { fontSize: '10px' }
                }
-             }
+             },
+            legend: { position: 'bottom' }
          }
       }]
     };
@@ -160,7 +236,7 @@ const SocTeamPerformanceChart: React.FC<SocTeamPerformanceChartProps> = ({
   // --- Render Logic ---
   const renderContent = () => {
     if (isLoading) {
-      return <Skeleton className="h-[350px] w-full" />;
+      return <Skeleton className="h-[400px] w-full" />;
     }
 
     if (error) {
@@ -190,7 +266,7 @@ const SocTeamPerformanceChart: React.FC<SocTeamPerformanceChartProps> = ({
     return (
       <ApexChart
         type="bar"
-        height={350}
+        height={400}
         options={options}
         series={chartData.series}
       />
@@ -202,7 +278,7 @@ const SocTeamPerformanceChart: React.FC<SocTeamPerformanceChartProps> = ({
     <Card className={`flex-1 flex flex-col ${isDark ? "bg-[#171727] border-0" : "bg-white"}`}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-base font-medium">
-          SOC Team Performance (Rate & Accuracy by BU)
+          SOC Performance by Team & Business Unit
         </CardTitle>
         {/* Placeholder for potential filters or actions */}
       </CardHeader>
