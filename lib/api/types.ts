@@ -1213,3 +1213,71 @@ export interface RiskAssessmentByBuQueryParams {
   limit?: number;
 }
 
+// ================= SOC Team Performance Types =================
+
+export interface SocTeamPerformanceBuDetail {
+  _id?: string; // Mongoose adds _id to subdocuments
+  buName: string;
+  resolutionRate: number; // Assuming percentages e.g., 10, 50
+  accuracy: number;       // Assuming percentages e.g., 20, 30
+  incidentsHandled: number;
+}
+
+export interface SocTeamPerformanceTeam {
+  _id?: string; // Mongoose adds _id to subdocuments
+  teamName: string;
+  bu: SocTeamPerformanceBuDetail[];
+}
+
+export interface SocTeamPerformance {
+  _id: string; // Mongoose document ID
+  month: string;
+  year: string;
+  socTeam: SocTeamPerformanceTeam[];
+  createdAt?: string; // From timestamps: true
+  updatedAt?: string; // From timestamps: true
+}
+
+export interface CreateSocTeamPerformanceDto {
+  month: string;
+  year: string;
+  socTeam: { // Define inline for creation DTO to avoid requiring _id
+    teamName: string;
+    bu: { 
+      buName: string;
+      resolutionRate: number;
+      accuracy: number;
+      incidentsHandled: number;
+    }[];
+  }[];
+}
+
+// Update DTO allows partial updates
+export interface UpdateSocTeamPerformanceDto {
+  month?: string;
+  year?: string;
+  socTeam?: { // Allow updating teams/BUs
+    _id?: string; // Include _id if needing to identify existing teams/BUs for update
+    teamName?: string;
+    bu?: { 
+      _id?: string;
+      buName?: string;
+      resolutionRate?: number;
+      accuracy?: number;
+      incidentsHandled?: number;
+    }[];
+  }[];
+}
+
+export interface SocTeamPerformanceQueryParams {
+  month?: string;
+  year?: string;
+  teamName?: string; // Example filter
+  buName?: string;   // Example filter
+  page?: number;
+  limit?: number;
+}
+
+// ================= Flattened Type for Frontend Use =================
+// ... existing FlatSocTeamPerformanceEntry interface ...
+

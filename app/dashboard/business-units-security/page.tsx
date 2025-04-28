@@ -9,6 +9,7 @@ import BusinessUnitsAlertsChart from '@/components/dashboard/business-units-aler
 import AlertSeverityTrendChart from '@/components/dashboard/alert-severity-trend-chart';
 import CompanyRiskScoresChart from '@/components/dashboard/company-risk-scores-chart';
 import RiskAssessmentByBuChart from '@/components/dashboard/risk-assessment-by-bu-chart';
+import SocTeamPerformanceChart from '@/components/dashboard/soc-team-performance-chart';
 import { useGetNetworkSecurities } from '@/lib/api/endpoints/business-units-security/network-security';
 import { useGetBuAlerts } from '@/lib/api/endpoints/business-units-security/business-units-alerts';
 import { useGetAlertSeverityTrends } from '@/lib/api/endpoints/business-units-security/alert-severity-trend';
@@ -98,6 +99,9 @@ export default function BusinessUnitsSecurityPage() {
                         isLoading={riskAssessmentLoading}
                         error={riskAssessmentError}
                     />
+                </div>
+                <div>
+                    <SocTeamPerformanceChart />
                 </div>
             </div>
         </PageContainer>
