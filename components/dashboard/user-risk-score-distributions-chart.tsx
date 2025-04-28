@@ -147,7 +147,6 @@ export default function UserRiskScoreDistributionsChart() {
   const queryParams = useMemo(() => ({
       month: selectedMonth === 'All' ? undefined : selectedMonth,
       year: selectedYear === 'All' ? undefined : selectedYear,
-      limit: 1000 // Keep fetching more data for chart aggregation
   }), [selectedMonth, selectedYear]);
 
   // Fetch data using query params

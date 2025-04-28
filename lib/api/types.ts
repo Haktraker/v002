@@ -1433,3 +1433,42 @@ export interface RiskScoreDistributionQueryParams {
   limit?: number;
 }
 
+// ================= User Risk Timeline (UBA) Types =================
+
+export type UserRiskSeverity = "low" | "medium" | "high" | "critical";
+
+// Represents the nested 'risk' object within the main document
+export interface UserRiskTimelineEntry {
+  month: string;
+  day: number; // 1-31
+  severity: UserRiskSeverity;
+  year: string;
+  count: number;
+}
+
+// Represents the full UserRiskTimeline document from the database
+export interface UserRiskTimeline {
+  _id: string; // Mongoose document ID
+  risk: UserRiskTimelineEntry;
+  createdAt?: string; // From timestamps: true
+  updatedAt?: string; // From timestamps: true
+}
+
+// DTO for creating a new timeline entry (matches the 'risk' object structure)
+export interface CreateUserRiskTimelineDto extends UserRiskTimelineEntry {}
+
+// DTO for updating an existing timeline entry (allows partial updates to the 'risk' object)
+export interface UpdateUserRiskTimelineDto {
+  risk?: Partial<UserRiskTimelineEntry>; // Allow updating parts of the nested risk object
+}
+
+// Query Params for fetching timeline entries
+export interface UserRiskTimelineQueryParams {
+  month?: string;
+  year?: string;
+  day?: number;
+  severity?: UserRiskSeverity;
+  page?: number;
+  limit?: number;
+}
+
