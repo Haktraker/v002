@@ -16,6 +16,8 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ApexOptions } from 'apexcharts';
+import Link from 'next/link';
+import { Button } from '../ui/button';
 
 // Dynamically import ApexCharts to prevent SSR issues
 const ApexChart = dynamic(() => import('react-apexcharts'), { ssr: false });
@@ -145,7 +147,7 @@ const SocTeamPerformanceChart: React.FC<SocTeamPerformanceChartProps> = ({
         height: dynamicHeight,
         stacked: false, 
         toolbar: {
-          show: true, // Keep toolbar for download
+          show: false, // Keep toolbar for download
           tools: { download: true, selection: false, zoom: false, zoomin: false, zoomout: false, pan: false, reset: true }
         },
         background: 'transparent',
@@ -299,11 +301,21 @@ const SocTeamPerformanceChart: React.FC<SocTeamPerformanceChartProps> = ({
 
   return (
     <Card className={cn("w-full", className)}>
-      <CardHeader>
+      <CardHeader className='flex flex-row justify-between items-center flex-row'>
+        <div className='flex flex-col'>
+
         <CardTitle>SOC Team Performance</CardTitle>
         <CardDescription>
           Resolution Rate, Accuracy, and Incidents Handled per Team/BU
         </CardDescription>
+        </div>
+        <div className='flex flex-row gap-2'>
+            <Link href='/dashboard/business-units-security/soc-team-performance'>
+                <Button variant='outline'>
+                    Manage All
+                </Button>
+            </Link>
+        </div>
       </CardHeader>
       <CardContent className="pt-4 pr-0 pb-2 pl-2">
         {renderContent()}
