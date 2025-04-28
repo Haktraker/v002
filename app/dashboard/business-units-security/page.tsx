@@ -9,14 +9,11 @@ import BusinessUnitsAlertsChart from '@/components/dashboard/business-units-aler
 import AlertSeverityTrendChart from '@/components/dashboard/alert-severity-trend-chart';
 import CompanyRiskScoresChart from '@/components/dashboard/company-risk-scores-chart';
 import RiskAssessmentByBuChart from '@/components/dashboard/risk-assessment-by-bu-chart';
-import SocTeamPerformanceChart from '@/components/dashboard/soc-team-performance-chart';
 import { useGetNetworkSecurities } from '@/lib/api/endpoints/business-units-security/network-security';
 import { useGetBuAlerts } from '@/lib/api/endpoints/business-units-security/business-units-alerts';
 import { useGetAlertSeverityTrends } from '@/lib/api/endpoints/business-units-security/alert-severity-trend';
 import { useGetCompanyRiskScores } from '@/lib/api/endpoints/business-units-security/company-risk-scores';
 import { useGetRiskAssessmentsByBu } from '@/lib/api/endpoints/business-units-security/risk-assessment-by-bu';
-import { useGetSocTeamPerformances } from '@/lib/api/endpoints/business-units-security/soc-team-performance';
-import { NetworkSecurity, BuAlerts, AlertSeverityTrend, CompanyRiskScore, RiskAssessmentByBu, SocTeamPerformance } from '@/lib/api/types';
 
 export default function BusinessUnitsSecurityPage() {
     const { selectedMonth, selectedYear } = useGlobalFilter();
@@ -61,15 +58,7 @@ export default function BusinessUnitsSecurityPage() {
         error: riskAssessmentError
     } = useGetRiskAssessmentsByBu(queryParams);
 
-    // Fetch data for SOC Team Performance Chart
-    const {
-        data: socPerformanceData,
-        isLoading: socPerformanceLoading,
-        error: socPerformanceError
-    } = useGetSocTeamPerformances(queryParams);
-
-    console.log(socPerformanceData,"socPerformanceData");
-
+    
     return (
         <PageContainer>
             <PageHeader title="Business Units Security" />
@@ -108,13 +97,6 @@ export default function BusinessUnitsSecurityPage() {
                         data={riskAssessmentData || []}
                         isLoading={riskAssessmentLoading}
                         error={riskAssessmentError}
-                    />
-                </div>
-                <div className="lg:col-span-2 xl:col-span-3">
-                    <SocTeamPerformanceChart
-                        data={socPerformanceData?.flatMap(item => item.socTeam) || []}
-                        isLoading={socPerformanceLoading}
-                        error={socPerformanceError}
                     />
                 </div>
             </div>
