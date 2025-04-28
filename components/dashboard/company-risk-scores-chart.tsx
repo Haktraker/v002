@@ -193,8 +193,8 @@ const CompanyRiskScoresChart: React.FC<CompanyRiskScoresChartProps> = ({ data, i
      }];
 
     return (
-      <div className=""> {/* Set explicit height for chart container */}
-         <ReactApexChart options={options} series={series} type="bar" />
+      <div className="h-full w-full"> 
+         <ReactApexChart options={options} series={series} type="bar" height="100%" />
       </div>
     );
   };
