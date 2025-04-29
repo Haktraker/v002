@@ -13,6 +13,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useGlobalFilter } from '@/lib/context/GlobalFilterContext';
 
 // Dynamically import ApexCharts
 const ApexChart = dynamic(() => import('react-apexcharts'), {
@@ -183,11 +184,13 @@ export default function BehavioralPatternChart() {
     const { theme } = useTheme();
     const isDark = theme === 'dark';
     // Keep global filters if you want to aggregate data for ONLY the selected month/year
-    // const { selectedMonth, selectedYear } = useGlobalFilter();
+    const { selectedMonth, selectedYear } = useGlobalFilter();
 
     // Fetch all data for aggregation across time by BU
-    const queryParams = useMemo(() => ({ limit: 10000 }), []); // No time filters
-
+    const queryParams = useMemo(() => ({
+        month: selectedMonth === 'All' ? undefined : selectedMonth,
+        year: selectedYear === 'All' ? undefined : selectedYear,
+    }), [selectedMonth, selectedYear]);
     const { data: paginatedData, isLoading, error, isError } = useGetBehavioralPatterns(queryParams);
 
     // Aggregate and transform data
