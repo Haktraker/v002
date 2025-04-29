@@ -16,16 +16,16 @@ export default function UserBehaviorAnalyticsDashboard() {
                 <div className="lg:col-span-3">
                     <UserBehaviorAnalyticsChart />
                 </div>
-                <div className="lg:col-span-1">
+                <div className="">
                     <UserRiskScoreDistributionsChart />
                 </div>
-                <div className="lg:col-span-1">
+                <div className="">
                     <UserRiskTimelineChart />
                 </div>
-                <div className="lg:col-span-1">
+                <div className="">
                     <BehavioralPatternChart />
                 </div>
-                <div className="lg:col-span-1">
+                <div className="">
                     <AnomalyCategoryDistributionChart />
                 </div>
             </div>
