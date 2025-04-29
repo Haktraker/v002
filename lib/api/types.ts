@@ -1538,3 +1538,48 @@ export interface BehavioralPatternQueryParams {
   limit?: number;
 }
 
+// ================= Anomaly Category Distribution (UBA) Types =================
+
+export type AnomalyCategoryName = 
+  | "Unusual Login Time"
+  | "Data Exfiltration"
+  | "Privilege Escalation"
+  | "Multiple Failed Logins"
+  | "Unusual File Access"
+  | "Abnormal Network Traffic";
+
+export interface AnomalyCategoryDistribution {
+  _id: string; // Mongoose document ID
+  name: AnomalyCategoryName;
+  value: number;
+  month: string;
+  year: string;
+  // No timestamps in the provided schema
+  // createdAt?: string; 
+  // updatedAt?: string; 
+}
+
+export interface CreateAnomalyCategoryDistributionDto {
+  name: AnomalyCategoryName;
+  value: number;
+  month: string;
+  year: string;
+}
+
+// Update DTO allows partial updates
+export interface UpdateAnomalyCategoryDistributionDto {
+  name?: AnomalyCategoryName;
+  value?: number;
+  month?: string;
+  year?: string;
+}
+
+// Query Params for fetching anomaly category distributions
+export interface AnomalyCategoryDistributionQueryParams {
+  name?: AnomalyCategoryName;
+  month?: string;
+  year?: string;
+  page?: number;
+  limit?: number;
+}
+
