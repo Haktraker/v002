@@ -84,13 +84,7 @@ function SidebarContent({ className, isCollapsed, setIsCollapsed }: {
     { icon: <User size={20} />, label: "User Behavior Analytics", href: "/dashboard/user-behavior-analytics" },
     { icon: <Link2Off size={20} />, label: "Kill Chain", href: "/dashboard/kill-chain" },
     { icon: <Gauge size={20} />, label: "Compliance Dashboard", href: "/dashboard/cybersecurity-compliance-dashboard" },
-    { icon: <Virus size={20} />, label: "Malware", href: "/dashboard/malware" },
-    { icon: <Users size={20} />, label: "Employees", href: "/dashboard/employees" },
-    { icon: <Shield size={20} />, label: "Security", href: "/dashboard/security" },
-    { icon: <FileSearch size={20} />, label: "Logs", href: "/dashboard/logs" },
-    { icon: <Globe size={20} />, label: "Network", href: "/dashboard/network" },
     { icon: <Building size={20} />, label: "Assets", href: "/dashboard/assets" },
-    { icon: <Lock size={20} />, label: "Access", href: "/dashboard/access" },
     { icon: <BarChart2 size={20} />, label: "Reports", href: "/dashboard/reports" },
   ]
 
