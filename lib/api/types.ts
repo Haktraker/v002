@@ -1827,3 +1827,43 @@ export interface LockHeadPhasesQueryParams {
   limit?: number;
 }
 
+// ================= Threat Break Down Types =================
+
+export type ThreatBreakDownType = 
+  | "Threat Type Distribution"
+  | "Kill Chain Phase Distribution"
+  | "Mitigation Status"
+  | "Attack Vector Breakdown";
+
+export interface ThreatBreakDown {
+  _id: string;
+  month: string;
+  year: string;
+  score: number;
+  threatType: ThreatBreakDownType;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CreateThreatBreakDownDto {
+  month: string;
+  year: string;
+  score: number;
+  threatType: ThreatBreakDownType;
+}
+
+export interface UpdateThreatBreakDownDto {
+  month?: string;
+  year?: string;
+  score?: number;
+  threatType?: ThreatBreakDownType;
+}
+
+export interface ThreatBreakDownQueryParams {
+  month?: string;
+  year?: string;
+  threatType?: ThreatBreakDownType;
+  page?: number;
+  limit?: number;
+}
+

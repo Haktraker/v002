@@ -283,7 +283,7 @@ const LockHeadPhasesChart: React.FC = () => {
                 <CardTitle>Kill Chain Phase Analysis</CardTitle>
                 <CardDescription>Distribution of scores by severity across kill chain phases</CardDescription>
             </CardHeader>
-            <CardContent className="pt-4 pr-2 pb-2 pl-2">
+            <CardContent className="">
                 {renderContent()} 
             </CardContent>
         </Card>
