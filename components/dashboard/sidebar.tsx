@@ -26,6 +26,7 @@ import {
   ShieldAlert,
   Network,
   User,
+  Link2Off,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -81,6 +82,7 @@ function SidebarContent({ className, isCollapsed, setIsCollapsed }: {
     { icon: <Bug size={20} />, label: "Security Breach Indicators", href: "/dashboard/security-breach-indicators" },
     { icon: <Network size={20} />, label: "BusinessUnits Security", href: "/dashboard/business-units-security" },
     { icon: <User size={20} />, label: "User Behavior Analytics", href: "/dashboard/user-behavior-analytics" },
+    { icon: <Link2Off size={20} />, label: "Kill Chain", href: "/dashboard/kill-chain" },
     { icon: <Gauge size={20} />, label: "Compliance Dashboard", href: "/dashboard/cybersecurity-compliance-dashboard" },
     { icon: <Virus size={20} />, label: "Malware", href: "/dashboard/malware" },
     { icon: <Users size={20} />, label: "Employees", href: "/dashboard/employees" },

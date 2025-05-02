@@ -1867,3 +1867,48 @@ export interface ThreatBreakDownQueryParams {
   limit?: number;
 }
 
+// ================= Incident Response Metrics Types =================
+
+export type IncidentResponsePhase = 
+  | "Reconnaissance"
+  | "Weaponization"
+  | "Delivery"
+  | "Exploitation"
+  | "Installation"
+  | "Command and Control (C&C)"
+  | "Actions on Objectives";
+
+export interface IncidentResponsePhaseItem {
+  _id?: string; // MongoDB will add this to subdocuments
+  phase: IncidentResponsePhase;
+  score: number;
+}
+
+export interface IncidentResponseMetrics {
+  _id: string;
+  month: string;
+  year: string;
+  phases: IncidentResponsePhaseItem[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CreateIncidentResponseMetricsDto {
+  month: string;
+  year: string;
+  phases: Omit<IncidentResponsePhaseItem, '_id'>[];
+}
+
+export interface UpdateIncidentResponseMetricsDto {
+  month?: string;
+  year?: string;
+  phases?: Omit<IncidentResponsePhaseItem, '_id'>[];
+}
+
+export interface IncidentResponseMetricsQueryParams {
+  month?: string;
+  year?: string;
+  page?: number;
+  limit?: number;
+}
+

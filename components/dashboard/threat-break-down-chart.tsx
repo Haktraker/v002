@@ -1,17 +1,18 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { ApexOptions } from 'apexcharts';
 import { useTheme } from 'next-themes';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Terminal, Info } from 'lucide-react';
+import { Terminal, Info, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useGlobalFilter } from '@/lib/context/GlobalFilterContext';
 import { useGetThreatBreakDowns } from '@/lib/api/endpoints/kill-chain/threat-break-down';
 import type { ThreatBreakDown, ThreatBreakDownType } from '@/lib/api/types';
+import { Button } from "@/components/ui/button";
 
 // Dynamically import ApexCharts
 const ReactApexChart = dynamic(() => import('react-apexcharts'), {
@@ -21,10 +22,10 @@ const ReactApexChart = dynamic(() => import('react-apexcharts'), {
 
 // Define colors for threat types
 const THREAT_TYPE_COLORS: Record<ThreatBreakDownType, string> = {
-    'Threat Type Distribution': '#3b82f6',     // blue-500
-    'Kill Chain Phase Distribution': '#8b5cf6', // violet-500
-    'Mitigation Status': '#10b981',            // emerald-500
-    'Attack Vector Breakdown': '#f97316'       // orange-500
+    'Threat Type Distribution': '#008FFB',     // blue
+    'Kill Chain Phase Distribution': '#00E396', // green
+    'Mitigation Status': '#FEB019',            // yellow/orange
+    'Attack Vector Breakdown': '#FF4560'       // red
 };
 
 // Main Component
@@ -32,6 +33,7 @@ const ThreatBreakDownChart: React.FC = () => {
     const { theme } = useTheme();
     const isDark = theme === 'dark';
     const { selectedMonth, selectedYear } = useGlobalFilter();
+    const [highlightedIndex, setHighlightedIndex] = useState<number | null>(null);
 
     // Convert 'All' value to undefined and directly work with specific values only
     const month = selectedMonth === 'All' ? undefined : selectedMonth;
@@ -46,7 +48,7 @@ const ThreatBreakDownChart: React.FC = () => {
     }, [month, year]);
 
     // Fetch data
-    const { data: threatBreakDownResponse, isLoading, error, isError } = useGetThreatBreakDowns(queryParams);
+    const { data: threatBreakDownResponse, isLoading, error, isError, refetch } = useGetThreatBreakDowns(queryParams);
 
     // Process data for chart
     const chartData = useMemo(() => {
@@ -98,6 +100,12 @@ const ThreatBreakDownChart: React.FC = () => {
         return { threatTypes, series };
     }, [threatBreakDownResponse, month, year]);
 
+    // Handle chart click 
+    const handleChartClick = (_: any, chartContext: any, config: { dataPointIndex: number }) => {
+        const index = config.dataPointIndex;
+        setHighlightedIndex(index === highlightedIndex ? null : index);
+    };
+
     // Chart options
     const chartOptions: ApexOptions = useMemo(() => {
         const textColor = isDark ? '#e2e8f0' : '#475569';
@@ -111,7 +119,10 @@ const ThreatBreakDownChart: React.FC = () => {
                     show: false
                 },
                 background: 'transparent',
-                foreColor: textColor
+                foreColor: textColor,
+                events: {
+                    dataPointSelection: handleChartClick
+                }
             },
             labels: chartData.threatTypes,
             colors: chartData.threatTypes.map(type => THREAT_TYPE_COLORS[type]),
@@ -121,9 +132,9 @@ const ThreatBreakDownChart: React.FC = () => {
                     return `${Math.round(Number(val))}%`;
                 },
                 style: {
-                    fontSize: '12px',
+                    fontSize: '14px',
                     fontFamily: 'inherit',
-                    fontWeight: 'bold'
+                    fontWeight: 'normal'
                 },
                 dropShadow: {
                     enabled: false
@@ -153,9 +164,6 @@ const ThreatBreakDownChart: React.FC = () => {
                     }
                 }
             },
-            stroke: {
-                width: 2
-            },
             responsive: [
                 {
                     breakpoint: 480,
@@ -173,7 +181,13 @@ const ThreatBreakDownChart: React.FC = () => {
                 mode: chartThemeMode
             }
         };
-    }, [chartData, isDark]);
+    }, [chartData, isDark, handleChartClick]);
+
+    // Handle refresh
+    const handleRefresh = () => {
+        refetch();
+        setHighlightedIndex(null);
+    };
 
     // Render content
     const renderContent = () => {
@@ -205,10 +219,29 @@ const ThreatBreakDownChart: React.FC = () => {
             );
         }
 
+        // Apply transformation for highlighted section if needed
+        const seriesData = [...chartData.series];
+        
+        if (highlightedIndex !== null) {
+            // Create a visual effect for the highlighted segment
+            const highlightedData = [...seriesData];
+            // Increase the highlighted segment's value by 10% for visual emphasis
+            highlightedData[highlightedIndex] = Math.round(highlightedData[highlightedIndex] * 1.1);
+            return (
+                <ReactApexChart
+                    options={chartOptions}
+                    series={highlightedData}
+                    type="pie"
+                    height={350}
+                    width="100%"
+                />
+            );
+        }
+
         return (
             <ReactApexChart
                 options={chartOptions}
-                series={chartData.series}
+                series={seriesData}
                 type="pie"
                 height={350}
                 width="100%"
@@ -218,13 +251,34 @@ const ThreatBreakDownChart: React.FC = () => {
 
     // Return Card structure
     return (
-        <Card className={cn("w-full")}>
-            <CardHeader>
-                <CardTitle>Threat Breakdown</CardTitle>
-                <CardDescription>Distribution of security threats by category</CardDescription>
+        <Card className={`flex flex-col ${isDark ? 'bg-[#171727] border-0' : 'bg-white'}`}>
+            <CardHeader className="flex flex-row items-center justify-between">
+                <div className="flex flex-col">
+                    <CardTitle className="text-base font-medium">Threat Breakdown</CardTitle>
+                    <CardDescription>Distribution of security threats by category</CardDescription>
+                </div>
+                <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    onClick={handleRefresh} 
+                    className="ml-auto" 
+                    title="Refresh data"
+                >
+                    <RefreshCw className="h-4 w-4" />
+                </Button>
             </CardHeader>
-            <CardContent className="">
+            <CardContent className="flex-1 flex flex-col justify-center pt-4 min-h-[382px]">
                 {renderContent()} 
+                {highlightedIndex !== null && (
+                    <div className="mt-4 text-center text-sm">
+                        <p className="font-medium">
+                            Selected: {chartData.threatTypes[highlightedIndex]}
+                        </p>
+                        <p className="text-muted-foreground">
+                            Click on the same segment again to reset view
+                        </p>
+                    </div>
+                )}
             </CardContent>
         </Card>
     );

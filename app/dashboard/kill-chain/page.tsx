@@ -4,6 +4,7 @@ import { GlobalFilterComponent } from '@/components/dashboard/global-filter';
 import ThreatImpactOverviewChart from "@/components/dashboard/threat-impact-overview-chart";
 import LockHeadPhasesChart from "@/components/dashboard/lock-head-phases-chart";
 import ThreatBreakDownChart from "@/components/dashboard/threat-break-down-chart";
+import IncidentResponseMetricsChart from "@/components/dashboard/incident-response-metrics-chart";
 
 export default function KillChain() {
     return (
@@ -19,6 +20,9 @@ export default function KillChain() {
                 </div>
                 <div className="">
                     <ThreatBreakDownChart />
+                </div>
+                <div className="lg:col-span-3">
+                    <IncidentResponseMetricsChart />
                 </div>
           
                 {/* Add additional Kill Chain related charts here as they become available */}
