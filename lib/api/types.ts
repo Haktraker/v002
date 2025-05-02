@@ -1699,3 +1699,80 @@ export interface AlertTrendAnalysisQueryParams {
   limit?: number;
 }
 
+// ================= User Behavior Pattern Analysis Types =================
+
+export interface UserBehaviorPatternAnalysis {
+  _id: string; // Mongoose document ID
+  category: string;
+  Normal: number;
+  Suspicious: number;
+  month: string;
+  year: string;
+  createdAt?: string; // From timestamps: true
+  updatedAt?: string; // From timestamps: true
+}
+
+export interface CreateUserBehaviorPatternAnalysisDto {
+  category: string;
+  Normal: number;
+  Suspicious: number;
+  month: string;
+  year: string;
+}
+
+export interface UpdateUserBehaviorPatternAnalysisDto {
+  category?: string;
+  Normal?: number;
+  Suspicious?: number;
+  month?: string;
+  year?: string;
+}
+
+export interface UserBehaviorPatternAnalysisQueryParams {
+  category?: string;
+  month?: string;
+  year?: string;
+  page?: number;
+  limit?: number;
+}
+
+// ================= Threat Impact Overview Types =================
+
+export type ThreatPhase = 
+  | "Threats Blocked"
+  | "Active Critical Threats"
+  | "Ongoing Investigations"
+  | "Resolved Threats";
+
+export interface ThreatImpactOverview {
+  _id: string;
+  month: string;
+  year: string;
+  score: number;
+  phase: ThreatPhase;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CreateThreatImpactOverviewDto {
+  month: string;
+  year: string;
+  score: number;
+  phase: ThreatPhase;
+}
+
+export interface UpdateThreatImpactOverviewDto {
+  month?: string;
+  year?: string;
+  score?: number;
+  phase?: ThreatPhase;
+}
+
+export interface ThreatImpactOverviewQueryParams {
+  month?: string;
+  year?: string;
+  phase?: ThreatPhase;
+  page?: number;
+  limit?: number;
+}
+
