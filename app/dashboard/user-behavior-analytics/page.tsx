@@ -6,6 +6,7 @@ import UserRiskTimelineChart from '@/components/dashboard/user-risk-timeline-cha
 import BehavioralPatternChart from '@/components/dashboard/behavioral-pattern-chart';
 import { AnomalyCategoryDistributionChart } from '@/components/dashboard/anomaly-category-distribution-chart';
 import { GlobalFilterComponent } from '@/components/dashboard/global-filter';
+import HighRiskUsersChart from '@/components/dashboard/high-risk-users-chart';
 
 export default function UserBehaviorAnalyticsDashboard() {
     return (
@@ -27,6 +28,9 @@ export default function UserBehaviorAnalyticsDashboard() {
                 </div>
                 <div className="">
                     <AnomalyCategoryDistributionChart />
+                </div>
+                <div className="">
+                    <HighRiskUsersChart />
                 </div>
             </div>
         </PageContainer>

@@ -114,6 +114,7 @@ export interface AssetQueryParams {
 
 // Pagination response
 export interface PaginatedResponse<T> {
+  map: any;
   data: T[];
   total: number;
   page: number;
@@ -1579,6 +1580,74 @@ export interface AnomalyCategoryDistributionQueryParams {
   name?: AnomalyCategoryName;
   month?: string;
   year?: string;
+  page?: number;
+  limit?: number;
+}
+
+// ================= High Risk Users (UBA) Types =================
+
+// Re-using BusinessUnitName from Behavioral Pattern as it matches the enum
+// export type BusinessUnitName = 
+//   | "HO/DR"
+//   | "CWC"
+//   | "RAMAT"
+//   | "EFS"
+//   | "ETS"
+//   | "Alrashed Food"
+//   | "Alrashed Tires"
+//   | "Jana Marine / Tanajib"
+//   | "Industrials (Steel, Fast)"
+//   | "Alrashed Wood"
+//   | "Admirals"
+//   | "YAUMI"
+//   | "BMD"
+//   | "Saudi Filter"
+//   | "cement"
+//   | "Insuwrap"
+//   | "EFS/ETS"
+//   | "Ubmksa"
+//   | "Polystyrene";
+
+export interface HighRiskUser {
+  _id: string; // Mongoose document ID
+  userName: string;
+  riskScore: number;
+  incidents: number;
+  bu: BusinessUnitName; // Use the existing BusinessUnitName type
+  month: string;
+  year: string;
+  createdAt?: string; // Assuming timestamps based on common practice
+  updatedAt?: string; // Assuming timestamps based on common practice
+}
+
+export interface CreateHighRiskUserDto {
+  userName: string;
+  riskScore: number;
+  incidents: number;
+  bu: BusinessUnitName;
+  month: string;
+  year: string;
+}
+
+// Update DTO allows partial updates
+export interface UpdateHighRiskUserDto {
+  userName?: string;
+  riskScore?: number;
+  incidents?: number;
+  bu?: BusinessUnitName;
+  month?: string;
+  year?: string;
+}
+
+// Query Params for fetching high-risk users
+export interface HighRiskUserQueryParams {
+  bu?: BusinessUnitName;
+  month?: string;
+  year?: string;
+  minRiskScore?: number;
+  maxRiskScore?: number;
+  minIncidents?: number;
+  maxIncidents?: number;
   page?: number;
   limit?: number;
 }
