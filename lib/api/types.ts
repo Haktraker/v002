@@ -1912,3 +1912,41 @@ export interface IncidentResponseMetricsQueryParams {
   limit?: number;
 }
 
+// ================= Threat Severity Over Time Types =================
+
+export type ThreatSeverityLevel = "Low" | "Medium" | "High" | "Critical";
+
+export interface ThreatSeverityItem {
+  _id?: string; // MongoDB will add this to subdocuments
+  severity: ThreatSeverityLevel;
+  count: number;
+}
+
+export interface ThreatSeverityOverTime {
+  _id: string;
+  month: string;
+  year: string;
+  severities: ThreatSeverityItem[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CreateThreatSeverityOverTimeDto {
+  month: string;
+  year: string;
+  severities: Omit<ThreatSeverityItem, '_id'>[];
+}
+
+export interface UpdateThreatSeverityOverTimeDto {
+  month?: string;
+  year?: string;
+  severities?: Omit<ThreatSeverityItem, '_id'>[];
+}
+
+export interface ThreatSeverityOverTimeQueryParams {
+  month?: string;
+  year?: string;
+  page?: number;
+  limit?: number;
+}
+

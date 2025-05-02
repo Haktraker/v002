@@ -5,6 +5,7 @@ import ThreatImpactOverviewChart from "@/components/dashboard/threat-impact-over
 import LockHeadPhasesChart from "@/components/dashboard/lock-head-phases-chart";
 import ThreatBreakDownChart from "@/components/dashboard/threat-break-down-chart";
 import IncidentResponseMetricsChart from "@/components/dashboard/incident-response-metrics-chart";
+import ThreatSeverityOvertimeChart from "@/components/dashboard/threat-severity-overtime-chart";
 
 export default function KillChain() {
     return (
@@ -14,6 +15,9 @@ export default function KillChain() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
                 <div className="lg:col-span-3">
                     <LockHeadPhasesChart />
+                </div>
+                <div className="">
+                    <ThreatSeverityOvertimeChart />
                 </div>
                 <div className="">
                     <ThreatImpactOverviewChart />
