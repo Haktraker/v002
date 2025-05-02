@@ -1776,3 +1776,54 @@ export interface ThreatImpactOverviewQueryParams {
   limit?: number;
 }
 
+// ================= Lock Head Phases Types =================
+
+export type LockHeadPhase = 
+  | "Reconnaissance"
+  | "Weaponization"
+  | "Delivery"
+  | "Exploitation"
+  | "Installation"
+  | "Command and Control (C&C)"
+  | "Actions on Objectives";
+
+export type PhaseSeverity = "Low" | "Medium" | "High" | "Critical";
+
+export interface SeverityItem {
+  severity: PhaseSeverity;
+  score: number;
+  _id?: string; // MongoDB will add this for array items
+}
+
+export interface LockHeadPhases {
+  _id: string;
+  month: string;
+  year: string;
+  phase: LockHeadPhase;
+  severities: SeverityItem[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CreateLockHeadPhasesDto {
+  month: string;
+  year: string;
+  phase: LockHeadPhase;
+  severities: Omit<SeverityItem, '_id'>[];
+}
+
+export interface UpdateLockHeadPhasesDto {
+  month?: string;
+  year?: string;
+  phase?: LockHeadPhase;
+  severities?: Omit<SeverityItem, '_id'>[];
+}
+
+export interface LockHeadPhasesQueryParams {
+  month?: string;
+  year?: string;
+  phase?: LockHeadPhase;
+  page?: number;
+  limit?: number;
+}
+
