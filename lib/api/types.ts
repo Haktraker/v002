@@ -1652,3 +1652,50 @@ export interface HighRiskUserQueryParams {
   limit?: number;
 }
 
+// ================= Alert Trend Analysis (UBA) Types =================
+
+// Define severity levels based on schema enum
+export type AlertTrendSeverity = "low" | "medium" | "high" | "critical";
+
+// Represents the nested 'risk' object within the main document
+export interface AlertTrendAnalysisEntry {
+  month: string;
+  week: number; // 1-4
+  severity: AlertTrendSeverity;
+  year: string;
+  count: number;
+}
+
+// Represents the full AlertTrendAnalysis document from the database
+export interface AlertTrendAnalysis {
+  _id: string; // Mongoose document ID
+  risk: AlertTrendAnalysisEntry;
+  createdAt?: string; // From timestamps: true
+  updatedAt?: string; // From timestamps: true
+}
+
+// DTO for creating a new trend entry (matches the 'risk' object structure)
+// The backend likely expects the 'risk' object directly for creation
+export interface CreateAlertTrendAnalysisDto {
+    risk: AlertTrendAnalysisEntry;
+}
+
+// DTO for updating an existing trend entry (allows partial updates to the 'risk' object)
+export interface UpdateAlertTrendAnalysisDto {
+  // It might be simpler to update the whole risk object, 
+  // or the backend might support partial updates via PATCH
+  risk?: Partial<AlertTrendAnalysisEntry>; 
+}
+
+// Query Params for fetching trend analysis entries
+export interface AlertTrendAnalysisQueryParams {
+  'risk.month'?: string;
+  'risk.year'?: string;
+  'risk.week'?: number;
+  'risk.severity'?: AlertTrendSeverity;
+  startDate?: string; // Optional: if backend supports date range filtering
+  endDate?: string;   // Optional: if backend supports date range filtering
+  page?: number;
+  limit?: number;
+}
+

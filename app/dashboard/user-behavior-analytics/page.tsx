@@ -7,6 +7,7 @@ import BehavioralPatternChart from '@/components/dashboard/behavioral-pattern-ch
 import { AnomalyCategoryDistributionChart } from '@/components/dashboard/anomaly-category-distribution-chart';
 import { GlobalFilterComponent } from '@/components/dashboard/global-filter';
 import HighRiskUsersChart from '@/components/dashboard/high-risk-users-chart';
+import AlertTrendAnalysisChart from "@/components/dashboard/alert-trend-analysis-chart";
 
 export default function UserBehaviorAnalyticsDashboard() {
     return (
@@ -31,6 +32,9 @@ export default function UserBehaviorAnalyticsDashboard() {
                 </div>
                 <div className="">
                     <HighRiskUsersChart />
+                </div>
+                <div className="lg:col-span-3">
+                    <AlertTrendAnalysisChart />
                 </div>
             </div>
         </PageContainer>

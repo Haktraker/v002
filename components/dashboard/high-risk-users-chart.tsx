@@ -203,7 +203,7 @@ const HighRiskUsersChart = () => {
     return (
          <Card className={cn("w-full")}>
              <CardHeader>
-                 <CardTitle>Top 10 High Risk Users</CardTitle>
+                 <CardTitle>Top High Risk Users</CardTitle>
              </CardHeader>
              <CardContent className="pt-4 pr-2 pb-2 pl-2">
                 {renderContent()}
