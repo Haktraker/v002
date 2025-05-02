@@ -22,7 +22,6 @@ const HighRiskUsersChart = () => {
     }), [selectedMonth, selectedYear]);
     const { data: highRiskUsersData, isLoading, isError, error } = useGetHighRiskUsers(queryParams);
 
-    console.log(highRiskUsersData);
 
     if (isLoading) {
         return (
@@ -79,7 +78,7 @@ const HighRiskUsersChart = () => {
             type: 'bar',
             height: 350,
             toolbar: {
-                show: true,
+                show: false,
             },
             zoom: {
                 enabled: false
@@ -125,6 +124,8 @@ const HighRiskUsersChart = () => {
             opacity: 1
         },
         tooltip: {
+            shared: true,
+            intersect: false,
             y: {
                 formatter: function (val) {
                     return val + " points"
@@ -137,8 +138,7 @@ const HighRiskUsersChart = () => {
             offsetX: 40
         },
         grid: {
-            borderColor: '#e0e6ed', // Adjust grid color if needed
-            strokeDashArray: 5,
+            show: false,
         },
         colors: ['#dc2626'], // Red color for high risk
         // Responsive options can be added here if needed
