@@ -38,13 +38,11 @@ const AlertTrendAnalysisChart: React.FC = () => {
     const year = selectedYear === 'All' ? undefined : selectedYear;
 
     // Explicitly log the filter values for debugging
-    console.log('Filter values - Month:', month, 'Year:', year);
 
     // Fetch all data - we'll filter on the client side
     const { data: alertTrendAnalysisResponse, isLoading, error, isError } = useGetAlertTrendAnalyses();
 
     // Log the response for debugging
-    console.log('API Response received:', alertTrendAnalysisResponse);
 
     // Process data exactly like HighRiskUsersChart does, following its pattern closely
     const chartData = useMemo(() => {
@@ -52,11 +50,9 @@ const AlertTrendAnalysisChart: React.FC = () => {
         const dataArray = alertTrendAnalysisResponse?.data;
         
         // Log the extracted data array
-        console.log('Data array extracted for chart:', dataArray?.length, 'items');
         
         // Ensure we have valid data
         if (!Array.isArray(dataArray) || dataArray.length === 0) {
-            console.log('No valid data array found, returning empty dataset');
             return { series: [], categories: [], colors: [] };
         }
 
@@ -75,7 +71,6 @@ const AlertTrendAnalysisChart: React.FC = () => {
             return item.risk.month === month && item.risk.year === year;
         });
         
-        console.log('Filtered data results:', filteredData.length, 'items');
         
         // If no data after filtering, return empty dataset
         if (filteredData.length === 0) {
@@ -99,7 +94,6 @@ const AlertTrendAnalysisChart: React.FC = () => {
         
         // Sort categories chronologically
         const sortedCategories = Array.from(categoriesSet).sort();
-        console.log('Sorted categories:', sortedCategories);
         
         // Create series data for each severity level
         const severities: AlertTrendSeverity[] = ['critical', 'high', 'medium', 'low'];
@@ -110,7 +104,6 @@ const AlertTrendAnalysisChart: React.FC = () => {
             )
         }));
         
-        console.log('Generated series data:', series);
         
         return {
             series,
