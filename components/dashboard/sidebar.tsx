@@ -77,6 +77,15 @@ function SidebarContent({ className, isCollapsed, setIsCollapsed }: {
   const pathname = usePathname()
   const { logout } = useAuth()
 
+  // Helper function to check if the current path matches an item's path
+  const isPathActive = (itemPath: string) => {
+    if (pathname === itemPath) return true;
+    // For exact matches like /dashboard, don't match with /dashboard/something
+    if (itemPath === '/dashboard' && pathname !== '/dashboard') return false;
+    // For other paths, check if pathname starts with the item's path
+    return pathname.startsWith(itemPath);
+  };
+
   const sidebarItems = [
     { icon: <LayoutDashboard size={20} />, label: "Dashboard", href: "/dashboard" },
     { icon: <ShieldAlert size={20} />, label: "Threat Composition", href: "/dashboard/threat-composition" },
@@ -84,6 +93,7 @@ function SidebarContent({ className, isCollapsed, setIsCollapsed }: {
     { icon: <Network size={20} />, label: "BusinessUnits Security", href: "/dashboard/business-units-security" },
     { icon: <User size={20} />, label: "User Behavior Analytics", href: "/dashboard/user-behavior-analytics" },
     { icon: <Link2Off size={20} />, label: "Kill Chain", href: "/dashboard/kill-chain" },
+    { icon: <Globe size={20} />, label: "Cyber Threat Map", href: "/dashboard/cyber-map" },
     { icon: <Gauge size={20} />, label: "Compliance Dashboard", href: "/dashboard/cybersecurity-compliance-dashboard" },
     { icon: <Building size={20} />, label: "Assets", href: "/dashboard/assets" },
     { icon: <Target size={20} />, label: "Attack Surface", href: "/dashboard/attack-surface" },
@@ -119,7 +129,7 @@ function SidebarContent({ className, isCollapsed, setIsCollapsed }: {
                       icon={item.icon}
                       label={item.label}
                       href={item.href}
-                      isActive={pathname === item.href}
+                      isActive={isPathActive(item.href)}
                       isCollapsed={isCollapsed}
                     />
                   </div>
@@ -144,7 +154,7 @@ function SidebarContent({ className, isCollapsed, setIsCollapsed }: {
                     icon={<Settings size={20} />}
                     label="Settings"
                     href="/dashboard/settings"
-                    isActive={pathname === "/dashboard/settings"}
+                    isActive={isPathActive("/dashboard/settings")}
                     isCollapsed={isCollapsed}
                   />
                 </div>
@@ -162,7 +172,7 @@ function SidebarContent({ className, isCollapsed, setIsCollapsed }: {
                     icon={<HelpCircle size={20} />}
                     label="Help"
                     href="/dashboard/help"
-                    isActive={pathname === "/dashboard/help"}
+                    isActive={isPathActive("/dashboard/help")}
                     isCollapsed={isCollapsed}
                   />
                 </div>
