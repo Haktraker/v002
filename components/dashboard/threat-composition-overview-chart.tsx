@@ -8,6 +8,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useGetThreatCompositionOverviews } from '@/lib/api/endpoints/executive-dashboard/threat-composition-overview';
 import { ThreatCompositionOverview, ThreatCompositionOverviewQueryParams, ThreatCompositionOverviewType } from '@/lib/api/executive-dashboard-types/types';
 import { useGlobalFilter } from '@/lib/context/GlobalFilterContext'; // Import global filter context
+import Link from 'next/link'; // Import Link
+import { Button } from '@/components/ui/button'; // Import Button
 
 // Define interfaces for component props
 interface ThreatCompositionOverviewChartProps {
@@ -190,11 +192,16 @@ const ThreatCompositionOverviewChart = ({}: ThreatCompositionOverviewChartProps)
 
   return (
     <Card className={`flex-1 ${isDark ? "bg-[#171727] border-0" : "bg-white"}`}>
-      <CardHeader>
-        <CardTitle>Threat Composition Overview</CardTitle>
-        <CardDescription>Score distribution by threat type for {selectedMonth === 'All' ? 'All Months' : selectedMonth}, {selectedYear === 'All' ? 'All Years' : selectedYear}</CardDescription>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <div className="flex flex-col space-y-1.5">
+            <CardTitle>Threat Composition Overview</CardTitle>
+            <CardDescription>Score distribution by threat type for {selectedMonth === 'All' ? 'All Months' : selectedMonth}, {selectedYear === 'All' ? 'All Years' : selectedYear}</CardDescription>
+        </div>
+         <Link href="/dashboard/executive-dashboard/threat-composition-overview">
+          <Button variant="outline" size="sm">Manage All</Button>
+        </Link>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-2"> {/* Adjusted padding */}
         {renderContent()}
       </CardContent>
     </Card>

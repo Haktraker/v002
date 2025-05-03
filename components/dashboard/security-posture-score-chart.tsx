@@ -6,6 +6,8 @@ import ApexChart from '@/components/ui/apex-chart';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SecurityPostureScore } from '@/lib/api/executive-dashboard-types/types';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 // Define interfaces for component props
 interface SecurityPostureScoreChartProps {
@@ -176,12 +178,16 @@ const SecurityPostureScoreChart = ({ data, isLoading, error }: SecurityPostureSc
 
   return (
     <Card className={`w-full max-w-md mx-auto ${isDark ? "bg-[#171727] border-0" : "bg-white"}`}>
-      {/* Optional Header */}
-      {/* <CardHeader>
-        <CardTitle>Security Posture Score</CardTitle>
-        <CardDescription>Latest assessment</CardDescription>
-      </CardHeader> */}
-      <CardContent className="pt-6 pb-4">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <div className="flex flex-col space-y-1.5">
+          <CardTitle className="text-base font-medium">Security Posture Score</CardTitle>
+          <CardDescription>Latest assessment</CardDescription>
+        </div>
+        <Link href="/dashboard/executive-dashboard/security-posture-score">
+          <Button variant="outline" size="sm">Manage All</Button>
+        </Link>
+      </CardHeader>
+      <CardContent className="pt-2 pb-4">
         {renderContent()}
       </CardContent>
     </Card>
