@@ -28,6 +28,8 @@ import {
   User,
   Link2Off,
   Target,
+  ChartNoAxesColumn,
+  Fingerprint,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -97,6 +99,8 @@ function SidebarContent({ className, isCollapsed, setIsCollapsed }: {
     { icon: <Gauge size={20} />, label: "Compliance Dashboard", href: "/dashboard/cybersecurity-compliance-dashboard" },
     { icon: <Building size={20} />, label: "Assets", href: "/dashboard/assets" },
     { icon: <Target size={20} />, label: "Attack Surface", href: "/dashboard/attack-surface" },
+    { icon: <Fingerprint size={20} />, label: "Brand Reputation", href: "/dashboard/brand-reputation" },
+
     { icon: <BarChart2 size={20} />, label: "Reports", href: "/dashboard/reports" },
   ]
 

@@ -2069,3 +2069,50 @@ export interface AttackSurfaceQueryParams {
   limit?: number;
 }
 
+// ================= Brand Reputation Types =================
+
+export type BrandReputationStatus = "taking down" | "in progress" | "false positive" | "resolving";
+
+export interface BrandReputation {
+  _id: string;
+  domainName: string;
+  brandName: string;
+  incidentDescription: string;
+  sampleFile?: string;
+  status: BrandReputationStatus;
+  mitigationSteps?: string;
+  time: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CreateBrandReputationDto {
+  domainName: string;
+  brandName: string;
+  incidentDescription: string;
+  sampleFile?: string;
+  status: BrandReputationStatus;
+  mitigationSteps?: string;
+  time: string;
+}
+
+export interface UpdateBrandReputationDto {
+  domainName?: string;
+  brandName?: string;
+  incidentDescription?: string;
+  sampleFile?: string;
+  status?: BrandReputationStatus;
+  mitigationSteps?: string;
+  time?: string;
+}
+
+export interface BrandReputationQueryParams {
+  status?: BrandReputationStatus;
+  domainName?: string;
+  brandName?: string;
+  startDate?: string;
+  endDate?: string;
+  page?: number;
+  limit?: number;
+}
+
