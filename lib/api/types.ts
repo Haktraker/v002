@@ -3,6 +3,71 @@ export interface ApiResponse<T> {
   success: boolean;
   data: T;
   message?: string;
+  pagination?: {
+    currentPage: number;
+    totalPages: number;
+    totalAssets?: number;
+    totalDetections?: number;
+    limit: number;
+  };
+}
+
+// Interface for Machine sub-document
+export interface IMachine {
+  Name: string;
+  IP: string;
+  User: string;
+  Notes: string;
+  affectedSystem?: string;
+}
+
+// Interface for Server sub-document
+export interface IServer {
+  Name?: string;
+  IP?: string;
+  User?: string;
+  Notes?: string;
+  affectedSystem?: string;
+}
+
+// Interface for the main Asset Inventory document
+export interface IAssetInventory {
+  _id: string; // Added by MongoDB
+  BU: string;
+  Function: string;
+  Location: string;
+  Server: boolean;
+  Ecommerce: boolean;
+  SecuritySolutions?: string;
+  NetworkInfrastructure?: string;
+  Notes?: string;
+  machines: IMachine[];
+  servers: IServer[];
+  createdAt: string; // Added by timestamps: true
+  updatedAt: string; // Added by timestamps: true
+}
+
+// Interface for Create/Update payload (omits MongoDB generated fields)
+export type AssetInventoryPayload = Omit<IAssetInventory, '_id' | 'createdAt' | 'updatedAt'>;
+
+// Interface for Threat Detection
+export interface IThreatDetection {
+  _id: string;
+  detectionTime?: string; // Assuming ISO date string
+  alertID?: string;
+  securityProduct?: string;
+  threatType?: string;
+  severity?: 'low' | 'medium' | 'high' | 'critical';
+  bu?: string;
+  device?: string; // Matches Machine/Server Name
+  ips?: string;
+  user?: string;
+  filePath?: string;
+  actionTaken?: string;
+  mitigationSteps?: string;
+  status?: 'investigating' | 'resolved' | 'unresolved';
+  createdAt: string;
+  updatedAt: string;
 }
 
 // Base Asset Type
@@ -18,7 +83,7 @@ export interface BaseAsset {
 // IPS Types
 export interface IPS extends BaseAsset {
   // Additional IPS-specific fields can be added here
-  ips:any[]
+  ips: any[]
 }
 
 export interface CreateIPSDto {
@@ -1946,6 +2011,60 @@ export interface UpdateThreatSeverityOverTimeDto {
 export interface ThreatSeverityOverTimeQueryParams {
   month?: string;
   year?: string;
+  page?: number;
+  limit?: number;
+}
+
+// ================= Attack Surface Types =================
+
+export interface OpenPortDetail {
+  port: string;
+  _id?: string; // MongoDB might add this
+}
+
+export type AttackSurfaceStatus = "investigating" | "resolved" | "unresolved";
+
+export interface AttackSurface {
+  _id: string;
+  detectionTime?: string; // Using string for Date representation in JSON
+  affectedSystems?: string;
+  openPorts?: OpenPortDetail[];
+  services?: string;
+  screenshot?: string; // URL or identifier
+  sampleFile?: string; // URL or identifier
+  mitigationSteps?: string;
+  status: AttackSurfaceStatus;
+  createdAt?: string; // From timestamps: true
+  updatedAt?: string; // From timestamps: true
+}
+
+export interface CreateAttackSurfaceDto {
+  detectionTime: string;
+  affectedSystems: string;
+  openPorts: Array<{ port: string }>;
+  services?: string;
+  screenshot?: string;
+  sampleFile?: string;
+  mitigationSteps?: string;
+  status?: AttackSurfaceStatus;
+}
+
+export interface UpdateAttackSurfaceDto {
+  detectionTime?: string;
+  affectedSystems?: string;
+  openPorts?: Omit<OpenPortDetail, '_id'>[]; // Allow updating ports, usually replacing the array
+  services?: string;
+  screenshot?: string;
+  sampleFile?: string;
+  mitigationSteps?: string;
+  status?: AttackSurfaceStatus;
+}
+
+export interface AttackSurfaceQueryParams {
+  status?: AttackSurfaceStatus;
+  startDate?: string; // For filtering by detectionTime range
+  endDate?: string;   // For filtering by detectionTime range
+  port?: string;      // For filtering by a specific open port
   page?: number;
   limit?: number;
 }

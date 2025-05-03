@@ -27,6 +27,7 @@ import {
   Network,
   User,
   Link2Off,
+  Target,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -85,6 +86,7 @@ function SidebarContent({ className, isCollapsed, setIsCollapsed }: {
     { icon: <Link2Off size={20} />, label: "Kill Chain", href: "/dashboard/kill-chain" },
     { icon: <Gauge size={20} />, label: "Compliance Dashboard", href: "/dashboard/cybersecurity-compliance-dashboard" },
     { icon: <Building size={20} />, label: "Assets", href: "/dashboard/assets" },
+    { icon: <Target size={20} />, label: "Attack Surface", href: "/dashboard/attack-surface" },
     { icon: <BarChart2 size={20} />, label: "Reports", href: "/dashboard/reports" },
   ]
 

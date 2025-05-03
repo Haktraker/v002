@@ -3,10 +3,10 @@
 import { useIPSAssets, useDomainAssets, usePortalAssets } from "@/lib/api/endpoints/assets";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { User, Globe, Server } from "lucide-react";
+import { User, Globe, Server, Database } from "lucide-react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { PageContainer } from '@/components/layout/page-container';
+import AssetsInventoryPage from "./assets-inventory";
 
 export default function AssetsPage() {
   return (
@@ -15,11 +15,16 @@ export default function AssetsPage() {
         <h1 className="text-2xl font-semibold">Assets</h1>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {/* Asset summary cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
         <IPsCard />
         <DomainsCard />
         <PortalsCard />
+        <InventoryCard />
       </div>
+      
+      {/* Assets Inventory */}
+      <AssetsInventoryPage />
     </PageContainer>
   );
 }
@@ -124,6 +129,30 @@ function PortalsCard() {
             {`${count} portals monitored`}
           </div>
         )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function InventoryCard() {
+  return (
+    <Card className="h-full">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <div className="flex items-center space-x-2">
+          <Database className="h-5 w-5" />
+          <CardTitle className="text-md font-medium">Inventory</CardTitle>
+        </div>
+        <div className="text-sm text-muted-foreground">
+          Assets
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="text-4xl font-bold">
+          <Skeleton className="h-10 w-16" />
+        </div>
+        <div className="text-sm text-muted-foreground mt-2">
+          Complete asset inventory
+        </div>
       </CardContent>
     </Card>
   );
