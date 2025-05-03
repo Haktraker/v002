@@ -30,6 +30,7 @@ import {
   Target,
   ChartNoAxesColumn,
   Fingerprint,
+  ShieldX,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -100,6 +101,7 @@ function SidebarContent({ className, isCollapsed, setIsCollapsed }: {
     { icon: <Building size={20} />, label: "Assets", href: "/dashboard/assets" },
     { icon: <Target size={20} />, label: "Attack Surface", href: "/dashboard/attack-surface" },
     { icon: <Fingerprint size={20} />, label: "Brand Reputation", href: "/dashboard/brand-reputation" },
+    { icon: <ShieldX size={20} />, label: "Dark Web Monitoring", href: "/dashboard/dark-web-monitoring" },
 
     { icon: <BarChart2 size={20} />, label: "Reports", href: "/dashboard/reports" },
   ]
