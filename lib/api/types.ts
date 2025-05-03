@@ -18,7 +18,7 @@ export interface IMachine {
   IP: string;
   User: string;
   Notes: string;
-  affectedSystem?: string;
+  operatingSystem?: string;
 }
 
 // Interface for Server sub-document
@@ -27,7 +27,7 @@ export interface IServer {
   IP?: string;
   User?: string;
   Notes?: string;
-  affectedSystem?: string;
+  operatingSystem?: string;
 }
 
 // Interface for the main Asset Inventory document

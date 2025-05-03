@@ -91,7 +91,7 @@ export const AssetDetails = ({ asset, onEdit, onViewDetections }: AssetDetailsPr
                 <TableHead>Name</TableHead>
                 <TableHead>IP Address</TableHead>
                 <TableHead>User</TableHead>
-                <TableHead>Affected System</TableHead>
+                <TableHead>Operating System</TableHead>
                 <TableHead>Notes</TableHead>
               </TableRow>
             </TableHeader>
@@ -109,7 +109,7 @@ export const AssetDetails = ({ asset, onEdit, onViewDetections }: AssetDetailsPr
                   </TableCell>
                   <TableCell>{machine.IP}</TableCell>
                   <TableCell>{machine.User}</TableCell>
-                  <TableCell>{machine.affectedSystem || "N/A"}</TableCell>
+                  <TableCell>{machine.operatingSystem || "N/A"}</TableCell>
                   <TableCell className="max-w-[300px] truncate">{machine.Notes}</TableCell>
                 </TableRow>
               ))}
@@ -131,7 +131,7 @@ export const AssetDetails = ({ asset, onEdit, onViewDetections }: AssetDetailsPr
                 <TableHead>Name</TableHead>
                 <TableHead>IP Address</TableHead>
                 <TableHead>User</TableHead>
-                <TableHead>Affected System</TableHead>
+                <TableHead>Operating System</TableHead>
                 <TableHead>Notes</TableHead>
               </TableRow>
             </TableHeader>
@@ -153,7 +153,7 @@ export const AssetDetails = ({ asset, onEdit, onViewDetections }: AssetDetailsPr
                   </TableCell>
                   <TableCell>{server.IP || "N/A"}</TableCell>
                   <TableCell>{server.User || "N/A"}</TableCell>
-                  <TableCell>{server.affectedSystem || "N/A"}</TableCell>
+                  <TableCell>{server.operatingSystem || "N/A"}</TableCell>
                   <TableCell className="max-w-[300px] truncate">{server.Notes || "N/A"}</TableCell>
                 </TableRow>
               ))}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { ColumnDef } from '@tanstack/react-table';
@@ -41,8 +41,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
 // API functions and types
-import { getAssets, deleteAsset } from '@/lib/api/endpoints/assets-inventory';
-import { IAssetInventory, AssetInventoryPayload, IMachine, IServer } from '@/lib/api/types';
+import { useGetAssets, useDeleteAsset } from '@/lib/api/endpoints/assets-inventory';
+import { IAssetInventory } from '@/lib/api/types';
 
 // Custom components for our functionality
 import { AssetForm } from '@/components/assets/asset-form';
@@ -50,24 +50,17 @@ import { AssetDetails } from '@/components/assets/asset-details';
 import { DetectionsModal } from '@/components/assets/detections-modal';
 
 export default function AssetsInventoryPage() {
-  // State for assets and loading state
-  const [assets, setAssets] = useState<IAssetInventory[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  
-  // Pagination state
-  const [pagination, setPagination] = useState({
-    currentPage: 1,
-    totalPages: 1,
-    totalAssets: 0,
-    limit: 10,
-  });
-  
   // State for filters
   const [filters, setFilters] = useState({
     BU: '',
     Function: '',
     Location: '',
+  });
+  
+  // Pagination state
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    limit: 10,
   });
   
   // Modal states
@@ -83,45 +76,32 @@ export default function AssetsInventoryPage() {
   
   const router = useRouter();
   
-  // Function to fetch assets with current pagination and filters
-  const fetchAssets = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      const params = {
-        page: pagination.currentPage,
-        limit: pagination.limit,
-        ...Object.fromEntries(
-          Object.entries(filters).filter(([_, value]) => value !== '')
-        ),
-      };
-      
-      const response = await getAssets(params);
-      
-      setAssets(response.data);
-      
-      if (response.pagination) {
-        setPagination({
-          currentPage: response.pagination.currentPage,
-          totalPages: response.pagination.totalPages,
-          totalAssets: response.pagination.totalAssets || 0,
-          limit: response.pagination.limit,
-        });
-      }
-    } catch (err) {
-      console.error('Failed to fetch assets:', err);
-      setError(err instanceof Error ? err.message : 'An unknown error occurred');
-      toast.error('Failed to load assets');
-    } finally {
-      setLoading(false);
-    }
-  }, [pagination.currentPage, pagination.limit, filters]);
+  // Use React Query for data fetching
+  const { 
+    data: assetsResponse, 
+    isLoading, 
+    isError, 
+    error, 
+    refetch 
+  } = useGetAssets({
+    page: pagination.currentPage,
+    limit: pagination.limit,
+    ...Object.fromEntries(
+      Object.entries(filters).filter(([_, value]) => value !== '')
+    ),
+  });
   
-  // Load assets on initial render and when dependencies change
-  useEffect(() => {
-    fetchAssets();
-  }, [fetchAssets]);
+  // Use React Query for delete mutation
+  const { mutate: deleteAssetMutation } = useDeleteAsset();
+  
+  // Extract data from response
+  const assets = assetsResponse?.data || [];
+  const paginationInfo = {
+    currentPage: assetsResponse?.pagination?.currentPage || 1,
+    totalPages: assetsResponse?.pagination?.totalPages || 1,
+    totalAssets: assetsResponse?.pagination?.totalAssets || 0,
+    limit: assetsResponse?.pagination?.limit || 10,
+  };
   
   // Handle pagination change
   const handlePageChange = (page: number) => {
@@ -162,20 +142,18 @@ export default function AssetsInventoryPage() {
   };
   
   // Handle actually deleting the asset
-  const handleDeleteAsset = async () => {
+  const handleDeleteAsset = () => {
     if (!selectedAsset) return;
     
-    try {
-      await deleteAsset(selectedAsset._id);
-      toast.success('Asset deleted successfully');
-      fetchAssets();
-    } catch (err) {
-      console.error('Failed to delete asset:', err);
-      toast.error(err instanceof Error ? err.message : 'Failed to delete asset');
-    } finally {
-      setDeleteDialogOpen(false);
-      setSelectedAsset(null);
-    }
+    deleteAssetMutation(selectedAsset._id, {
+      onSuccess: () => {
+        setDeleteDialogOpen(false);
+        setSelectedAsset(null);
+      },
+      onError: (err) => {
+        console.error('Failed to delete asset:', err);
+      }
+    });
   };
   
   // Handle filter change
@@ -195,7 +173,7 @@ export default function AssetsInventoryPage() {
   
   // Apply filters
   const handleApplyFilters = () => {
-    fetchAssets();
+    refetch();
   };
   
   // Clear filters
@@ -374,24 +352,26 @@ export default function AssetsInventoryPage() {
         <CardHeader>
           <CardTitle>Assets List</CardTitle>
           <CardDescription>
-            {pagination.totalAssets > 0 
-              ? `Showing ${Math.min((pagination.currentPage - 1) * pagination.limit + 1, pagination.totalAssets)}-${Math.min(pagination.currentPage * pagination.limit, pagination.totalAssets)} of ${pagination.totalAssets} assets` 
+            {paginationInfo.totalAssets > 0 
+              ? `Showing ${Math.min((paginationInfo.currentPage - 1) * paginationInfo.limit + 1, paginationInfo.totalAssets)}-${Math.min(paginationInfo.currentPage * paginationInfo.limit, paginationInfo.totalAssets)} of ${paginationInfo.totalAssets} assets` 
               : 'No assets found'}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {loading ? (
+          {isLoading ? (
             // Loading skeleton
             <div className="space-y-2">
               {Array.from({ length: 5 }).map((_, index) => (
                 <Skeleton key={index} className="h-12 w-full" />
               ))}
             </div>
-          ) : error ? (
+          ) : isError ? (
             // Error message
             <div className="py-8 text-center">
-              <p className="text-destructive">{error}</p>
-              <Button variant="outline" onClick={fetchAssets} className="mt-4">
+              <p className="text-destructive">
+                {error instanceof Error ? error.message : 'An error occurred while loading assets'}
+              </p>
+              <Button variant="outline" onClick={() => refetch()} className="mt-4">
                 Retry
               </Button>
             </div>
@@ -409,8 +389,8 @@ export default function AssetsInventoryPage() {
               columns={columns}
               data={assets}
               pagination={{
-                currentPage: pagination.currentPage,
-                totalPages: pagination.totalPages,
+                currentPage: paginationInfo.currentPage,
+                totalPages: paginationInfo.totalPages,
                 onPageChange: handlePageChange,
               }}
             />
@@ -432,7 +412,7 @@ export default function AssetsInventoryPage() {
           <AssetForm 
             onSuccess={() => {
               setCreateModalOpen(false);
-              fetchAssets();
+              refetch();
             }}
             onCancel={() => setCreateModalOpen(false)}
           />
@@ -453,7 +433,7 @@ export default function AssetsInventoryPage() {
               asset={selectedAsset}
               onSuccess={() => {
                 setEditModalOpen(false);
-                fetchAssets();
+                refetch();
               }}
               onCancel={() => setEditModalOpen(false)}
             />
