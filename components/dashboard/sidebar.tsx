@@ -104,6 +104,7 @@ function SidebarContent({ className, isCollapsed, setIsCollapsed }: {
     { icon: <Fingerprint size={20} />, label: "Brand Reputation", href: "/dashboard/brand-reputation" },
     { icon: <ShieldX size={20} />, label: "Dark Web Monitoring", href: "/dashboard/dark-web-monitoring" },
     { icon: <BugPlay size={20} />, label: "Vulnerability Intelligence", href: "/dashboard/vulnerability-intelligence" },
+    { icon: <BugPlay size={20} />, label: "Executive Dashboard", href: "/dashboard/executive-dashboard" },
 
     { icon: <BarChart2 size={20} />, label: "Reports", href: "/dashboard/reports" },
   ]
