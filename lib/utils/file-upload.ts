@@ -1,5 +1,6 @@
+import { useState } from 'react';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
-import { storage, validateFirebaseStorage } from './firebase-config';
+import { storage } from '@/lib/firebase';
 import { v4 as uuidv4 } from 'uuid';
 
 // Development mode detection
@@ -14,6 +15,23 @@ export interface UploadResult {
   path: string;
   fileName: string;
   contentType: string;
+}
+
+export type UploadState = 'idle' | 'uploading' | 'success' | 'error';
+
+export interface UseFileUploadOptions {
+  path?: string;
+  allowedTypes?: string[];
+  maxSizeMB?: number;
+}
+
+export interface UseFileUploadReturn {
+  uploadState: UploadState;
+  progress: number;
+  fileUrl: string | null;
+  errorMessage: string | null;
+  uploadFile: (file: File) => Promise<string>;
+  resetUpload: () => void;
 }
 
 /**
@@ -92,7 +110,7 @@ export const uploadFile = async (
   }
   
   // Validate Firebase storage initialization
-  if (!validateFirebaseStorage()) {
+  if (!testFirebaseStorage()) {
     console.error('[UPLOAD] Firebase storage validation failed');
     throw new Error('Firebase storage is not properly initialized');
   }
@@ -222,26 +240,121 @@ export const uploadFile = async (
 };
 
 /**
- * Helper hook to track upload progress for multiple files
+ * Custom hook for uploading files to Firebase Storage
+ * @param options Configuration options for the upload
+ * @returns Object containing upload state, progress, file URL, error message, and upload functions
  */
-export const useFileUpload = () => {
-  const uploadFiles = async (
-    files: File[], 
-    folder: string
-  ): Promise<UploadResult[]> => {
-    if (!files || files.length === 0) {
-      return [];
-    }
+export const useFileUpload = (options: UseFileUploadOptions = {}): UseFileUploadReturn => {
+  const {
+    path = 'uploads',
+    allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf', 'text/plain'],
+    maxSizeMB = 5
+  } = options;
 
-    // Upload all files in parallel
-    const uploadPromises = Array.from(files).map(file => 
-      uploadFile(file, folder)
-    );
+  const [uploadState, setUploadState] = useState<UploadState>('idle');
+  const [progress, setProgress] = useState<number>(0);
+  const [fileUrl, setFileUrl] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-    return Promise.all(uploadPromises);
+  const resetUpload = () => {
+    setUploadState('idle');
+    setProgress(0);
+    setFileUrl(null);
+    setErrorMessage(null);
   };
 
-  return { uploadFiles };
+  const validateFile = (file: File): boolean => {
+    // Check file type
+    if (allowedTypes.length > 0 && !allowedTypes.includes(file.type)) {
+      setErrorMessage(`Invalid file type. Allowed types: ${allowedTypes.join(', ')}`);
+      setUploadState('error');
+      return false;
+    }
+
+    // Check file size
+    const fileSizeMB = file.size / (1024 * 1024);
+    if (fileSizeMB > maxSizeMB) {
+      setErrorMessage(`File size exceeds the maximum limit of ${maxSizeMB}MB`);
+      setUploadState('error');
+      return false;
+    }
+
+    return true;
+  };
+
+  const uploadFile = async (file: File): Promise<string> => {
+    if (!validateFile(file)) {
+      return Promise.reject(errorMessage);
+    }
+
+    resetUpload();
+    setUploadState('uploading');
+
+    // Create a unique filename
+    const fileExtension = file.name.split('.').pop();
+    const uniqueFileName = `${uuidv4()}.${fileExtension}`;
+    const storagePath = `${path}/${uniqueFileName}`;
+    
+    // Create storage reference
+    const storageRef = ref(storage, storagePath);
+    
+    // Upload the file
+    const uploadTask = uploadBytesResumable(storageRef, file);
+
+    return new Promise((resolve, reject) => {
+      uploadTask.on(
+        'state_changed',
+        (snapshot) => {
+          // Track upload progress
+          const progressPercent = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          setProgress(progressPercent);
+        },
+        (error) => {
+          // Handle upload error
+          setErrorMessage(`Upload failed: ${error.message}`);
+          setUploadState('error');
+          reject(error.message);
+        },
+        async () => {
+          // Upload completed successfully
+          try {
+            const downloadUrl = await getDownloadURL(uploadTask.snapshot.ref);
+            setFileUrl(downloadUrl);
+            setUploadState('success');
+            resolve(downloadUrl);
+          } catch (error: any) {
+            setErrorMessage(`Failed to get download URL: ${error.message}`);
+            setUploadState('error');
+            reject(error.message);
+          }
+        }
+      );
+    });
+  };
+
+  return {
+    uploadState,
+    progress,
+    fileUrl,
+    errorMessage,
+    uploadFile,
+    resetUpload
+  };
+};
+
+/**
+ * Helper function to format file size
+ * @param bytes File size in bytes
+ * @returns Formatted file size string (e.g., "1.5 MB")
+ */
+export const formatFileSize = (bytes: number): string => {
+  if (bytes === 0) return '0 Bytes';
+  
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 };
 
 /**
@@ -259,7 +372,7 @@ export const testFirebaseStorage = async (): Promise<boolean> => {
     }
     
     // Then validate Firebase storage
-    if (!validateFirebaseStorage()) {
+    if (!testFirebaseStorage()) {
       console.error('[FIREBASE-TEST] Firebase storage validation failed');
       return false;
     }

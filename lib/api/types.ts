@@ -2116,3 +2116,72 @@ export interface BrandReputationQueryParams {
   limit?: number;
 }
 
+// ================= Vulnerability Intelligence Types =================
+
+export type VulnerabilitySeverity = "low" | "medium" | "high" | "critical";
+export type VulnerabilityStatus = "investigating" | "resolved" | "unresolved";
+
+export interface VulnerabilityIntelligence {
+  _id: string;
+  detectionTime?: string;
+  vulnerabilityID: string;
+  description: string;
+  severity: VulnerabilitySeverity;
+  affectedSystems: string;
+  impact: string;
+  cvsScore: string;
+  exploitAvailability: string;
+  patchAvailability: string;
+  vendor: string;
+  mitigationSteps?: string;
+  sampleFile?: string;
+  status: VulnerabilityStatus;
+  references?: string[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CreateVulnerabilityIntelligenceDto {
+  detectionTime?: string;
+  vulnerabilityID: string;
+  description: string;
+  severity: VulnerabilitySeverity;
+  affectedSystems: string;
+  impact: string;
+  cvsScore: string;
+  exploitAvailability: string;
+  patchAvailability: string;
+  vendor: string;
+  mitigationSteps?: string;
+  sampleFile?: string;
+  status?: VulnerabilityStatus;
+  references?: string[];
+}
+
+export interface UpdateVulnerabilityIntelligenceDto {
+  detectionTime?: string;
+  vulnerabilityID?: string;
+  description?: string;
+  severity?: VulnerabilitySeverity;
+  affectedSystems?: string;
+  impact?: string;
+  cvsScore?: string;
+  exploitAvailability?: string;
+  patchAvailability?: string;
+  vendor?: string;
+  mitigationSteps?: string;
+  sampleFile?: string;
+  status?: VulnerabilityStatus;
+  references?: string[];
+}
+
+export interface VulnerabilityIntelligenceQueryParams {
+  severity?: VulnerabilitySeverity;
+  status?: VulnerabilityStatus;
+  vendor?: string;
+  startDate?: string;
+  endDate?: string;
+  page?: number;
+  limit?: number;
+}
+
