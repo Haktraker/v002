@@ -92,5 +92,49 @@ export interface ThreatCompositionOverviewQueryParams {
   page?: number;
   limit?: number;
 }
+
+// ================= Security Breach Indicators Types =================
+
+export type SecurityBreachIndicatorType = 
+  | "Compromised Employees"
+  | "Account Take Over"
+  | "3rd Party Leaked Credentials"
+  | "Brand Reputation";
+
+export interface SecurityBreachIndicators {
+  _id: string;
+  month: string;
+  year: string;
+  quarter: number;
+  score: string; // Consider number if score is numeric
+  indicator: SecurityBreachIndicatorType;
+  createdAt?: string; // From timestamps: true
+  updatedAt?: string; // From timestamps: true
+}
+
+export interface CreateSecurityBreachIndicatorsDto {
+  month: string;
+  year: string;
+  quarter: number;
+  score: string;
+  indicator: SecurityBreachIndicatorType;
+}
+
+export interface UpdateSecurityBreachIndicatorsDto {
+  month?: string;
+  year?: string;
+  quarter?: number;
+  score?: string;
+  indicator?: SecurityBreachIndicatorType;
+}
+
+export interface SecurityBreachIndicatorsQueryParams {
+  month?: string;
+  year?: string;
+  indicator?: SecurityBreachIndicatorType;
+  quarter?: number;
+  page?: number;
+  limit?: number;
+}
   
   
