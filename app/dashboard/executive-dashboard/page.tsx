@@ -5,6 +5,7 @@ import { PageHeader } from '@/components/ui/page-header';
 import SecurityPostureScoreChart from '@/components/dashboard/security-posture-score-chart';
 import ThreatCompositionOverviewChart from '@/components/dashboard/threat-composition-overview-chart';
 import SecurityBreachIndicatorsChart from '@/components/dashboard/security-breach-indicators-chart';
+import NonComplianceGapsOverviewChart from '@/components/dashboard/non-compliance-gaps-overview-chart';
 import { useGlobalFilter } from '@/lib/context/GlobalFilterContext';
 import { GlobalFilterComponent } from '@/components/dashboard/global-filter';
 import { useGetSecurityPostureScores } from '@/lib/api/endpoints/executive-dashboard/security-posture-score';
@@ -30,9 +31,9 @@ export default function ExecutiveDashboard() {
       <PageHeader title="Executive Dashboard" />
       {/* Add Global Filters component */}
       <GlobalFilterComponent />
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4"> {/* Added mt-4 for spacing */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mt-4"> {/* Added mt-4 for spacing */}
         {/* Security Posture Score Chart */}
-        <div className="col-span-1 md:col-span-1 lg:col-span-1 flex justify-center items-start">
+        <div className="col-span-1 flex justify-center items-start">
           <SecurityPostureScoreChart
             data={securityScoreData?.data}
             isLoading={isSecurityScoreLoading}
@@ -41,13 +42,18 @@ export default function ExecutiveDashboard() {
         </div>
 
         {/* Threat Composition Overview Chart */}
-        <div className="col-span-1 md:col-span-1 lg:col-span-1">
+        <div className="">
           <ThreatCompositionOverviewChart />
         </div>
 
         {/* Security Breach Indicators Chart */}
-        <div className="col-span-1 md:col-span-1 lg:col-span-1">
+        <div className="">
           <SecurityBreachIndicatorsChart />
+        </div>
+
+        {/* Non-Compliance Gaps Overview Chart */}
+        <div className="">
+          <NonComplianceGapsOverviewChart />
         </div>
 
         {/* Placeholder for other charts/components */}

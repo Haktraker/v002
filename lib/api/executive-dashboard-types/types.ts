@@ -136,5 +136,50 @@ export interface SecurityBreachIndicatorsQueryParams {
   page?: number;
   limit?: number;
 }
+
+// ================= Non-Compliance Gaps Overview Types =================
+
+export type ComplianceFrameworkType = 
+  | "MITRE ATT&CK"
+  | "ISO 27001"
+  | "NIST CSF"
+  | "PDPL"
+  | "CIS";
+
+export interface NonComplianceGapsOverview {
+  _id: string;
+  month: string;
+  year: string;
+  quarter: number;
+  score: string; // Consider number if score is numeric
+  compliance: ComplianceFrameworkType;
+  createdAt?: string; // From timestamps: true
+  updatedAt?: string; // From timestamps: true
+}
+
+export interface CreateNonComplianceGapsOverviewDto {
+  month: string;
+  year: string;
+  quarter: number;
+  score: string;
+  compliance: ComplianceFrameworkType;
+}
+
+export interface UpdateNonComplianceGapsOverviewDto {
+  month?: string;
+  year?: string;
+  quarter?: number;
+  score?: string;
+  compliance?: ComplianceFrameworkType;
+}
+
+export interface NonComplianceGapsOverviewQueryParams {
+  month?: string;
+  year?: string;
+  compliance?: ComplianceFrameworkType;
+  quarter?: number;
+  page?: number;
+  limit?: number;
+}
   
   
