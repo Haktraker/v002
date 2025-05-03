@@ -48,4 +48,49 @@ export interface SecurityPostureScore {
     limit?: number;
   }
   
+// ================= Threat Composition Overview Types =================
+
+export type ThreatCompositionOverviewType = 
+  | "ATO"
+  | "Insider Threats"
+  | "Trojan and Malware"
+  | "3rd Party leaks"
+  | "Attack Surfaces";
+
+export interface ThreatCompositionOverview {
+  _id: string;
+  month: string;
+  year: string;
+  score: string; // Consider number if score is numeric
+  threatType: ThreatCompositionOverviewType;
+  quarter: number;
+  createdAt?: string; // From timestamps: true
+  updatedAt?: string; // From timestamps: true
+}
+
+export interface CreateThreatCompositionOverviewDto {
+  month: string;
+  year: string;
+  score: string;
+  threatType: ThreatCompositionOverviewType;
+  quarter: number;
+}
+
+export interface UpdateThreatCompositionOverviewDto {
+  month?: string;
+  year?: string;
+  score?: string;
+  threatType?: ThreatCompositionOverviewType;
+  quarter?: number;
+}
+
+export interface ThreatCompositionOverviewQueryParams {
+  month?: string;
+  year?: string;
+  threatType?: ThreatCompositionOverviewType;
+  quarter?: number;
+  page?: number;
+  limit?: number;
+}
+  
   
