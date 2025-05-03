@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
-import { storage } from '@/lib/firebase';
+import { storage, validateFirebaseStorage } from '@/lib/utils/firebase-config';
 import { v4 as uuidv4 } from 'uuid';
 
 // Development mode detection
@@ -35,47 +35,6 @@ export interface UseFileUploadReturn {
 }
 
 /**
- * Check if the required Firebase environment variables are present
- */
-const isFirebaseConfigured = (): boolean => {
-  const requiredEnvVars = [
-    process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-    process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-    process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
-  ];
-  
-  return requiredEnvVars.every(value => !!value);
-};
-
-/**
- * Check if the storage bucket URL is malformed
- */
-const checkStorageBucket = (): boolean => {
-  if (!process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET) {
-    console.error('[UPLOAD] Missing storage bucket configuration');
-    return false;
-  }
-  
-  const storageBucket = process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET.trim();
-  
-  // Check for common issues
-  if (storageBucket.includes(',')) {
-    console.error('[UPLOAD] Storage bucket contains commas which will cause errors:', storageBucket);
-    console.error('[UPLOAD] Please fix the NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET environment variable');
-    return false;
-  }
-  
-  if (storageBucket.includes(' ')) {
-    console.error('[UPLOAD] Storage bucket contains spaces which can cause errors:', storageBucket);
-    console.error('[UPLOAD] Please fix the NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET environment variable');
-    return false;
-  }
-  
-  console.log('[UPLOAD] Storage bucket appears to be correctly formatted:', storageBucket);
-  return true;
-};
-
-/**
  * Upload a file to Firebase Storage
  * @param file The file to upload
  * @param folder The folder path in Firebase Storage (e.g., "screenshots", "sample-files")
@@ -94,25 +53,10 @@ export const uploadFile = async (
     throw new Error('No file provided');
   }
   
-  // Validate Firebase configuration
-  if (!isFirebaseConfigured()) {
-    console.error('[UPLOAD] Firebase not configured', { 
-      apiKey: !!process.env.NEXT_PUBLIC_FIREBASE_API_KEY, 
-      projectId: !!process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID, 
-      storageBucket: !!process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET 
-    });
-    throw new Error('Firebase is not properly configured. Please check your environment variables.');
-  }
-  
-  // Check storage bucket format
-  if (!checkStorageBucket()) {
-    throw new Error('Firebase storage bucket is malformed. Check console for details.');
-  }
-  
-  // Validate Firebase storage initialization
-  if (!testFirebaseStorage()) {
-    console.error('[UPLOAD] Firebase storage validation failed');
-    throw new Error('Firebase storage is not properly initialized');
+  // Validate Firebase configuration and initialization using the central validator
+  if (!validateFirebaseStorage()) {
+    console.error('[UPLOAD] Firebase storage validation failed. Check console logs from firebase-config.ts for details.');
+    throw new Error('Firebase storage is not properly configured or initialized. Cannot upload file.');
   }
 
   try {
@@ -165,10 +109,48 @@ export const uploadFile = async (
               }
             },
             (error) => {
-              // Handle upload errors
+              // Handle upload errors with more detail
               console.error('[UPLOAD] Error during upload', error);
               console.error('[UPLOAD] Error code:', error.code);
               console.error('[UPLOAD] Error message:', error.message);
+
+              // Log specific Firebase Storage errors
+              switch (error.code) {
+                case 'storage/unauthorized':
+                  console.error('[UPLOAD] Unauthorized: User does not have permission.');
+                  break;
+                case 'storage/canceled':
+                  console.error('[UPLOAD] Canceled: User canceled the upload.');
+                  break;
+                case 'storage/object-not-found':
+                  console.error('[UPLOAD] Object Not Found: The file path may be incorrect.');
+                  break;
+                case 'storage/bucket-not-found':
+                  console.error('[UPLOAD] Bucket Not Found: Check NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET.');
+                  break;
+                case 'storage/project-not-found':
+                  console.error('[UPLOAD] Project Not Found: Check Firebase project configuration.');
+                  break;
+                case 'storage/quota-exceeded':
+                  console.error('[UPLOAD] Quota Exceeded: Storage quota has been reached.');
+                  break;
+                case 'storage/unauthenticated':
+                  console.error('[UPLOAD] Unauthenticated: User is not authenticated.');
+                  break;
+                case 'storage/retry-limit-exceeded':
+                  console.error('[UPLOAD] Retry Limit Exceeded: Max retry time limit exceeded.');
+                  break;
+                case 'storage/invalid-checksum':
+                  console.error('[UPLOAD] Invalid Checksum: File might be corrupted.');
+                  break;
+                case 'storage/server-file-wrong-size':
+                   console.error('[UPLOAD] Server File Wrong Size: File size mismatch.');
+                   break;
+                case 'storage/unknown':
+                default:
+                  console.error('[UPLOAD] Unknown Error: Inspect error object and server response.');
+                  break;
+              }
               
               // If we have more attempts, retry after delay
               if (uploadAttempts < maxAttempts) {
@@ -177,7 +159,7 @@ export const uploadFile = async (
                   attemptUpload().then(resolve).catch(reject);
                 }, 1000);
               } else {
-                reject(error);
+                reject(new Error(`Upload failed after ${maxAttempts} attempts: ${error.message} (Code: ${error.code})`));
               }
             },
             async () => {
@@ -190,7 +172,7 @@ export const uploadFile = async (
                 
                 if (!downloadURL) {
                   console.error('[UPLOAD] Download URL is empty or undefined');
-                  throw new Error('Failed to get download URL');
+                  throw new Error('Failed to get download URL after successful upload.');
                 }
                 
                 // Return download URL and file path
@@ -207,35 +189,39 @@ export const uploadFile = async (
                 console.error('[UPLOAD] Error getting download URL:', error);
                 console.error('[UPLOAD] Detailed error:', JSON.stringify(error, null, 2));
                 
-                // If we have more attempts, retry after delay
+                // If we have more attempts, retry getting URL after delay
                 if (uploadAttempts < maxAttempts) {
                   console.log(`[UPLOAD] Will retry getting URL in 1 second (attempt ${uploadAttempts + 1} of ${maxAttempts})`);
+                  // Note: Retrying the entire upload, as getting URL failed after upload completion
                   setTimeout(() => {
-                    attemptUpload().then(resolve).catch(reject);
+                    attemptUpload().then(resolve).catch(reject); 
                   }, 1000);
                 } else {
-                  reject(error);
+                  reject(new Error(`Failed to get download URL after ${maxAttempts} attempts: ${error instanceof Error ? error.message : String(error)}`));
                 }
               }
             }
           );
         });
       } catch (error) {
-        console.error(`[UPLOAD] Error in attempt ${uploadAttempts}:`, error);
+        console.error(`[UPLOAD] Error setting up upload task in attempt ${uploadAttempts}:`, error);
         
         // Retry or throw
         if (uploadAttempts < maxAttempts) {
-          console.log('[UPLOAD] Retrying upload...');
+          console.log('[UPLOAD] Retrying upload setup...');
+          // Add a small delay before retrying the setup
+          await new Promise(res => setTimeout(res, 500)); 
           return attemptUpload();
         }
-        throw error;
+        throw error; // Throw after max attempts at setup
       }
     };
     
     return attemptUpload();
   } catch (error) {
     console.error('[UPLOAD] Unexpected error during upload setup:', error);
-    throw error;
+    // Ensure the error is re-thrown correctly
+    throw error instanceof Error ? error : new Error(String(error));
   }
 };
 
@@ -365,16 +351,10 @@ export const testFirebaseStorage = async (): Promise<boolean> => {
   console.log('[FIREBASE-TEST] Testing Firebase storage connection...');
   
   try {
-    // First validate Firebase config
-    if (!isFirebaseConfigured()) {
-      console.error('[FIREBASE-TEST] Firebase not configured properly');
-      return false;
-    }
-    
-    // Then validate Firebase storage
-    if (!testFirebaseStorage()) {
-      console.error('[FIREBASE-TEST] Firebase storage validation failed');
-      return false;
+    // First validate Firebase config and initialization using the central validator
+    if (!validateFirebaseStorage()) {
+      console.error('[FIREBASE-TEST] Firebase storage validation failed. Check console logs from firebase-config.ts for details.');
+      return false; // Exit early if validation fails
     }
     
     // Create a small test file (1x1 pixel transparent GIF)
@@ -403,9 +383,10 @@ export const testFirebaseStorage = async (): Promise<boolean> => {
       name: testFile.name
     });
     
-    // Upload test file
-    console.log('[FIREBASE-TEST] Attempting to upload test file...');
-    const storageRef = ref(storage, 'test/test-' + Date.now() + '.gif');
+    // Upload test file to a dedicated test path
+    const testPath = 'test/connection-test-' + Date.now() + '.gif';
+    console.log('[FIREBASE-TEST] Attempting to upload test file to:', testPath);
+    const storageRef = ref(storage, testPath);
     const uploadTask = uploadBytesResumable(storageRef, testFile);
     
     return new Promise((resolve) => {
@@ -414,25 +395,35 @@ export const testFirebaseStorage = async (): Promise<boolean> => {
         (snapshot) => {
           const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           console.log('[FIREBASE-TEST] Upload progress:', Math.round(progress));
+          // Optional: Add timeout logic here if needed
         },
         (error) => {
           console.error('[FIREBASE-TEST] Upload failed:', error);
+          console.error('[FIREBASE-TEST] Error Code:', error.code);
+          // Provide hints based on common errors
+          if (error.code === 'storage/unauthorized') {
+             console.error('[FIREBASE-TEST] Hint: Check Firebase Storage security rules. Are writes allowed to the /test path for authenticated/unauthenticated users?');
+          } else if (error.code === 'storage/bucket-not-found') {
+             console.error('[FIREBASE-TEST] Hint: Double-check the NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET environment variable.');
+          }
           resolve(false);
         },
         async () => {
           try {
+            console.log('[FIREBASE-TEST] Test upload completed. Verifying download URL...');
             const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-            console.log('[FIREBASE-TEST] Test successful! Download URL:', downloadURL);
+            console.log('[FIREBASE-TEST] Test successful! Download URL obtained:', downloadURL);
+            // Optional: Try to delete the test file here?
             resolve(true);
           } catch (error) {
-            console.error('[FIREBASE-TEST] Failed to get download URL:', error);
+            console.error('[FIREBASE-TEST] Failed to get download URL after successful upload:', error);
             resolve(false);
           }
         }
       );
     });
   } catch (error) {
-    console.error('[FIREBASE-TEST] Test failed with error:', error);
+    console.error('[FIREBASE-TEST] Test failed with an unexpected error during setup:', error);
     return false;
   }
 }; 
