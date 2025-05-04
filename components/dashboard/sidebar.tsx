@@ -32,6 +32,8 @@ import {
   Fingerprint,
   ShieldX,
   BugPlay,
+  FireExtinguisher,
+  SkipForward,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -94,7 +96,7 @@ function SidebarContent({ className, isCollapsed, setIsCollapsed }: {
     { icon: <LayoutDashboard size={20} />, label: "Dashboard", href: "/dashboard" },
     { icon: <ShieldAlert size={20} />, label: "Threat Composition", href: "/dashboard/threat-composition" },
     { icon: <Bug size={20} />, label: "Security Breach Indicators", href: "/dashboard/security-breach-indicators" },
-    { icon: <Network size={20} />, label: "BusinessUnits Security", href: "/dashboard/business-units-security" },
+    { icon: <Network size={20} />, label: "Business Units Security", href: "/dashboard/business-units-security" },
     { icon: <User size={20} />, label: "User Behavior Analytics", href: "/dashboard/user-behavior-analytics" },
     { icon: <Link2Off size={20} />, label: "Kill Chain", href: "/dashboard/kill-chain" },
     { icon: <Globe size={20} />, label: "Cyber Threat Map", href: "/dashboard/cyber-map" },
@@ -105,13 +107,13 @@ function SidebarContent({ className, isCollapsed, setIsCollapsed }: {
     { icon: <ShieldX size={20} />, label: "Dark Web Monitoring", href: "/dashboard/dark-web-monitoring" },
     { icon: <BugPlay size={20} />, label: "Vulnerability Intelligence", href: "/dashboard/vulnerability-intelligence" },
     { icon: <BugPlay size={20} />, label: "Executive Dashboard", href: "/dashboard/executive-dashboard" },
-
+    { icon: <SkipForward size={20} />, label: "Account Take Over", href: "/dashboard/account-take-over" },
     { icon: <BarChart2 size={20} />, label: "Reports", href: "/dashboard/reports" },
   ]
 
   return (
-    <div className={cn("flex flex-col h-full bg-card border-r", className)}>
-      <div className="p-3 flex-shrink-0">
+    <div className={cn("flex flex-col h-full bg-card border-r overflow-hidden", className)}>
+      <div className="flex-shrink-0 p-3">
         <div className="flex items-center justify-between mb-4 px-2">
           {!isCollapsed && (
             <div className="flex items-center">
@@ -128,6 +130,9 @@ function SidebarContent({ className, isCollapsed, setIsCollapsed }: {
             {isCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
           </Button>
         </div>
+      </div>
+      
+      <div className="flex-1 overflow-y-auto min-h-0 px-3 pb-2 scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-muted-foreground/20 scrollbar-track-transparent">
         <nav className="space-y-1">
           {sidebarItems.map((item) => (
             <TooltipProvider key={item.href} delayDuration={0}>
@@ -153,7 +158,8 @@ function SidebarContent({ className, isCollapsed, setIsCollapsed }: {
           ))}
         </nav>
       </div>
-      <div className="mt-auto p-3">
+      
+      <div className="flex-shrink-0 p-3 pt-0 border-t mt-auto">
         <nav className="space-y-1">
           <TooltipProvider delayDuration={0}>
             <Tooltip>
@@ -238,7 +244,7 @@ export function DashboardSidebar() {
             <Menu size={20} />
           </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="p-0 w-72">
+        <SheetContent side="left" className="p-0 w-72 h-full overflow-hidden">
           <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
           <SidebarContent isCollapsed={false} setIsCollapsed={setIsCollapsed} />
         </SheetContent>
@@ -249,7 +255,7 @@ export function DashboardSidebar() {
   return (
     <SidebarContent 
       className={cn(
-        "border-r transition-all duration-300",
+        "border-r transition-all duration-300 h-screen",
         isCollapsed ? "w-[70px]" : "w-[240px]"
       )}
       isCollapsed={isCollapsed}
