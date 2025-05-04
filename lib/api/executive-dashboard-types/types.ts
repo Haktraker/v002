@@ -257,4 +257,46 @@ export interface ThirdPartyThreatIntelligenceQueryParams {
   limit?: number;
 }
   
+// ================= Digital Risk Intelligence Types =================
+
+export type RiskLevel = "no risk" | "medium" | "high" | "critical";
+export type RiskIndicator = "executive protection" | "situational awareness" | "impersonations" | "social media";
+
+export interface DigitalRiskIntelligence {
+  _id: string;
+  level: RiskLevel;
+  indicator: RiskIndicator;
+  year: string;
+  month: string;
+  quarter: number;
+  createdAt?: string; // From timestamps: true
+  updatedAt?: string; // From timestamps: true
+}
+
+export interface CreateDigitalRiskIntelligenceDto {
+  level: RiskLevel;
+  indicator: RiskIndicator;
+  year: string;
+  month: string;
+  quarter: number;
+}
+
+export interface UpdateDigitalRiskIntelligenceDto {
+  level?: RiskLevel;
+  indicator?: RiskIndicator;
+  year?: string;
+  month?: string;
+  quarter?: number;
+}
+
+export interface DigitalRiskIntelligenceQueryParams {
+  level?: RiskLevel;
+  indicator?: RiskIndicator;
+  month?: string;
+  year?: string;
+  quarter?: number;
+  page?: number;
+  limit?: number;
+}
+  
   
