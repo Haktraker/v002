@@ -6,6 +6,7 @@ import { GlobalFilterComponent } from '@/components/dashboard/global-filter';
 import { useGlobalFilter } from '@/lib/context/GlobalFilterContext';
 import ReportsSecurityPostureScoreChart from '@/components/dashboard/reports/security-posture-score-chart';
 import { useGetReportsSecurityPostureScores } from '@/lib/api/endpoints/reports/security-posture-score';
+import ReportsIncidentAlertVolumeChart from '@/components/dashboard/reports/incident-alert-volume-chart';
 // Import other necessary components for the reports page here
 
 export default function ReportsPage() {
@@ -26,6 +27,9 @@ export default function ReportsPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mt-4">
        <div>
         <ReportsSecurityPostureScoreChart data={securityPostureScoreData?.data} isLoading={isSecurityPostureScoreLoading} error={securityPostureScoreError}/>
+       </div>
+       <div>
+        <ReportsIncidentAlertVolumeChart />
        </div>
         <div className="col-span-1 md:col-span-2 xl:col-span-3 p-8 border rounded-lg text-center bg-muted/20">
           <p className="text-muted-foreground">Report components will be added here.</p>

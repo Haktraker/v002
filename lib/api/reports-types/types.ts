@@ -44,4 +44,34 @@ export interface ReportsSecurityPostureScore {
     limit?: number;
   }
 
+// ================= Reports Incident and Alert Volume Types =================
+
+export interface ReportsIncidentAlertVolume {
+    _id: string;
+    month: string; // Unique
+    score: string; // Represents volume
+    year: string;
+    createdAt?: string; // From timestamps: true
+    updatedAt?: string; // From timestamps: true
+}
+
+export interface CreateReportsIncidentAlertVolumeDto {
+    month: string;
+    score: string;
+    year: string;
+}
+
+export interface UpdateReportsIncidentAlertVolumeDto {
+    month?: string;
+    score?: string;
+    year?: string;
+}
+
+export interface ReportsIncidentAlertVolumeQueryParams {
+    month?: string;
+    year?: string;
+    page?: number;
+    limit?: number;
+}
+
 // Add other report-specific types below this line
