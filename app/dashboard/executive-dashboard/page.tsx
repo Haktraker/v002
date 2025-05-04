@@ -9,6 +9,7 @@ import NonComplianceGapsOverviewChart from '@/components/dashboard/non-complianc
 import IncidentAndAlertVolumeChart from '@/components/dashboard/incident-and-alert-volume-chart';
 import ThirdPartyThreatIntelligenceChart from '@/components/dashboard/third-party-threat-intelligence-chart';
 import DigitalRiskIntelligenceChart from '@/components/dashboard/digital-risk-intelligence-chart';
+import TtdTtrChart from '@/components/dashboard/ttd-ttr-chart';
 import { useGlobalFilter } from '@/lib/context/GlobalFilterContext';
 import { GlobalFilterComponent } from '@/components/dashboard/global-filter';
 import { useGetSecurityPostureScores } from '@/lib/api/endpoints/executive-dashboard/security-posture-score';
@@ -72,6 +73,11 @@ export default function ExecutiveDashboard() {
         {/* Digital Risk Intelligence Chart */}
         <div className="">
           <DigitalRiskIntelligenceChart />
+        </div>
+
+        {/* TTD/TTR Chart */}
+        <div className="">
+          <TtdTtrChart />
         </div>
 
         {/* Placeholder for other charts/components */}

@@ -299,4 +299,44 @@ export interface DigitalRiskIntelligenceQueryParams {
   limit?: number;
 }
   
+// ================= TTD/TTR Types =================
+
+export type TtdTtrIndicator = "TTD" | "TTR";
+
+export interface TtdTtr {
+  _id: string;
+  month: string;
+  year: string;
+  score: string; // Represents time (e.g., in hours or days), consider number if calculations needed
+  indicator: TtdTtrIndicator;
+  quarter: number;
+  createdAt?: string; // From timestamps: true
+  updatedAt?: string; // From timestamps: true
+}
+
+export interface CreateTtdTtrDto {
+  month: string;
+  year: string;
+  score: string;
+  indicator: TtdTtrIndicator;
+  quarter: number;
+}
+
+export interface UpdateTtdTtrDto {
+  month?: string;
+  year?: string;
+  score?: string;
+  indicator?: TtdTtrIndicator;
+  quarter?: number;
+}
+
+export interface TtdTtrQueryParams {
+  month?: string;
+  year?: string;
+  indicator?: TtdTtrIndicator;
+  quarter?: number;
+  page?: number;
+  limit?: number;
+}
+  
   
