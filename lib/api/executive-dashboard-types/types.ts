@@ -181,5 +181,39 @@ export interface NonComplianceGapsOverviewQueryParams {
   page?: number;
   limit?: number;
 }
+
+// ================= Incident and Alert Volume Types =================
+
+export interface IncidentAndAlertVolume {
+  _id: string;
+  month: string; // Should be unique per the schema, handled by backend
+  year: string;
+  quarter: number;
+  score: string; // Represents volume, consider number if applicable
+  createdAt?: string; // From timestamps: true
+  updatedAt?: string; // From timestamps: true
+}
+
+export interface CreateIncidentAndAlertVolumeDto {
+  month: string;
+  year: string;
+  quarter: number;
+  score: string;
+}
+
+export interface UpdateIncidentAndAlertVolumeDto {
+  month?: string;
+  year?: string;
+  quarter?: number;
+  score?: string;
+}
+
+export interface IncidentAndAlertVolumeQueryParams {
+  month?: string;
+  year?: string;
+  quarter?: number;
+  page?: number;
+  limit?: number;
+}
   
   

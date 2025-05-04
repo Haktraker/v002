@@ -6,6 +6,7 @@ import SecurityPostureScoreChart from '@/components/dashboard/security-posture-s
 import ThreatCompositionOverviewChart from '@/components/dashboard/threat-composition-overview-chart';
 import SecurityBreachIndicatorsChart from '@/components/dashboard/security-breach-indicators-chart';
 import NonComplianceGapsOverviewChart from '@/components/dashboard/non-compliance-gaps-overview-chart';
+import IncidentAndAlertVolumeChart from '@/components/dashboard/incident-and-alert-volume-chart';
 import { useGlobalFilter } from '@/lib/context/GlobalFilterContext';
 import { GlobalFilterComponent } from '@/components/dashboard/global-filter';
 import { useGetSecurityPostureScores } from '@/lib/api/endpoints/executive-dashboard/security-posture-score';
@@ -54,6 +55,11 @@ export default function ExecutiveDashboard() {
         {/* Non-Compliance Gaps Overview Chart */}
         <div className="">
           <NonComplianceGapsOverviewChart />
+        </div>
+
+        {/* Incident and Alert Volume Chart */}
+        <div className="">
+          <IncidentAndAlertVolumeChart />
         </div>
 
         {/* Placeholder for other charts/components */}
