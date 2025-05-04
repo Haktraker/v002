@@ -216,4 +216,45 @@ export interface IncidentAndAlertVolumeQueryParams {
   limit?: number;
 }
   
+// ================= Third Party Threat Intelligence Types =================
+
+export type SeverityLevel = "low" | "medium" | "high" | "critical";
+
+export interface ThirdPartyThreatIntelligence {
+  _id: string;
+  thirdParty: string;
+  severity: SeverityLevel;
+  year: string;
+  month: string;
+  quarter: number;
+  createdAt?: string; // From timestamps: true
+  updatedAt?: string; // From timestamps: true
+}
+
+export interface CreateThirdPartyThreatIntelligenceDto {
+  thirdParty: string;
+  severity: SeverityLevel;
+  year: string;
+  month: string;
+  quarter: number;
+}
+
+export interface UpdateThirdPartyThreatIntelligenceDto {
+  thirdParty?: string;
+  severity?: SeverityLevel;
+  year?: string;
+  month?: string;
+  quarter?: number;
+}
+
+export interface ThirdPartyThreatIntelligenceQueryParams {
+  thirdParty?: string;
+  severity?: SeverityLevel;
+  month?: string;
+  year?: string;
+  quarter?: number;
+  page?: number;
+  limit?: number;
+}
+  
   
