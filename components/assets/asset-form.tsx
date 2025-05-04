@@ -426,7 +426,7 @@ export const AssetForm = ({ asset, onSuccess, onCancel }: AssetFormProps) => {
                     </Card>
                   ))}
                   
-                  {machineFields.length === 0 && (
+                  {machineFields.length === 0 ? (
                     <div className="text-center py-4 border rounded-md bg-muted/20">
                       <p className="text-muted-foreground">No machines added yet</p>
                       <Button 
@@ -440,6 +440,16 @@ export const AssetForm = ({ asset, onSuccess, onCancel }: AssetFormProps) => {
                         Add Machine
                       </Button>
                     </div>
+                  ) : (
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      onClick={() => appendMachine({ Name: '', IP: '', User: '', Notes: '', operatingSystem: '' })}
+                      className="w-full"
+                    >
+                      <Plus className="mr-2 h-4 w-4" />
+                      Add Machine
+                    </Button>
                   )}
                 </div>
               </>

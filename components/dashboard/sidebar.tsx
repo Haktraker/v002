@@ -107,7 +107,7 @@ function SidebarContent({ className, isCollapsed, setIsCollapsed }: {
     { icon: <ShieldX size={20} />, label: "Dark Web Monitoring", href: "/dashboard/dark-web-monitoring" },
     { icon: <BugPlay size={20} />, label: "Vulnerability Intelligence", href: "/dashboard/vulnerability-intelligence" },
     { icon: <BugPlay size={20} />, label: "Executive Dashboard", href: "/dashboard/executive-dashboard" },
-    { icon: <SkipForward size={20} />, label: "Account Take Over", href: "/dashboard/account-take-over" },
+    // { icon: <SkipForward size={20} />, label: "Account Take Over", href: "/dashboard/account-take-over" },
     { icon: <BarChart2 size={20} />, label: "Reports", href: "/dashboard/reports" },
   ]
 

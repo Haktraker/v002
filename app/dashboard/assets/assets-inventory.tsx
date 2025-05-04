@@ -402,10 +402,10 @@ export default function AssetsInventoryPage() {
       
       {/* Create Asset Modal */}
       <Dialog open={createModalOpen} onOpenChange={setCreateModalOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-background border-border">
           <DialogHeader>
-            <DialogTitle>Create New Asset</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-foreground">Create New Asset</DialogTitle>
+            <DialogDescription className="text-muted-foreground">
               Add a new asset to the inventory. Fill in all required fields.
             </DialogDescription>
           </DialogHeader>
@@ -421,10 +421,10 @@ export default function AssetsInventoryPage() {
 
       {/* Edit Asset Modal */}
       <Dialog open={editModalOpen} onOpenChange={setEditModalOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-background border-border">
           <DialogHeader>
-            <DialogTitle>Edit Asset</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-foreground">Edit Asset</DialogTitle>
+            <DialogDescription className="text-muted-foreground">
               Update the asset information. All fields marked with * are required.
             </DialogDescription>
           </DialogHeader>
@@ -443,10 +443,10 @@ export default function AssetsInventoryPage() {
 
       {/* View Asset Details Modal */}
       <Dialog open={viewModalOpen} onOpenChange={setViewModalOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-background border-border">
           <DialogHeader>
-            <DialogTitle>Asset Details</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-foreground">Asset Details</DialogTitle>
+            <DialogDescription className="text-muted-foreground">
               Detailed information about the selected asset.
             </DialogDescription>
           </DialogHeader>
@@ -466,10 +466,10 @@ export default function AssetsInventoryPage() {
 
       {/* Detections Modal */}
       <Dialog open={detectionsModalOpen} onOpenChange={setDetectionsModalOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-background border-border">
           <DialogHeader>
-            <DialogTitle>Threat Detections - {selectedDeviceName}</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-foreground">Threat Detections - {selectedDeviceName}</DialogTitle>
+            <DialogDescription className="text-muted-foreground">
               Showing all threat detections for this device.
             </DialogDescription>
           </DialogHeader>
@@ -479,16 +479,16 @@ export default function AssetsInventoryPage() {
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent className="bg-background border-border">
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogTitle className="text-foreground">Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription className="text-muted-foreground">
               This will permanently delete the asset {selectedAsset?.BU} - {selectedAsset?.Function} and all associated data.
               This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="bg-secondary text-secondary-foreground hover:bg-secondary/80">Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleDeleteAsset} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
               Delete
             </AlertDialogAction>

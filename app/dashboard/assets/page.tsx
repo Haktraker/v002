@@ -7,6 +7,7 @@ import { User, Globe, Server, Database } from "lucide-react";
 import Link from "next/link";
 import { PageContainer } from '@/components/layout/page-container';
 import AssetsInventoryPage from "./assets-inventory";
+import { useGetAssets } from "@/lib/api/endpoints/assets-inventory";
 
 export default function AssetsPage() {
   return (
@@ -135,6 +136,8 @@ function PortalsCard() {
 }
 
 function InventoryCard() {
+  const { data: assetsInventory, isLoading } = useGetAssets();
+  const count = assetsInventory?.data?.length || 0;
   return (
     <Card className="h-full">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -147,12 +150,22 @@ function InventoryCard() {
         </div>
       </CardHeader>
       <CardContent>
-        <div className="text-4xl font-bold">
+        {isLoading ? (
           <Skeleton className="h-10 w-16" />
-        </div>
-        <div className="text-sm text-muted-foreground mt-2">
-          Complete asset inventory
-        </div>
+        ) : (
+          <div className="text-4xl font-bold">
+            {count}
+          </div>
+        )}
+        {isLoading ? (
+          <div className="mt-2">
+            <Skeleton className="h-4 w-full" />
+          </div>
+        ) : (
+          <div className="text-sm text-muted-foreground mt-2">
+            {`${count} assets in inventory`}
+          </div>
+        )}
       </CardContent>
     </Card>
   );
