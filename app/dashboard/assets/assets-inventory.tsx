@@ -350,7 +350,7 @@ export default function AssetsInventoryPage() {
       {/* Main Content */}
       <Card>
         <CardHeader>
-          <CardTitle>Assets List</CardTitle>
+          <CardTitle>Business Units</CardTitle>
           <CardDescription>
             {paginationInfo.totalAssets > 0 
               ? `Showing ${Math.min((paginationInfo.currentPage - 1) * paginationInfo.limit + 1, paginationInfo.totalAssets)}-${Math.min(paginationInfo.currentPage * paginationInfo.limit, paginationInfo.totalAssets)} of ${paginationInfo.totalAssets} assets` 

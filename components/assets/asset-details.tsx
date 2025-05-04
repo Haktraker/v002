@@ -79,6 +79,10 @@ export const AssetDetails = ({ asset, onEdit, onViewDetections }: AssetDetailsPr
       </div>
 
       <Separator />
+      <div className="space-y-2">
+        <h3 className="font-medium text-lg">Asset List</h3>
+      </div>
+      
 
       {/* Machines table */}
       <div className="space-y-4">
