@@ -170,4 +170,39 @@ export interface ReportsThreatCompositionOverviewQueryParams {
     limit?: number;
 }
 
+// ================= Reports Digital Risk Intelligence Types =================
+
+export type ReportLevel = "no risk" | "medium" | "high" | "critical";
+export type ReportIndicator = "executive protection" | "situational awareness" | "impersonations" | "social media";
+
+export interface ReportsDigitalRiskIntelligence {
+  _id: string; // Changed from id to _id to match typical MongoDB IDs
+  level: ReportLevel;
+  indicator: ReportIndicator;
+  year: string;
+  month: string;
+  createdAt?: string; // From timestamps: true
+  updatedAt?: string; // From timestamps: true
+}
+
+export interface ReportsDigitalRiskIntelligenceQueryParams {
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+  year?: string;
+  month?: string;
+  level?: ReportLevel | 'All';
+  indicator?: ReportIndicator | 'All';
+}
+
+export interface CreateReportsDigitalRiskIntelligenceDto {
+  level: ReportLevel;
+  indicator: ReportIndicator;
+  year: string;
+  month: string;
+}
+
+export interface UpdateReportsDigitalRiskIntelligenceDto extends Partial<CreateReportsDigitalRiskIntelligenceDto> {}
+
 // Add other report-specific types below this line

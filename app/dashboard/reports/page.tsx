@@ -10,6 +10,7 @@ import ReportsIncidentAlertVolumeChart from '@/components/dashboard/reports/inci
 import ThreatCompositionOverviewChart from '@/components/dashboard/reports/threat-composition-overview-chart';
 import ReportsSecurityBreachIndicatorsChart from '@/components/dashboard/reports/security-breach-indicators-chart';
 import NonComplianceGapsOverviewChart from '@/components/dashboard/reports/non-compliance-gaps-overview-chart';
+import ReportsDigitalRiskIntelligenceChart from '@/components/dashboard/reports/digital-risk-intelligence-chart';
 // Import other necessary components for the reports page here
 
 export default function ReportsPage() {
@@ -39,6 +40,9 @@ export default function ReportsPage() {
        </div>
        <div>
         <NonComplianceGapsOverviewChart />
+       </div>
+       <div>
+        <ReportsDigitalRiskIntelligenceChart />
        </div>
        <div className="col-span-full">
         <ThreatCompositionOverviewChart />
