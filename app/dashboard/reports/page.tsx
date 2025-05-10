@@ -7,6 +7,7 @@ import { useGlobalFilter } from '@/lib/context/GlobalFilterContext';
 import ReportsSecurityPostureScoreChart from '@/components/dashboard/reports/security-posture-score-chart';
 import { useGetReportsSecurityPostureScores } from '@/lib/api/endpoints/reports/security-posture-score';
 import ReportsIncidentAlertVolumeChart from '@/components/dashboard/reports/incident-alert-volume-chart';
+import ThreatCompositionOverviewChart from '@/components/dashboard/reports/threat-composition-overview-chart';
 // Import other necessary components for the reports page here
 
 export default function ReportsPage() {
@@ -31,9 +32,9 @@ export default function ReportsPage() {
        <div>
         <ReportsIncidentAlertVolumeChart />
        </div>
-        <div className="col-span-1 md:col-span-2 xl:col-span-3 p-8 border rounded-lg text-center bg-muted/20">
-          <p className="text-muted-foreground">Report components will be added here.</p>
-        </div>
+    <div className='col-span-3'>
+        <ThreatCompositionOverviewChart />
+    </div>
       </div>
     </PageContainer>
   );
