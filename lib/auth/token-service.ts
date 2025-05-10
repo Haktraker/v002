@@ -1,3 +1,5 @@
+import { jwtDecode } from 'jwt-decode';
+
 // Token expiration times
 const ACCESS_TOKEN_EXPIRY = 24 * 60 * 60 * 1000 // 24 hours for better persistence
 
@@ -50,6 +52,28 @@ export const TokenService = {
       console.error("Error getting access token:", error)
       this.clearTokens()
       return null
+    }
+  },
+
+  // Get User ID from access token
+  getUserId(): string | null {
+    try {
+      const token = this.getAccessToken();
+      if (!token) return null;
+
+      // Adjusting the type to expect a nested payload object
+      const decodedToken: { payload: { _id: string } } = jwtDecode(token);
+      
+      // Access _id from the nested payload object
+      if (decodedToken && decodedToken.payload && decodedToken.payload._id) {
+        return decodedToken.payload._id;
+      }
+      
+      console.error("User ID not found in decoded token payload.");
+      return null;
+    } catch (error) {
+      console.error("Error decoding token or getting user ID:", error);
+      return null;
     }
   },
 

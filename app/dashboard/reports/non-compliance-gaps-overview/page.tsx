@@ -53,6 +53,16 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { ChatService } from '@/lib/api/chat-service';
+import { Sparkles, Loader2 as PageLoader } from 'lucide-react';
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+    Dialog as PageAiDialog,
+    DialogContent as PageAiDialogContent,
+    DialogHeader as PageAiDialogHeader,
+    DialogTitle as PageAiDialogTitle,
+    DialogFooter as PageAiDialogFooter
+} from "@/components/ui/dialog";
 
 // Define the new interface for aggregated data
 export interface MonthlyComplianceSummary {
@@ -86,6 +96,12 @@ export default function ReportNonComplianceGapsOverviewPage() {
   // State for the new "Non Compliance Details" dialog
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
   const [selectedRecordsForDetails, setSelectedRecordsForDetails] = useState<ReportNonComplianceGapsOverview[] | null>(null);
+
+  // State for Page-Level AI Chatbot Interaction
+  const [isPageAiResponseDialogOpen, setIsPageAiResponseDialogOpen] = useState(false);
+  const [pageAiResponse, setPageAiResponse] = useState<{ summary: string; recommendations: string[] } | null>(null);
+  const [isPageAiLoading, setIsPageAiLoading] = useState(false);
+  const [selectedRowForAi, setSelectedRowForAi] = useState<MonthlyComplianceSummary | null>(null);
 
   const aggregatedData = useMemo((): MonthlyComplianceSummary[] => {
     if (!apiResponse?.data) return [];
@@ -255,6 +271,69 @@ export default function ReportNonComplianceGapsOverviewPage() {
     setShowBulkDeleteDialog,
   });
 
+  const handleAskPageAi = async (summaryRow: MonthlyComplianceSummary) => {
+    if (!summaryRow) {
+      toast.error("No data selected to analyze.");
+      return;
+    }
+    setSelectedRowForAi(summaryRow); // Keep track of which row's AI is loading
+    setIsPageAiLoading(true);
+
+    try {
+      // We send the MonthlyComplianceSummary object itself, as it contains aggregated scores and originalRecords.
+      // The AI prompt in chat-service stringifies this entire object.
+      const rawResponseString = await ChatService.sendPrompt(summaryRow);
+      let parsedResponse: { summary: string; recommendations: string[] } | null = null;
+
+      if (typeof rawResponseString === 'string') {
+        try {
+          parsedResponse = JSON.parse(rawResponseString);
+        } catch (parseError) {
+          console.error("Page AI response JSON parsing error:", parseError, "Raw response:", rawResponseString);
+          toast.error("Failed to parse AI assistant's response.");
+          setPageAiResponse({ summary: "Could not understand the AI's response. It was not valid JSON.", recommendations: [] });
+          setIsPageAiResponseDialogOpen(true);
+          setIsPageAiLoading(false);
+          setSelectedRowForAi(null);
+          return;
+        }
+      } else if (typeof rawResponseString === 'object' && rawResponseString !== null && typeof (rawResponseString as any).summary === 'string' && Array.isArray((rawResponseString as any).recommendations)){
+        parsedResponse = rawResponseString as { summary: string; recommendations: string[] };
+      } else {
+        console.error("Page AI response was not a string or a valid object:", rawResponseString);
+        toast.error("Received an invalid response type from the AI assistant.");
+        setPageAiResponse({ summary: "The AI assistant provided a response in an unknown format.", recommendations: [] });
+        setIsPageAiResponseDialogOpen(true);
+        setIsPageAiLoading(false);
+        setSelectedRowForAi(null);
+        return;
+      }
+
+      if (parsedResponse && typeof parsedResponse.summary === 'string' && Array.isArray(parsedResponse.recommendations)) {
+        setPageAiResponse(parsedResponse);
+      } else {
+        console.error("Parsed Page AI response format unexpected:", parsedResponse, "Original raw string:", rawResponseString);
+        toast.error("Received an unexpected response structure from the AI assistant after parsing.");
+        setPageAiResponse({ summary: "Could not retrieve a valid analysis. The response data structure was unexpected.", recommendations: [] });
+      }
+      setIsPageAiResponseDialogOpen(true);
+    } catch (error) {
+      console.error("Error asking Page AI:", error);
+      let errorMessage = "Failed to get insights from Haktrak AI for this month.";
+      if (error instanceof Error && error.message.includes("User not authenticated")) {
+        errorMessage = "Authentication error. Please log in again to use the AI assistant.";
+      } else if (error instanceof Error && error.message.includes("Chat service is not configured")) {
+         errorMessage = "AI assistant is not configured. Please contact support.";
+      }
+      toast.error(errorMessage);
+      setPageAiResponse({ summary: errorMessage, recommendations: ["Please check your connection or try again later."] });
+      setIsPageAiResponseDialogOpen(true); 
+    } finally {
+      setIsPageAiLoading(false);
+      setSelectedRowForAi(null);
+    }
+  };
+
   const columns = useMemo<ColumnDef<MonthlyComplianceSummary, any>[]>(() => {
     return [
       tableStyle.getSelectionColumn(),
@@ -299,9 +378,26 @@ export default function ReportNonComplianceGapsOverviewPage() {
       },
       {
         id: 'haktrak',
-        header: 'Haktrak',
-        cell: () => "Will be implemented later", // Placeholder
-        meta: { cellClassName: 'min-w-[150px]' }
+        header: 'Haktrak AI',
+        cell: ({ row }) => {
+          const isLoadingThisRow = isPageAiLoading && selectedRowForAi?._id === row.original._id;
+          return (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => handleAskPageAi(row.original)}
+              disabled={isPageAiLoading && !isLoadingThisRow} // Disable if any AI is loading, unless it's this row
+            >
+              {isLoadingThisRow ? (
+                <PageLoader className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Sparkles className="mr-2 h-4 w-4" />
+              )}
+              Get Insights
+            </Button>
+          );
+        },
+        meta: { cellClassName: 'min-w-[150px] text-center' } // Adjusted class for centering
       },
       tableStyle.getActionColumn((summaryRow: MonthlyComplianceSummary) => (
         <div className="flex items-center space-x-1">
@@ -407,6 +503,47 @@ export default function ReportNonComplianceGapsOverviewPage() {
         onClose={handleCloseDetailsDialog}
         records={selectedRecordsForDetails}
       />
+
+      {/* Page-Level AI Response Dialog */}
+      {isPageAiResponseDialogOpen && (
+        <PageAiDialog open={isPageAiResponseDialogOpen} onOpenChange={setIsPageAiResponseDialogOpen}>
+          <PageAiDialogContent className="max-w-lg">
+            <PageAiDialogHeader>
+              <PageAiDialogTitle>AI Assistant Insights for {selectedRowForAi?.month} {selectedRowForAi?.year}</PageAiDialogTitle>
+            </PageAiDialogHeader>
+            <ScrollArea className="max-h-[60vh] p-1 pr-3">
+              <div className="py-4 pr-2 space-y-4">
+                {pageAiResponse ? (
+                  <>
+                    <div>
+                      <h4 className="font-semibold mb-1 text-foreground">Summary:</h4>
+                      <p className="text-sm text-muted-foreground whitespace-pre-wrap">{pageAiResponse.summary}</p>
+                    </div>
+                    {pageAiResponse.recommendations && pageAiResponse.recommendations.length > 0 && (
+                      <div>
+                        <h4 className="font-semibold mb-1 text-foreground">Recommendations:</h4>
+                        <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
+                          {pageAiResponse.recommendations.map((rec, index) => (
+                            <li key={index}>{rec}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    {(pageAiResponse.recommendations?.length === 0 && !pageAiResponse.summary.startsWith("Failed") && !pageAiResponse.summary.startsWith("Could not")) && (
+                       <p className="text-sm text-muted-foreground">No specific recommendations provided for this analysis.</p>
+                    )}
+                  </>
+                ) : (
+                  <p className="text-sm text-muted-foreground">Loading insights...</p>
+                )}
+              </div>
+            </ScrollArea>
+            <PageAiDialogFooter className="pt-4 border-t">
+              <Button onClick={() => setIsPageAiResponseDialogOpen(false)}>Close</Button>
+            </PageAiDialogFooter>
+          </PageAiDialogContent>
+        </PageAiDialog>
+      )}
     </PageContainer>
   );
 }

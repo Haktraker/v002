@@ -27,9 +27,10 @@ import {
   StatusType
 } from '@/lib/api/endpoints/reports/non-compliance-gaps-overview';
 import { toast } from 'sonner';
-import { Loader2, PlusCircle, XCircle } from 'lucide-react';
+import { Loader2, PlusCircle, XCircle, Sparkles } from 'lucide-react';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { MONTHS } from '@/lib/constants/months-list';
+import { ChatService } from '@/lib/api/chat-service';
 
 interface NonComplianceGapsOverviewEditDialogProps {
   isOpen: boolean;
@@ -59,6 +60,11 @@ export function NonComplianceGapsOverviewEditDialog({
   const [formData, setFormData] = useState<Partial<Omit<UpdateReportNonComplianceGapsOverviewDto, 'details'>>>({});
   const [details, setDetails] = useState<NonComplianceGapDetailItem[]>([]);
   const updateMutation = useUpdateReportNonComplianceGapsOverview();
+
+  // State for AI Chatbot Interaction
+  const [isAiResponseDialogOpen, setIsAiResponseDialogOpen] = useState(false);
+  const [aiResponse, setAiResponse] = useState<{ summary: string; recommendations: string[] } | null>(null);
+  const [isAiLoading, setIsAiLoading] = useState(false);
 
   useEffect(() => {
     if (reportToEdit) {
@@ -150,8 +156,75 @@ export function NonComplianceGapsOverviewEditDialog({
     }
   };
 
+  const handleAskAi = async () => {
+    if (!reportToEdit && Object.keys(formData).length === 0 && details.length === 0) {
+      toast.error("No data to analyze. Please fill in some report details first.");
+      return;
+    }
+    
+    setIsAiLoading(true);
+    const currentReportData = {
+      ...reportToEdit,
+      ...formData,
+      details: details.map(({ _id, ...item }) => item),
+    };
+
+    try {
+      const rawResponseString = await ChatService.sendPrompt(currentReportData);
+      let parsedAiResponse: { summary: string; recommendations: string[] } | null = null;
+
+      if (typeof rawResponseString === 'string') {
+        try {
+          parsedAiResponse = JSON.parse(rawResponseString);
+        } catch (parseError) {
+          console.error("AI response JSON parsing error:", parseError, "Raw response:", rawResponseString);
+          toast.error("Failed to parse AI assistant's response.");
+          setAiResponse({ summary: "Could not understand the AI's response. It was not valid JSON.", recommendations: [] });
+          setIsAiResponseDialogOpen(true);
+          setIsAiLoading(false); // Ensure loading is stopped
+          return; // Exit if parsing fails
+        }
+      } else if (typeof rawResponseString === 'object' && rawResponseString !== null && typeof (rawResponseString as any).summary === 'string' && Array.isArray((rawResponseString as any).recommendations)){
+        // Fallback if it was already an object (less likely based on the error, but safe to check)
+        parsedAiResponse = rawResponseString as { summary: string; recommendations: string[] };
+      } else {
+        // If it's neither a string nor the expected object structure directly
+        console.error("AI response was not a string or a valid object:", rawResponseString);
+        toast.error("Received an invalid response type from the AI assistant.");
+        setAiResponse({ summary: "The AI assistant provided a response in an unknown format.", recommendations: [] });
+        setIsAiResponseDialogOpen(true);
+        setIsAiLoading(false); // Ensure loading is stopped
+        return;
+      }
+
+      if (parsedAiResponse && typeof parsedAiResponse.summary === 'string' && Array.isArray(parsedAiResponse.recommendations)) {
+        setAiResponse(parsedAiResponse);
+        setIsAiResponseDialogOpen(true);
+      } else {
+        console.error("Parsed AI response format unexpected:", parsedAiResponse, "Original raw string:", rawResponseString);
+        toast.error("Received an unexpected response structure from the AI assistant after parsing.");
+        setAiResponse({ summary: "Could not retrieve a valid analysis. The response data structure was unexpected.", recommendations: [] });
+        setIsAiResponseDialogOpen(true);
+      }
+    } catch (error) {
+      console.error("Error asking AI:", error);
+      let errorMessage = "Failed to get insights from Haktrak AI.";
+      if (error instanceof Error && error.message.includes("User not authenticated")) {
+        errorMessage = "Authentication error. Please log in again to use the AI assistant.";
+      } else if (error instanceof Error && error.message.includes("Chat service is not configured")) {
+         errorMessage = "AI assistant is not configured. Please contact support.";
+      }
+      toast.error(errorMessage);
+      // Optionally, set a specific error message in aiResponse to display in the dialog
+      setAiResponse({ summary: errorMessage, recommendations: ["Please check your connection or try again later."] });
+      setIsAiResponseDialogOpen(true); 
+    } finally {
+      setIsAiLoading(false);
+    }
+  };
+
   const handleInteractOutside = (event: Event) => {
-    if (updateMutation.isPending) {
+    if (updateMutation.isPending || isAiLoading) { // Prevent closing if AI is also loading
       event.preventDefault();
     }
   };
@@ -273,18 +346,63 @@ export function NonComplianceGapsOverviewEditDialog({
           </div>
           </ScrollArea>
           <DialogFooter className="pt-4 border-t mt-2">
+            <Button type="button" variant="outline" onClick={handleAskAi} disabled={updateMutation.isPending || isAiLoading}>
+              {isAiLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+              Ask Haktrak AI
+            </Button>
+            <div className="flex-grow" /> {/* Spacer */}
             <DialogClose asChild>
-              <Button type="button" variant="outline" disabled={updateMutation.isPending}>
+              <Button type="button" variant="outline" disabled={updateMutation.isPending || isAiLoading}>
                 Cancel
               </Button>
             </DialogClose>
-            <Button type="submit" disabled={updateMutation.isPending}>
-              {updateMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            <Button type="submit" disabled={updateMutation.isPending || isAiLoading}>
+              {(updateMutation.isPending) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Save Changes
             </Button>
           </DialogFooter>
         </form>
       </DialogContent>
+      {/* AI Response Dialog */}
+      {isAiResponseDialogOpen && (
+        <Dialog open={isAiResponseDialogOpen} onOpenChange={setIsAiResponseDialogOpen}>
+          <DialogContent className="max-w-lg">
+            <DialogHeader>
+              <DialogTitle>AI Assistant Insights</DialogTitle>
+            </DialogHeader>
+            <ScrollArea className="max-h-[60vh] p-1 pr-3">
+              <div className="py-4 pr-2 space-y-4">
+                {aiResponse ? (
+                  <>
+                    <div>
+                      <h4 className="font-semibold mb-1 text-foreground">Summary:</h4>
+                      <p className="text-sm text-muted-foreground whitespace-pre-wrap">{aiResponse.summary}</p>
+                    </div>
+                    {aiResponse.recommendations && aiResponse.recommendations.length > 0 && (
+                      <div>
+                        <h4 className="font-semibold mb-1 text-foreground">Recommendations:</h4>
+                        <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
+                          {aiResponse.recommendations.map((rec, index) => (
+                            <li key={index}>{rec}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    {(aiResponse.recommendations?.length === 0 && !aiResponse.summary.startsWith("Failed") && !aiResponse.summary.startsWith("Could not")) && (
+                       <p className="text-sm text-muted-foreground">No specific recommendations provided for this analysis.</p>
+                    )}
+                  </>
+                ) : (
+                  <p className="text-sm text-muted-foreground">Loading insights...</p>
+                )}
+              </div>
+            </ScrollArea>
+            <DialogFooter className="pt-4 border-t">
+              <Button onClick={() => setIsAiResponseDialogOpen(false)}>Close</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
     </Dialog>
   );
 }

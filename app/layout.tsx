@@ -3,6 +3,7 @@ import type { Metadata } from "next"
 import ClientLayout from "./client"
 import { QueryProvider } from "@/providers/query-client"
 import { LoadingProvider } from "@/lib/context/loading-context"
+import ChatWidget from '@/components/ChatWidget'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -25,6 +26,7 @@ export default function RootLayout({
             <ClientLayout>{children}</ClientLayout>
           </LoadingProvider>
         </QueryProvider>
+        <ChatWidget />
       </body>
     </html>
   )
