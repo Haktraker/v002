@@ -209,11 +209,6 @@ const ReportsDigitalRiskIntelligencePage = () => {
     manualFiltering: true, // Add if API handles filtering
   });
 
-  // Handle API-driven pagination changes
-  useEffect(() => {
-    table.setPageSize(pageSize); // Sync table state if pageSize changes
-  }, [pageSize, table]);
-
   useEffect(() => {
     // This effect handles refetching if current page becomes invalid after deletion, similar to previous logic
     const totalPages = apiResponse?.pagination?.totalPages ?? 0;
@@ -257,8 +252,50 @@ const ReportsDigitalRiskIntelligencePage = () => {
       {/* Render table using useTableStyle hook */}
       {tableStyle.renderTable(table)}
       
-      {/* Render pagination using useTableStyle hook */}
-      {tableStyle.Pagination({ table })}
+      {/* Replace or augment tableStyle.Pagination with manual controls for server-side pagination */}
+      <div className="flex items-center justify-end space-x-2 py-4">
+        <div className="flex-1 text-sm text-muted-foreground">
+          {table.getFilteredSelectedRowModel().rows.length} of{" "}
+          {table.getCoreRowModel().rows.length} row(s) selected. 
+          (Displaying {table.getRowModel().rows.length} rows on this page)
+        </div>
+        <div className="space-x-2">
+            <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+            disabled={currentPage === 1 || isLoading || deleteMutation.isPending}
+            >
+            Previous
+            </Button>
+            <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage(prev => prev + 1)}
+            disabled={currentPage >= (apiResponse?.pagination?.totalPages ?? 0) || isLoading || deleteMutation.isPending}
+            >
+            Next
+            </Button>
+        </div>
+        <span className="text-sm">
+          Page {currentPage} of {apiResponse?.pagination?.totalPages ?? 0}
+        </span>
+         <select
+            value={pageSize}
+            onChange={e => {
+                setPageSize(Number(e.target.value));
+                setCurrentPage(1); // Reset to first page on page size change
+            }}
+            className="p-2 border rounded-md text-sm bg-background text-foreground"
+            disabled={isLoading || deleteMutation.isPending}
+            >
+            {[10, 20, 30, 40, 50].map(size => (
+                <option key={size} value={size}>
+                Show {size}
+                </option>
+            ))}
+        </select>
+      </div>
 
       {/* Render bulk delete dialog using useTableStyle hook */}
       {tableStyle.BulkDeleteDialog()}

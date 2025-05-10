@@ -56,14 +56,14 @@ export const useGetReportsDigitalRiskIntelligenceById = (id: string) => {
 export const useCreateReportsDigitalRiskIntelligence = () => {
   const queryClient = useQueryClient();
   const { withLoading } = useApiLoading();
-  return useMutation<ReportsDigitalRiskIntelligence, Error, CreateReportsDigitalRiskIntelligenceDto>({ 
+  return useMutation<ReportsDigitalRiskIntelligence, Error, CreateReportsDigitalRiskIntelligenceDto>({
     mutationFn: async (newData: CreateReportsDigitalRiskIntelligenceDto) => {
       const response = await withLoading(() => apiClient.post<ApiResponse<ReportsDigitalRiskIntelligence>>(BASE_URL, newData));
       return response.data.data;
     },
     onSuccess: () => {
       showToast('Digital Risk Intelligence record created successfully', 'success'); 
-      queryClient.invalidateQueries({ queryKey: REPORTS_DIGITAL_RISK_INTELLIGENCE_KEYS.lists() });
+      queryClient.invalidateQueries({ queryKey: [REPORTS_DIGITAL_RISK_INTELLIGENCE_KEYS.lists()[0]] });
     },
     onError: (error: any) => {
       console.error('Failed to create record:', error);
@@ -76,7 +76,7 @@ export const useCreateReportsDigitalRiskIntelligence = () => {
 export const useUpdateReportsDigitalRiskIntelligence = () => {
   const queryClient = useQueryClient();
   const { withLoading } = useApiLoading();
-  return useMutation<ReportsDigitalRiskIntelligence, Error, UpdateReportsDigitalRiskIntelligenceDto & { id: string }>({ 
+  return useMutation<ReportsDigitalRiskIntelligence, Error, UpdateReportsDigitalRiskIntelligenceDto & { id: string }>({
     mutationFn: async ({ id, ...updateData }: UpdateReportsDigitalRiskIntelligenceDto & { id: string }) => {
       const response = await withLoading(() => apiClient.patch<ApiResponse<ReportsDigitalRiskIntelligence>>(`${BASE_URL}/${id}`, updateData));
       return response.data.data;
@@ -84,7 +84,7 @@ export const useUpdateReportsDigitalRiskIntelligence = () => {
     onSuccess: (_, variables) => {
       showToast('Digital Risk Intelligence record updated successfully', 'success'); 
       queryClient.invalidateQueries({ queryKey: REPORTS_DIGITAL_RISK_INTELLIGENCE_KEYS.detail(variables.id) });
-      queryClient.invalidateQueries({ queryKey: REPORTS_DIGITAL_RISK_INTELLIGENCE_KEYS.lists() });
+      queryClient.invalidateQueries({ queryKey: [REPORTS_DIGITAL_RISK_INTELLIGENCE_KEYS.lists()[0]] });
     },
     onError: (error: any) => {
       console.error('Failed to update record:', error);
@@ -97,7 +97,7 @@ export const useUpdateReportsDigitalRiskIntelligence = () => {
 export const useDeleteReportsDigitalRiskIntelligence = () => {
   const queryClient = useQueryClient();
   const { withLoading } = useApiLoading();
-  return useMutation<ApiResponse<null>, Error, string>({ 
+  return useMutation<ApiResponse<null>, Error, string>({
     mutationFn: async (id: string) => {
       const response = await withLoading(() => apiClient.delete<ApiResponse<null>>(`${BASE_URL}/${id}`));
       return response.data;
@@ -105,7 +105,7 @@ export const useDeleteReportsDigitalRiskIntelligence = () => {
     onSuccess: (_, id) => {
       showToast('Digital Risk Intelligence record deleted successfully', 'success'); 
       queryClient.removeQueries({ queryKey: REPORTS_DIGITAL_RISK_INTELLIGENCE_KEYS.detail(id) });
-      queryClient.invalidateQueries({ queryKey: REPORTS_DIGITAL_RISK_INTELLIGENCE_KEYS.lists() });
+      queryClient.invalidateQueries({ queryKey: [REPORTS_DIGITAL_RISK_INTELLIGENCE_KEYS.lists()[0]] });
     },
     onError: (error: any) => {
       console.error('Failed to delete record:', error);
