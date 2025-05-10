@@ -280,3 +280,40 @@ export interface ReportThirdPartyThreatIntelligenceQueryParams {
   month?: string;
 
 }
+
+
+
+// ================= Supply Chain Threat Exposure Types =================
+
+
+export interface SupplyChainThreatExposure {
+    _id: string;
+    chain: string;
+    severity: SeverityLevel;
+    month?: string;
+    year?: string;
+    createdAt?: string;
+    updatedAt?: string;
+  }
+  
+  export interface SupplyChainThreatExposureQueryParams {
+    month?: string;
+    year?: string;
+    chain?: string;
+    severity?: SeverityLevel;
+    // Add other potential query params here, e.g., sortBy, limit, page
+  }
+  
+  export interface CreateSupplyChainThreatExposureDto {
+    chain: string;
+    severity: SeverityLevel;
+    month?: string;
+    year?: string;
+  }
+  
+  export interface UpdateSupplyChainThreatExposureDto {
+    chain?: string;
+    severity?: SeverityLevel;
+    month?: string;
+    year?: string;
+  }

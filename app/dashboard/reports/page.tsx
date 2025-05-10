@@ -13,6 +13,7 @@ import NonComplianceGapsOverviewChart from '@/components/dashboard/reports/non-c
 import ReportsDigitalRiskIntelligenceChart from '@/components/dashboard/reports/digital-risk-intelligence-chart';
 import ReportTtdTtrChart from '@/components/dashboard/report-ttd-ttr-chart';
 import ReportThirdPartyThreatIntelligenceChart from '@/components/dashboard/reports/report-third-party-threat-intelligence-chart';
+import SupplyChainThreatExposureChart from '@/components/dashboard/reports/supply-chain-threat-exposure-chart';
 // Import other necessary components for the reports page here
 
 export default function ReportsPage() {
@@ -51,6 +52,9 @@ export default function ReportsPage() {
        </div>
        <div>
         <ReportThirdPartyThreatIntelligenceChart />
+       </div>
+       <div>
+        <SupplyChainThreatExposureChart />
        </div>
        <div className="col-span-full">
         <ThreatCompositionOverviewChart />
