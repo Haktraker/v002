@@ -38,7 +38,7 @@ const ReportsIncidentAlertVolumeChart = () => {
   // Prepare chart data
   const chartData = useMemo(() => {
     if (!apiResponse?.data || apiResponse.data.length === 0) {
-      return { categories: [], seriesData: [] };
+      return { categories: [], series: [] };
     }
 
     // Sort data by year then month
@@ -47,77 +47,95 @@ const ReportsIncidentAlertVolumeChart = () => {
     const categories = sortedData.map(item => `${item.month.substring(0, 3)} ${item.year}`);
     const seriesData = sortedData.map(item => parseInt(item.score || '0', 10)); // Convert score string to number
 
-    return { categories, seriesData };
+    return {
+      categories,
+      series: [{ name: 'Volume', data: seriesData }]
+    };
   }, [apiResponse?.data]);
 
   // --- Chart Configuration (Bar Chart Example) ---
   const chartOptions: ApexCharts.ApexOptions = useMemo(() => ({
     chart: {
-      type: 'bar',
+      type: 'area',
       height: 350,
       toolbar: {
         show: false,
       },
       background: 'transparent',
-    },
-    plotOptions: {
-      bar: {
-        horizontal: false,
-        columnWidth: '55%',
-        // endingShape: 'rounded',
-      },
+      foreColor: isDark ? '#f8fafc' : '#334155',
+      zoom: { enabled: false },
     },
     dataLabels: {
       enabled: false,
     },
     stroke: {
-      show: true,
-      width: 2,
-      colors: ['transparent'],
+      curve: 'smooth',
     },
     xaxis: {
+      type: 'category',
       categories: chartData.categories,
       labels: {
         style: {
           colors: isDark ? '#9ca3af' : '#6b7280',
+          fontSize: '12px',
+          fontFamily: 'inherit',
         },
       },
+      axisBorder: { color: isDark ? '#374151' : '#e5e7eb' },
+      axisTicks: { color: isDark ? '#374151' : '#e5e7eb' },
     },
     yaxis: {
       title: {
-        text: 'Volume',
+        text: 'Volume / Score',
         style: {
           color: isDark ? '#9ca3af' : '#6b7280',
+          fontSize: '12px',
+          fontWeight: 500,
+          fontFamily: 'inherit',
         },
       },
       labels: {
         style: {
           colors: isDark ? '#9ca3af' : '#6b7280',
+          fontSize: '12px',
+          fontFamily: 'inherit',
         },
+        formatter: (val) => val.toFixed(0)
       },
     },
     fill: {
-      opacity: 1,
-      colors: [isDark ? '#38bdf8' : '#0ea5e9'] // Example color
+      opacity: 0.3,
+      type: 'gradient',
+      gradient: {
+        shadeIntensity: 1,
+        opacityFrom: 0.7,
+        opacityTo: 0.9,
+        stops: [0, 90, 100]
+      },
     },
     tooltip: {
-      shared: true,
-      intersect: false,
+      theme: isDark ? 'dark' : 'light',
+      y: {
+        formatter: function (val) {
+          return val.toFixed(0) + " incidents/alerts";
+        }
+      },
+      style: { fontFamily: 'inherit', fontSize: '12px' }
     },
     grid: {
       show: false,
     },
-    theme: {
-      mode: isDark ? 'dark' : 'light',
+    legend: {
+        show: false
     },
-  }), [isDark, chartData]);
+  }), [isDark, chartData.categories]);
 
   const series = useMemo(() => [
     {
       name: 'Volume',
-      data: chartData.seriesData,
+      data: chartData.series[0]?.data || [],
     },
-  ], [chartData]);
+  ], [chartData.series]);
 
   // --- Render Logic ---
   const renderContent = () => {
@@ -136,14 +154,14 @@ const ReportsIncidentAlertVolumeChart = () => {
     if (!apiResponse?.data || apiResponse.data.length === 0) {
       return (
         <div className="text-center text-muted-foreground py-8">
-          No incident/alert volume data available for the selected period.
+          No volume data available.
         </div>
       );
     }
 
     return (
       <ApexChart
-        type="bar"
+        type="area"
         height={350}
         options={chartOptions}
         series={series}
@@ -152,11 +170,11 @@ const ReportsIncidentAlertVolumeChart = () => {
   };
 
   return (
-    <Card className={isDark ? "bg-card border" : "bg-card"}>
+    <Card className={`flex-1 ${isDark ? "bg-[#171727] border-0" : "bg-white"}`}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <div className="flex flex-col space-y-1.5">
-          <CardTitle className="text-base font-medium">Incident & Alert Volume (Report)</CardTitle>
-          <CardDescription>Monthly volume trend</CardDescription>
+          <CardTitle className="text-base font-medium">Incident & Alert Volume</CardTitle>
+          <CardDescription>Volume trend over selected period</CardDescription>
         </div>
         <Link href="/dashboard/reports/incident-alert-volume"> 
           <Button variant="outline" size="sm">Manage All</Button>
