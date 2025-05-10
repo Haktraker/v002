@@ -22,6 +22,7 @@ import {
   getFilteredRowModel,
   ColumnFiltersState,
   RowSelectionState,
+  FilterFn,
 } from "@tanstack/react-table";
 import { Input } from "@/components/ui/input";
 import { useTableStyle } from '@/hooks/use-table-style';
@@ -46,6 +47,7 @@ export default function ReportsThreatCompositionOverviewPage() {
   // State for Edit Dialog
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedRecordForEdit, setSelectedRecordForEdit] = useState<ReportsThreatCompositionOverview | null>(null);
+  const [globalFilter, setGlobalFilter] = useState('');
 
   const aggregatedData = useMemo(() => {
     if (!rawApiResponse) return [];
@@ -93,6 +95,27 @@ export default function ReportsThreatCompositionOverviewPage() {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [showBulkDeleteDialog, setShowBulkDeleteDialog] = useState(false);
+
+  // --- Custom Global Filter Function ---
+  const customGlobalFilterFn: FilterFn<MonthlyThreatSummary> = (row, columnId, filterValue) => {
+    const searchTerm = String(filterValue).toLowerCase();
+
+    // Check year and month (ensure they are strings before calling toLowerCase)
+    if (String(row.original.year).toLowerCase().includes(searchTerm) ||
+        String(row.original.month).toLowerCase().includes(searchTerm)) {
+      return true;
+    }
+
+    // Check threat types in originalRecords
+    if (row.original.originalRecords) {
+      for (const record of row.original.originalRecords) {
+        if (String(record.threatType).toLowerCase().includes(searchTerm)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  };
 
   // --- Handlers ---
   const handleDelete = async (monthId: string) => {
@@ -255,6 +278,7 @@ export default function ReportsThreatCompositionOverviewPage() {
   const table = useReactTable({
     data: aggregatedData,
     columns,
+    globalFilterFn: customGlobalFilterFn,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -262,10 +286,12 @@ export default function ReportsThreatCompositionOverviewPage() {
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onRowSelectionChange: setRowSelection,
+    onGlobalFilterChange: setGlobalFilter,
     state: {
       sorting,
       columnFilters,
       rowSelection,
+      globalFilter,
     },
   });
 
@@ -281,12 +307,11 @@ export default function ReportsThreatCompositionOverviewPage() {
   return (
     <PageContainer>
       <PageHeader title="Report: Threat Composition Overview Management" />
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-6 mt-6">
         <Input
-          placeholder="Filter by... (update column key)"
-          onChange={(event) => {
-            // Filtering logic will need to target a valid column in MonthlyThreatSummary
-          }}
+          placeholder="Filter by Year, Month, Threat Type..."
+          value={globalFilter ?? ''}
+          onChange={(event) => setGlobalFilter(event.target.value)}
           className="max-w-sm"
         />
         <div className="flex items-center gap-2">
