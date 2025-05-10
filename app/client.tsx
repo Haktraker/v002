@@ -9,6 +9,13 @@ import { Footer } from "@/components/layout/footer"
 import { AuthProvider } from "@/lib/auth/auth-provider"
 import { AOSProvider } from "@/components/aos-provider"
 import { SessionInitializer } from "@/components/session-initializer"
+import dynamic from 'next/dynamic'
+
+// Import AuthChatbot dynamically to avoid SSR issues
+const AuthChatbot = dynamic(() => import('@/components/auth-chatbot'), { 
+  ssr: false,
+  loading: () => null 
+});
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -27,6 +34,7 @@ export default function ClientLayout({
             <Footer />
           </div>
           <SessionInitializer />
+          <AuthChatbot />
         </AOSProvider>
       </AuthProvider>
     </ThemeProvider>

@@ -14,16 +14,6 @@ interface ChatRequestPayload {
   userId: string;
 }
 
-// This response structure is expected by both analysis and conversational (for now)
-interface StandardChatApiResponse {
-  summary: string;
-  recommendations?: string[]; // Optional for purely conversational replies
-  // Potentially other fields the API might return
-}
-
-// The service will return the 'response' part of the API call, which should be stringified JSON
-// that we parse into StandardChatApiResponse in the calling components.
-
 export const ChatService = {
   /**
    * Sends a complex data object to the AI for analysis.
@@ -60,3 +50,5 @@ export const ChatService = {
     }
   },
 }; 
+
+

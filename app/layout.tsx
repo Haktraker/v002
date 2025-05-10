@@ -26,7 +26,7 @@ export default function RootLayout({
             <ClientLayout>{children}</ClientLayout>
           </LoadingProvider>
         </QueryProvider>
-        {/* <ChatWidget /> */}{/* Removed component usage*/}
+        {/* AuthChatbot will only be displayed for authenticated users */}
       </body>
     </html>
   )
