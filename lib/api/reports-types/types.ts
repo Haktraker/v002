@@ -244,3 +244,39 @@ export interface TtdTtrQueryParams {
   year?: string;
 }
   
+
+
+// ================= Third Party Threat Intelligence Types =================
+
+export type SeverityLevel = "low" | "medium" | "high" | "critical";
+
+export interface ReportThirdPartyThreatIntelligence {
+  _id: string;
+  thirdParty: string;
+  severity: SeverityLevel;
+  year: string;
+  month: string;
+  createdAt?: string; // From timestamps: true
+  updatedAt?: string; // From timestamps: true
+}
+
+export interface CreateReportThirdPartyThreatIntelligenceDto {
+  thirdParty: string;
+  severity: SeverityLevel;
+  year: string;
+  month: string;
+}
+
+export interface UpdateReportThirdPartyThreatIntelligenceDto {
+  thirdParty?: string;
+  severity?: SeverityLevel;
+  year?: string;
+  month?: string;
+}
+
+export interface ReportThirdPartyThreatIntelligenceQueryParams {
+  thirdParty?: string;
+  severity?: SeverityLevel;
+  month?: string;
+
+}
