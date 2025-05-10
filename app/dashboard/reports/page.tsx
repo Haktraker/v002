@@ -9,6 +9,7 @@ import { useGetReportsSecurityPostureScores } from '@/lib/api/endpoints/reports/
 import ReportsIncidentAlertVolumeChart from '@/components/dashboard/reports/incident-alert-volume-chart';
 import ThreatCompositionOverviewChart from '@/components/dashboard/reports/threat-composition-overview-chart';
 import ReportsSecurityBreachIndicatorsChart from '@/components/dashboard/reports/security-breach-indicators-chart';
+import NonComplianceGapsOverviewChart from '@/components/dashboard/reports/non-compliance-gaps-overview-chart';
 // Import other necessary components for the reports page here
 
 export default function ReportsPage() {
@@ -35,6 +36,9 @@ export default function ReportsPage() {
        </div>
        <div>
         <ReportsSecurityBreachIndicatorsChart />
+       </div>
+       <div>
+        <NonComplianceGapsOverviewChart />
        </div>
        <div className="col-span-full">
         <ThreatCompositionOverviewChart />
