@@ -62,16 +62,26 @@ function getUserId(): string {
 /**
  * Parse the JSON response from the bot
  * @param responseText The raw response text from the bot
- * @returns The parsed content, extracting only the summary field
+ * @returns The parsed content, including both summary and recommendations
  */
 function parseBotResponse(responseText: string): string {
   try {
     // Try to parse the response as JSON
     const jsonResponse = JSON.parse(responseText) as BotResponseJSON;
     
-    // Extract only the summary field
+    // Format both summary and recommendations in a nice way
     if (jsonResponse && jsonResponse.summary) {
-      return jsonResponse.summary;
+      let formattedResponse = jsonResponse.summary;
+      
+      // Add recommendations if available
+      if (jsonResponse.recommendations && jsonResponse.recommendations.length > 0) {
+        formattedResponse += '\n\n**Recommendations:**\n';
+        jsonResponse.recommendations.forEach((rec, index) => {
+          formattedResponse += `${index + 1}. ${rec}\n`;
+        });
+      }
+      
+      return formattedResponse;
     }
     
     // If no summary field, return the original response
@@ -103,7 +113,6 @@ export async function sendChatRequest(request: ChatRequest): Promise<ChatRespons
         content: lastUserMessage.content
       }
     };
-
     
     const response = await axios.post(
       CHAT_API_URL,
@@ -119,7 +128,7 @@ export async function sendChatRequest(request: ChatRequest): Promise<ChatRespons
     // The backend returns { response: string } where response is a JSON string
     const apiResponse = response.data as AssistantApiResponse;
     
-    // Parse the JSON response and extract only the summary
+    // Parse the JSON response and format both summary and recommendations
     const parsedContent = parseBotResponse(apiResponse.response);
     
     // Convert to our app's expected format
