@@ -282,7 +282,7 @@ export default function ReportNonComplianceGapsOverviewPage() {
     try {
       // We send the MonthlyComplianceSummary object itself, as it contains aggregated scores and originalRecords.
       // The AI prompt in chat-service stringifies this entire object.
-      const rawResponseString = await ChatService.sendPrompt(summaryRow);
+      const rawResponseString = await ChatService.sendAnalysisPrompt(summaryRow);
       let parsedResponse: { summary: string; recommendations: string[] } | null = null;
 
       if (typeof rawResponseString === 'string') {

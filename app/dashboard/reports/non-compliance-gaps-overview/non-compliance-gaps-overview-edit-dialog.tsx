@@ -170,7 +170,7 @@ export function NonComplianceGapsOverviewEditDialog({
     };
 
     try {
-      const rawResponseString = await ChatService.sendPrompt(currentReportData);
+      const rawResponseString = await ChatService.sendAnalysisPrompt(currentReportData);
       let parsedAiResponse: { summary: string; recommendations: string[] } | null = null;
 
       if (typeof rawResponseString === 'string') {

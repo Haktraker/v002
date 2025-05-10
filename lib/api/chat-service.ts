@@ -14,52 +14,49 @@ interface ChatRequestPayload {
   userId: string;
 }
 
-interface ChatResponse {
-  // Define the expected response structure from your chat API
-  // For example:
-  // summary: string;
-  // recommendations: string[];
-  response: any; // Replace 'any' with a more specific type if known
+// This response structure is expected by both analysis and conversational (for now)
+interface StandardChatApiResponse {
+  summary: string;
+  recommendations?: string[]; // Optional for purely conversational replies
+  // Potentially other fields the API might return
 }
 
+// The service will return the 'response' part of the API call, which should be stringified JSON
+// that we parse into StandardChatApiResponse in the calling components.
+
 export const ChatService = {
-  async sendPrompt(model: any): Promise<any> { // Replace 'any' with a more specific type for 'model' and the return type
+  /**
+   * Sends a complex data object to the AI for analysis.
+   * Expects a structured JSON response with summary and recommendations.
+   */
+  async sendAnalysisPrompt(dataForAnalysis: any): Promise<string> { // Returns stringified JSON
     const userId = TokenService.getUserId();
-    console.log("userId", userId);
     if (!userId) {
-      console.error("User ID not found. Cannot send prompt.");
+      console.error("User ID not found. Cannot send analysis prompt.");
       throw new Error("User not authenticated.");
     }
-
     if (!CHAT_API_KEY) {
-      console.error("Chat API key not found.");
+      console.error("Chat API key not found for analysis.");
       throw new Error("Chat service is not configured.");
     }
-    
-    // Construct the payload as per the user's example
+
+    const analysisContent = ` . Please respond with JSON format like {"summary":string, "recommendations":[array of strings]}, analyze this object and Give me a summary and recommendations about: ${JSON.stringify(
+      dataForAnalysis
+    )}`;
+
     const payload: ChatRequestPayload = {
-      messages: {
-        role: "user",
-        content: ` . Please respond with JSON format like {"summary":string, "recommendations":[array of strings]}, analyze this object and Give me a summary and recommendations about: ${JSON.stringify(
-          model
-        )}`,
-      },
+      messages: { role: "user", content: analysisContent },
       userId: userId,
     };
 
     try {
-      const response = await apiClient.post<ChatResponse>(CHAT_API_URL, payload, {
-        headers: {
-          // Assuming the chat API key needs to be sent as a header.
-          // Adjust if it needs to be sent differently (e.g., in the body or as a query param).
-          'Authorization': `Bearer ${CHAT_API_KEY}`, // Or your specific auth scheme for the chat API
-          // 'X-Api-Key': CHAT_API_KEY, // Another common way to send API keys
-        }
+      const response = await apiClient.post<{ response: string }>(CHAT_API_URL, payload, {
+        headers: { 'Authorization': `Bearer ${CHAT_API_KEY}` },
       });
-      return response.data.response; // Or however the actual reply is structured
+      return response.data.response; // This is expected to be a stringified JSON
     } catch (error: any) {
-      console.error("Error sending prompt to chat API:", error.response?.data || error.message);
-      throw new Error("Failed to get response from chat assistant.");
+      console.error("Error sending analysis prompt to chat API:", error.response?.data || error.message);
+      throw new Error("Failed to get analysis from AI assistant.");
     }
   },
 }; 
