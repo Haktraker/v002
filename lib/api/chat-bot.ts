@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { toast } from 'sonner';
 
 // Constants
 const CHAT_API_URL = `${process.env.NEXT_PUBLIC_CHAT_BASE_URL}/chat`;
@@ -77,7 +78,6 @@ function parseBotResponse(responseText: string): string {
     return responseText;
   } catch (error) {
     // If parsing fails, return the original response
-    console.warn('Failed to parse bot response as JSON:', error);
     return responseText;
   }
 }
@@ -104,7 +104,6 @@ export async function sendChatRequest(request: ChatRequest): Promise<ChatRespons
       }
     };
 
-    console.log("Sending request to backend:", assistantRequest);
     
     const response = await axios.post(
       CHAT_API_URL,
@@ -131,7 +130,7 @@ export async function sendChatRequest(request: ChatRequest): Promise<ChatRespons
       }
     };
   } catch (error) {
-    console.error('Error sending chat request:', error);
+    toast.error(`Error sending chat request: ${error}`);
     
     // Return a graceful error message instead of throwing
     return {
@@ -161,7 +160,7 @@ export async function sendMessage(messages: Message[]): Promise<Message> {
     const response = await sendChatRequest(chatRequest);
     return response.message;
   } catch (error) {
-    console.error('Error in sendMessage:', error);
+    toast.error(`Error in sendMessage: ${error}`);
     return {
       role: 'assistant',
       content: 'Sorry, I encountered an error. Please try again later.'
