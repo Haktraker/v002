@@ -206,3 +206,41 @@ export interface CreateReportsDigitalRiskIntelligenceDto {
 export interface UpdateReportsDigitalRiskIntelligenceDto extends Partial<CreateReportsDigitalRiskIntelligenceDto> {}
 
 // Add other report-specific types below this line
+
+
+
+
+
+// ================= TTD/TTR Types =================
+
+export type TtdTtrIndicator = "TTD" | "TTR";
+
+export interface TtdTtr {
+  _id: string;
+  month: string;
+  year: string;
+  score: string; // Represents time (e.g., in hours or days), consider number if calculations needed
+  indicator: TtdTtrIndicator;
+createdAt?: string; // From timestamps: true
+  updatedAt?: string; // From timestamps: true
+}
+
+export interface CreateTtdTtrDto {
+  month: string;
+  year: string;
+  score: string;
+  indicator: TtdTtrIndicator;
+}
+
+export interface UpdateTtdTtrDto {
+  month?: string;
+  year?: string;
+  score?: string;
+  indicator?: TtdTtrIndicator;
+}
+
+export interface TtdTtrQueryParams {
+  month?: string;
+  year?: string;
+}
+  
