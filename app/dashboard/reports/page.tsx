@@ -26,7 +26,7 @@ export default function ReportsPage() {
       <GlobalFilterComponent />
       
       {/* Grid layout for report components */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mt-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-4">
        <div>
         <ReportsSecurityPostureScoreChart data={securityPostureScoreData?.data} isLoading={isSecurityPostureScoreLoading} error={securityPostureScoreError}/>
        </div>
@@ -36,9 +36,9 @@ export default function ReportsPage() {
        <div>
         <ReportsSecurityBreachIndicatorsChart />
        </div>
-    <div className='col-span-3'>
+       <div className="col-span-full">
         <ThreatCompositionOverviewChart />
-    </div>
+       </div>
       </div>
     </PageContainer>
   );
